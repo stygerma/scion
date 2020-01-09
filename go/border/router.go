@@ -110,6 +110,12 @@ func (r *Router) handleSock(s *rctx.Sock, stop, stopped chan struct{}) {
 		for i := 0; i < n; i++ {
 			rp := pkts[i].(*rpkt.RtrPkt)
 			r.processPacket(rp)
+<<<<<<< d2493eb93b223bf63c5f2c4fb7987f15a4b743bd
+=======
+			// the packet might still be queued so we can't release it here.
+			// it is released in forwardPacket
+			// rp.Release()
+>>>>>>> Move forwarding into its own function
 			pkts[i] = nil
 		}
 	}
@@ -201,3 +207,4 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 	}
 }
+
