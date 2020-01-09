@@ -100,7 +100,9 @@ func (r *Router) handleSock(s *rctx.Sock, stop, stopped chan struct{}) {
 		for i := 0; i < n; i++ {
 			rp := pkts[i].(*rpkt.RtrPkt)
 			r.processPacket(rp)
-			rp.Release()
+			// the packet might still be queued so we can't release it here.
+			// it is released in forwardPacket
+			// rp.Release()
 			pkts[i] = nil
 		}
 	}
@@ -169,9 +171,24 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		return
 	}
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
-	if err := rp.Route(); err != nil {
-		r.handlePktError(rp, err, "Error routing packet")
-		l.Result = metrics.ErrRoute
-		metrics.Process.Pkts(l).Inc()
-	}
+	// if err := rp.Route(); err != nil {
+	// 	r.handlePktError(rp, err, "Error routing packet")
+	// 	l.Result = metrics.ErrRoute
+	// 	metrics.Process.Pkts(l).Inc()
+	// }
+
+	r.forwardPacket(rp);
 }
+
+func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
+
+	defer rp.Release();
+
+		// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
+		if err := rp.Route(); err != nil {
+			r.handlePktError(rp, err, "Error routing packet")
+			// l.Result = metrics.ErrRoute
+			// metrics.Process.Pkts(l).Inc()
+		}
+}
+
