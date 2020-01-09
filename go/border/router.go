@@ -18,7 +18,9 @@
 package main
 
 import (
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/scionproto/scion/go/border/brconf"
 	"github.com/scionproto/scion/go/border/internal/metrics"
@@ -50,6 +52,14 @@ type Router struct {
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
 }
+
+var (
+	ticker = 0
+	queue  []rpkt.RtrPkt
+
+	fastQueue []*rpkt.RtrPkt
+	slowQueue []*rpkt.RtrPkt
+)
 
 func NewRouter(id, confDir string) (*Router, error) {
 	r := &Router{Id: id, confDir: confDir}
@@ -177,18 +187,72 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	// 	metrics.Process.Pkts(l).Inc()
 	// }
 
-	r.forwardPacket(rp);
+	r.queuePacket(rp)
+	// r.forwardPacket(rp);
 }
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 
-	defer rp.Release();
+	defer rp.Release()
 
-		// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
-		if err := rp.Route(); err != nil {
-			r.handlePktError(rp, err, "Error routing packet")
-			// l.Result = metrics.ErrRoute
-			// metrics.Process.Pkts(l).Inc()
-		}
+	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
+	if err := rp.Route(); err != nil {
+		r.handlePktError(rp, err, "Error routing packet")
+		// l.Result = metrics.ErrRoute
+		// metrics.Process.Pkts(l).Inc()
+	}
 }
 
+func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
+
+	log.Debug("preRouteStep")
+
+	// Put packets destined for 1-ff00:0:110 on the slow queue
+	// Put all other packets from br2 on a faster queue but still delayed
+
+	if strings.Contains(r.Id, "br2-ff00_0_212") {
+		log.Debug("It's me br2-ff00_0_212")
+
+		dstAddr, _ := rp.DstIA()
+		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {
+			log.Debug("It's destined for 1-ff00:0:110")
+			slowQueue = append(slowQueue, rp)
+
+			if len(slowQueue) >= 5 {
+				log.Debug("Start dequeue, but nap first")
+				time.Sleep(10 * time.Millisecond)
+				for len(slowQueue) > 0 {
+					log.Debug("Dequeue length %d", len(slowQueue), nil)
+					irp := slowQueue[0]
+					slowQueue = slowQueue[1:]
+					log.Debug("Routing delayed packet", irp)
+					r.forwardPacket(irp)
+				}
+			}
+		} else {
+
+			fastQueue = append(fastQueue, rp)
+
+			if len(fastQueue) >= 0 {
+				log.Debug("Start dequeue, but nap first")
+				time.Sleep(0 * time.Millisecond)
+				for len(fastQueue) > 0 {
+					log.Debug("Dequeue length %d", len(fastQueue), nil)
+					irp := fastQueue[0]
+					fastQueue = fastQueue[1:]
+					// _ = irp
+					log.Debug("Routing delayed packet", irp)
+					r.forwardPacket(irp)
+				}
+			}
+
+		}
+
+	} else {
+		log.Debug("In fact I am")
+		log.Debug("", r.Id, nil)
+		// r.processPacket(rp)
+		r.forwardPacket(rp)
+	}
+
+}
