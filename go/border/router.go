@@ -18,7 +18,9 @@
 package main
 
 import (
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/scionproto/scion/go/border/brconf"
 	"github.com/scionproto/scion/go/border/internal/metrics"
@@ -106,12 +108,6 @@ func (r *Router) handleSock(s *rctx.Sock, stop, stopped chan struct{}) {
 		for i := 0; i < n; i++ {
 			rp := pkts[i].(*rpkt.RtrPkt)
 			r.processPacket(rp)
-<<<<<<< d2493eb93b223bf63c5f2c4fb7987f15a4b743bd
-=======
-			// the packet might still be queued so we can't release it here.
-			// it is released in forwardPacket
-			// rp.Release()
->>>>>>> Move forwarding into its own function
 			pkts[i] = nil
 		}
 	}
@@ -198,3 +194,56 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	}
 }
 
+func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
+
+	log.Debug("preRouteStep")
+
+	// Put packets destined for 1-ff00:0:110 on the slow queue
+	// Put all other packets from br2 on a faster queue but still delayed
+
+	if strings.Contains(r.Id, "br2-ff00_0_212") {
+		log.Debug("It's me br2-ff00_0_212")
+
+		dstAddr, _ := rp.DstIA()
+		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {
+			log.Debug("It's destined for 1-ff00:0:110")
+			slowQueue = append(slowQueue, rp)
+
+			if len(slowQueue) >= 5 {
+				log.Debug("Start dequeue, but nap first")
+				time.Sleep(10 * time.Millisecond)
+				for len(slowQueue) > 0 {
+					log.Debug("Dequeue length %d", len(slowQueue), nil)
+					irp := slowQueue[0]
+					slowQueue = slowQueue[1:]
+					log.Debug("Routing delayed packet", irp)
+					r.forwardPacket(irp)
+				}
+			}
+		} else {
+
+			fastQueue = append(fastQueue, rp)
+
+			if len(fastQueue) >= 0 {
+				log.Debug("Start dequeue, but nap first")
+				time.Sleep(0 * time.Millisecond)
+				for len(fastQueue) > 0 {
+					log.Debug("Dequeue length %d", len(fastQueue), nil)
+					irp := fastQueue[0]
+					fastQueue = fastQueue[1:]
+					// _ = irp
+					log.Debug("Routing delayed packet", irp)
+					r.forwardPacket(irp)
+				}
+			}
+
+		}
+
+	} else {
+		log.Debug("In fact I am")
+		log.Debug("", r.Id, nil)
+		// r.processPacket(rp)
+		r.forwardPacket(rp)
+	}
+
+}
