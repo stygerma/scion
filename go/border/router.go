@@ -73,6 +73,8 @@ type classRule struct {
 type packetQueue struct {
 	// Id string
 
+	mutex *sync.Mutex
+
 	queue     	[]*rpkt.RtrPkt
 	maxLength 	int
 	priority  	int
@@ -94,9 +96,10 @@ func NewRouter(id, confDir string) (*Router, error) {
 		return nil, err
 	}
 
-	que := packetQueue{maxLength: 2, priority: 0}
-
+	que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}}
 	r.queues = append(r.queues, que)
+
+	que = packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}}
 	r.queues = append(r.queues, que)
 
 	rul := classRule{sourceAs: "br2-ff00_0_212", destinationAs: "1-ff00:0:110", queueNumber: 0}
@@ -116,6 +119,9 @@ func (r *Router) Start() {
 	go func() {
 		defer log.LogPanicAndExit()
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
+	}()
+	go func() {
+		r.dequeuer();
 	}()
 	if err := r.startDiscovery(); err != nil {
 		fatal.Fatal(common.NewBasicError("Unable to start discovery", err))
@@ -243,17 +249,23 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	}
 }
 
+func (r *Router) dequeue(i int) {
+
+	r.queues[i].mutex.Lock()
+	defer r.queues[i].mutex.Unlock()
+
+	for len(r.queues[i].queue) > 0 {
+		r.forwardPacket(r.queues[i].queue[0])
+		r.queues[i].queue = r.queues[i].queue[1:]
+	}
+
+}
+
 func (r *Router) dequeuer() {
 
 	i := 0
 	for {
-		if(len(r.queues[i].queue) > r.queues[i].maxLength) {
-			for len(r.queues[i].queue) > 0 {
-				r.forwardPacket(r.queues[i].queue[0])
-				r.queues[i].queue = r.queues[i].queue[1:]
-			}
-		}
-
+		r.dequeue(i)
 		i = (i + 1) % len(r.queues)
 		time.Sleep(2 * time.Millisecond)
 	}
@@ -272,43 +284,24 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 		dstAddr, _ := rp.DstIA()
 		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {
 			log.Debug("It's destined for 1-ff00:0:110")
+			r.queues[0].mutex.Lock()
 			r.queues[0].queue = append(r.queues[0].queue, rp)
+			r.queues[0].mutex.Unlock()
 
-			if len(r.queues[0].queue) >= r.queues[0].maxLength {
-				log.Debug("Start dequeue, but nap first")
-				time.Sleep(0 * time.Millisecond)
-				for len(r.queues[0].queue) > 0 {
-					log.Debug("Dequeue length %d", len(r.queues[0].queue), nil)
-					irp := r.queues[0].queue[0]
-					r.queues[0].queue = r.queues[0].queue[1:]
-					log.Debug("Routing delayed packet", irp)
-					r.forwardPacket(irp)
-				}
-			}
 		} else {
 
+			r.queues[1].mutex.Lock()
 			r.queues[1].queue = append(r.queues[1].queue, rp)
-
-			if len(r.queues[1].queue) >= 0 {
-				log.Debug("Start dequeue, but nap first")
-				time.Sleep(0 * time.Millisecond)
-				for len(r.queues[1].queue) > 0 {
-					log.Debug("Dequeue length %d", len(r.queues[1].queue), nil)
-					irp := r.queues[1].queue[0]
-					r.queues[1].queue = r.queues[1].queue[1:]
-					// _ = irp
-					log.Debug("Routing delayed packet", irp)
-					r.forwardPacket(irp)
-				}
-			}
+			r.queues[1].mutex.Unlock()
 
 		}
 
 	} else {
 		log.Debug("In fact I am")
 		log.Debug("", r.Id, nil)
-		// r.processPacket(rp)
-		r.forwardPacket(rp)
+		r.queues[1].mutex.Lock()
+		r.queues[1].queue = append(r.queues[1].queue, rp)
+		r.queues[1].mutex.Unlock()
 	}
 
 }
