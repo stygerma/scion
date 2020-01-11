@@ -37,6 +37,7 @@ import (
 
 const processBufCnt = 128
 
+// Router struct
 type Router struct {
 	// Id is the SCION element ID, e.g. "br4-ff00:0:2f".
 	Id string
@@ -51,21 +52,54 @@ type Router struct {
 	// setCtxMtx serializes modifications to the router context. Topology updates
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
+
+	queues []packetQueue
+	rules []classRule
 }
+
+// Rule contains a rule for matching packets
+type classRule struct {
+	// This is currently means the ID of the sending border router
+	sourceAs    	string
+	nextHopAs		string
+	destinationAs	string
+	queueNumber 	int
+}
+
+// Queue is a single queue
+type packetQueue struct {
+	// Id string
+
+	queue     	[]*rpkt.RtrPkt
+	maxLength 	int
+	priority  	int
+}
+
 
 var (
 	ticker = 0
-	queue  []rpkt.RtrPkt
+	// queue  []rpkt.RtrPkt
 
 	fastQueue []*rpkt.RtrPkt
 	slowQueue []*rpkt.RtrPkt
 )
 
+// NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
 	r := &Router{Id: id, confDir: confDir}
 	if err := r.setup(); err != nil {
 		return nil, err
 	}
+
+	que := packetQueue{maxLength: 2, priority: 0}
+
+	r.queues = append(r.queues, que)
+	r.queues = append(r.queues, que)
+
+	rul := classRule{sourceAs: "br2-ff00_0_212", destinationAs: "1-ff00:0:110", queueNumber: 0}
+
+	r.rules = append(r.rules, rul)
+
 	return r, nil
 }
 
@@ -203,6 +237,22 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	}
 }
 
+func (r *Router) dequeuer() {
+
+	i := 0
+	for {
+		if(len(r.queues[i].queue) > r.queues[i].maxLength) {
+			for len(r.queues[i].queue) > 0 {
+				r.forwardPacket(r.queues[i].queue[0])
+				r.queues[i].queue = r.queues[i].queue[1:]
+			}
+		}
+
+		i = (i + 1) % len(r.queues)
+		time.Sleep(2 * time.Millisecond)
+	}
+}
+
 func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 
 	log.Debug("preRouteStep")
@@ -216,30 +266,30 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 		dstAddr, _ := rp.DstIA()
 		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {
 			log.Debug("It's destined for 1-ff00:0:110")
-			slowQueue = append(slowQueue, rp)
+			r.queues[0].queue = append(r.queues[0].queue, rp)
 
-			if len(slowQueue) >= 5 {
+			if len(r.queues[0].queue) >= r.queues[0].maxLength {
 				log.Debug("Start dequeue, but nap first")
-				time.Sleep(10 * time.Millisecond)
-				for len(slowQueue) > 0 {
-					log.Debug("Dequeue length %d", len(slowQueue), nil)
-					irp := slowQueue[0]
-					slowQueue = slowQueue[1:]
+				time.Sleep(0 * time.Millisecond)
+				for len(r.queues[0].queue) > 0 {
+					log.Debug("Dequeue length %d", len(r.queues[0].queue), nil)
+					irp := r.queues[0].queue[0]
+					r.queues[0].queue = r.queues[0].queue[1:]
 					log.Debug("Routing delayed packet", irp)
 					r.forwardPacket(irp)
 				}
 			}
 		} else {
 
-			fastQueue = append(fastQueue, rp)
+			r.queues[1].queue = append(r.queues[1].queue, rp)
 
-			if len(fastQueue) >= 0 {
+			if len(r.queues[1].queue) >= 0 {
 				log.Debug("Start dequeue, but nap first")
 				time.Sleep(0 * time.Millisecond)
-				for len(fastQueue) > 0 {
-					log.Debug("Dequeue length %d", len(fastQueue), nil)
-					irp := fastQueue[0]
-					fastQueue = fastQueue[1:]
+				for len(r.queues[1].queue) > 0 {
+					log.Debug("Dequeue length %d", len(r.queues[1].queue), nil)
+					irp := r.queues[1].queue[0]
+					r.queues[1].queue = r.queues[1].queue[1:]
 					// _ = irp
 					log.Debug("Routing delayed packet", irp)
 					r.forwardPacket(irp)
