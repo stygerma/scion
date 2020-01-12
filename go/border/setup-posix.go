@@ -92,7 +92,7 @@ func (p posixLoc) addSock(r *Router, ctx *rctx.Ctx) error {
 	}
 	// Setup input goroutine.
 	ctx.LocSockIn = rctx.NewSock(ringbuf.New(64, nil, "loc_in"),
-		over, rcmn.DirLocal, 0, "", r.posixInput, r.handleSock, PosixSock)
+		over, rcmn.DirLocal, 0, "", r.posixInput, r.handleSock, PosixSock) //IMP: reference to handleSock method
 	ctx.LocSockOut = rctx.NewSock(ringbuf.New(64, nil, "loc_out"),
 		over, rcmn.DirLocal, 0, "", nil, r.posixOutput, PosixSock)
 	log.Debug("Done setting up new local socket.", "conn", over.LocalAddr())
@@ -163,7 +163,7 @@ func (p posixExt) addIntf(r *Router, ctx *rctx.Ctx, intf *topology.IFInfo) error
 		c, rcmn.DirExternal, intf.ID, intf.IA.String(), r.posixInput, r.handleSock, PosixSock)
 	ctx.ExtSockOut[intf.ID] = rctx.NewSock(
 		ringbuf.New(64, nil, fmt.Sprintf("ext_out_%s", intf.ID)),
-		c, rcmn.DirExternal, intf.ID, intf.IA.String(), nil, r.posixOutput, PosixSock)
+		c, rcmn.DirExternal, intf.ID, intf.IA.String(), nil, r.posixOutput, PosixSock) //IMP: reference to handleSock method
 	log.Debug("Done setting up new external socket.", "intf", intf)
 	return nil
 }

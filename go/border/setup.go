@@ -60,6 +60,7 @@ var registeredExtSockOps = map[brconf.SockType]extSockOps{}
 // setup creates the router's channels and map, sets up the rpkt package, and
 // sets up a new router context. This function can only be called once during startup.
 func (r *Router) setup() error {
+	log.Info("============ MS ============ we setting up a new router with id", r.Id, "============ MS ============")
 	r.freePkts = ringbuf.New(1024, func() interface{} {
 		return rpkt.NewRtrPkt()
 	}, "free_pkts")
@@ -75,7 +76,7 @@ func (r *Router) setup() error {
 	if conf, err = r.loadNewConfig(); err != nil {
 		return err
 	}
-	// Initialize itopo.
+	// Initialize itopo. //Q: what even is an itopo?
 	itopo.Init(r.Id, proto.ServiceType_br, itopo.Callbacks{CleanDynamic: r.setupCtxOnClean})
 	if _, _, err := itopo.SetStatic(conf.Topo, true); err != nil {
 		return err

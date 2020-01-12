@@ -73,8 +73,8 @@ func (rp *RtrPkt) parseBasic() error {
 		return err
 	}
 	// Set indexes for destination and source ISD-ASes.
-	rp.idxs.dstIA = spkt.CmnHdrLen
-	rp.idxs.srcIA = rp.idxs.dstIA + addr.IABytes
+	rp.idxs.dstIA = spkt.CmnHdrLen               //MS: set to 8 bytes
+	rp.idxs.srcIA = rp.idxs.dstIA + addr.IABytes //MS: addr.IABytes is also set to 8 bytes
 	// Set index for destination host address and calculate its length.
 	rp.idxs.dstHost = rp.idxs.srcIA + addr.IABytes
 	if dstLen, err = addr.HostLen(rp.CmnHdr.DstType); err != nil {
@@ -92,8 +92,8 @@ func (rp *RtrPkt) parseBasic() error {
 		return err
 	}
 	// Set index for path header.
-	addrLen := int(addr.IABytes*2 + dstLen + srcLen)
-	addrPad := util.CalcPadding(addrLen, common.LineLen)
+	addrLen := int(addr.IABytes*2 + dstLen + srcLen)     //MS: just all the lengths from above added together
+	addrPad := util.CalcPadding(addrLen, common.LineLen) //MS: calculates the padding such that it's multiple of 8
 	hdrLen := rp.CmnHdr.HdrLenBytes()
 	rp.idxs.path = spkt.CmnHdrLen + addrLen + addrPad
 	if rp.idxs.path > hdrLen {
@@ -109,8 +109,8 @@ func (rp *RtrPkt) parseBasic() error {
 func (rp *RtrPkt) parseHopExtns() error {
 	// +1 to allow for a leading SCMP hop-by-hop extension.
 	rp.idxs.hbhExt = make([]extnIdx, 0, common.ExtnMaxHBH+1)
-	rp.idxs.nextHdrIdx.Type = rp.CmnHdr.NextHdr
-	rp.idxs.nextHdrIdx.Index = rp.CmnHdr.HdrLenBytes()
+	rp.idxs.nextHdrIdx.Type = rp.CmnHdr.NextHdr        //MS: SCMP, UDP, TCP or none
+	rp.idxs.nextHdrIdx.Index = rp.CmnHdr.HdrLenBytes() //MS: 64 bytes long
 	nextHdr := &rp.idxs.nextHdrIdx.Type
 	offset := &rp.idxs.nextHdrIdx.Index
 	for *offset < len(rp.Raw) {
@@ -125,7 +125,7 @@ func (rp *RtrPkt) parseHopExtns() error {
 		if err != nil {
 			return err
 		}
-		e.RegisterHooks(&rp.hooks)
+		e.RegisterHooks(&rp.hooks) //IMP: creation of hooks for HBH extensions
 		rp.HBHExt = append(rp.HBHExt, e)
 		rp.idxs.hbhExt = append(rp.idxs.hbhExt, extnIdx{currExtn, *offset})
 		*nextHdr = common.L4ProtocolType(rp.Raw[*offset])

@@ -69,3 +69,14 @@ const (
 	// and no further hooks should be called.
 	HookFinish
 )
+
+func (rp *RtrPkt) Hooks() hooks {
+	if rp.hooks.isNil() {
+		return hooks{}
+	}
+	return rp.hooks
+}
+
+func (hooks *hooks) isNil() bool {
+	return (hooks.DstIA == nil && hooks.SrcIA == nil && hooks.DstHost == nil && hooks.SrcHost == nil && hooks.Infof == nil && hooks.HopF == nil && hooks.ConsDirFlag == nil && hooks.IFCurr == nil && hooks.IFNext == nil && hooks.Validate == nil && hooks.L4 == nil && hooks.Payload == nil && hooks.Process == nil && hooks.Route == nil)
+}

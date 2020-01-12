@@ -52,7 +52,7 @@ func (rp *RtrPkt) hookIA(hooks []hookIA, idx int) (addr.IA, error) {
 		ret, ia, err := f()
 		switch {
 		case err != nil:
-			return addr.IA{}, err
+			return addr.IA{}, err //MS: return uninitialized IA valua and an error
 		case ret == HookContinue:
 			continue
 		case ret == HookFinish:

@@ -35,17 +35,18 @@ const (
 // error.
 func (rp *RtrPkt) Validate() (bool, error) {
 	var mtu int
-	if rp.ifCurr != nil {
-		intf, ok := rp.Ctx.Conf.BR.IFs[*rp.ifCurr]
+	if rp.ifCurr != nil { //MS: ifCurr is the current interface ID of this RtrPkt
+		intf, ok := rp.Ctx.Conf.BR.IFs[*rp.ifCurr] //MS: probably returns a pointer to the IFInfo struct
+		//Q: don't quite see what is assigned to ok, I guess that nothing should be assigned to ok normally
 		if !ok {
 			return false, common.NewBasicError(errCurrIntfInvalid, nil, "ifid", *rp.ifCurr)
 		}
 		mtu = intf.MTU
 	} else {
-		mtu = int(rp.Ctx.Conf.Topo.MTU())
+		mtu = int(rp.Ctx.Conf.Topo.MTU()) //MS: get MTU through some other way
 	}
 	// XXX(kormat): the rest of the common header is checked by the parsing phase.
-	if !addr.HostTypeCheck(rp.CmnHdr.DstType) {
+	if !addr.HostTypeCheck(rp.CmnHdr.DstType) { //MS HostTypeCheck returns true if host has one of the following types:
 		return false, common.NewBasicError("Unsupported destination address type",
 			scmp.NewError(scmp.C_CmnHdr, scmp.T_C_BadDstType, nil, nil), "type", rp.CmnHdr.DstType)
 	}
@@ -55,7 +56,7 @@ func (rp *RtrPkt) Validate() (bool, error) {
 		return false, common.NewBasicError("Unsupported source address type",
 			scmp.NewError(scmp.C_CmnHdr, scmp.T_C_BadSrcType, nil, nil), "type", rp.CmnHdr.SrcType)
 	}
-	if int(rp.CmnHdr.TotalLen) != len(rp.Raw) {
+	if int(rp.CmnHdr.TotalLen) != len(rp.Raw) { //MS: pretty straightforward difference in lenghts
 		return false, common.NewBasicError(
 			"Total length specified in common header doesn't match bytes received",
 			scmp.NewError(scmp.C_CmnHdr, scmp.T_C_BadPktLen,

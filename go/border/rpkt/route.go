@@ -155,7 +155,7 @@ func (rp *RtrPkt) xoverFromExternal() error {
 	origIFNext := *rp.ifNext
 	var segChgd bool
 	var err error
-	if segChgd, err = rp.IncPath(); err != nil {
+	if segChgd, err = rp.IncPath(); err != nil { //MS first return variable is probably boolean for segment change
 		return err
 	}
 	if err = rp.validatePath(rcmn.DirLocal); err != nil {

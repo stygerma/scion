@@ -131,8 +131,8 @@ type RtrPkt struct {
 }
 
 func NewRtrPkt() *RtrPkt {
-	r := &RtrPkt{}
-	r.Raw = make(common.RawBytes, pktBufSize)
+	r := &RtrPkt{}                            //MS: memory address of new Rtrpkt-Struct with uninitialized fields
+	r.Raw = make(common.RawBytes, pktBufSize) //MS create slice of type Byte and len = pktBufsize which is about 64 kb
 	r.refCnt = 1
 	return r
 }
@@ -183,7 +183,7 @@ type packetIdxs struct {
 	dstHost    int
 	srcHost    int
 	path       int
-	nextHdrIdx hdrIdx
+	nextHdrIdx hdrIdx //MS: should be 72 bytes long
 	hbhExt     []extnIdx
 	e2eExt     []extnIdx
 	l4         int
@@ -192,8 +192,8 @@ type packetIdxs struct {
 
 // hdrIdx provides the protocol type and index of a given L4/extension header.
 type hdrIdx struct {
-	Type  common.L4ProtocolType
-	Index int
+	Type  common.L4ProtocolType //MS: should be uint8
+	Index int                   //MS: 64 bytes
 }
 
 // extnIdx provides the extension type and index of an extension header.

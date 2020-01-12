@@ -40,11 +40,15 @@ import (
 )
 
 var (
-	cfg brconf.Config
-	r   *Router
+	cfg brconf.Config //MS: Config is the border router configuration that is loaded from file. (Struct in brconf/params)
+	r   *Router       //MS: in router.go of this directory
 )
 
-func init() {
+func init() { /* MS: Like main function, init function is called by Go when a package is initialized.
+	It does not take any arguments and doesn't return any value. Init function is
+	implicitly declared in Go, hence you can not reference it from anywhere
+	(or call it like init()). You can have multiple init functions in a file or a package.
+	Order of the execution of init function in a file will be according to the order of their appearance*/
 	flag.Usage = env.Usage
 }
 
@@ -88,7 +92,7 @@ func realMain() int {
 	} else {
 		log.Info("Router was built with assertions OFF.")
 	}
-	r.Start()
+	r.Start() //MS: start tracing from here
 	select {
 	case <-fatal.ShutdownChan():
 		// Whenever we receive a SIGINT or SIGTERM we exit without an error.

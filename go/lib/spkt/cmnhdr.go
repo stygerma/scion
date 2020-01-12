@@ -106,7 +106,7 @@ func (c *CmnHdr) UpdatePathOffsets(b []byte, iOff, hOff uint8) {
 	b[6] = c.CurrHopF
 }
 
-func (c *CmnHdr) HdrLenBytes() int {
+func (c *CmnHdr) HdrLenBytes() int { //MS this is 8 times 8 bytes
 	return int(c.HdrLen) * common.LineLen
 }
 
