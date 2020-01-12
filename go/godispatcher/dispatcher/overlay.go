@@ -59,6 +59,7 @@ func (dp *NetToRingDataplane) Run() error {
 			log.Warn("error receiving next packet from overlay conn", "err", err)
 			continue
 		}
+		//log.Info("fot this packet rn", "pkt", pkt) //MS: testing the packtes that get sent
 
 		logDebugE2E(&pkt.Info)
 
@@ -170,8 +171,7 @@ func (d *UDPDestination) Send(dp *NetToRingDataplane, pkt *respool.Packet) {
 	routingEntry, ok := dp.RoutingTable.LookupPublic(pkt.Info.DstIA, (*net.UDPAddr)(d))
 	if !ok {
 		metrics.M.AppNotFoundErrors().Inc()
-		log.Warn("destination address not found", "ia", pkt.Info.DstIA,
-			"udpAddr", (*net.UDPAddr)(d))
+		log.Warn("destination address not found", "ia", pkt.Info.DstIA, "udpAddr", (*net.UDPAddr)(d))
 		return
 	}
 	sendPacket(routingEntry, pkt)
@@ -184,6 +184,7 @@ type SVCDestination addr.HostSVC
 func (d SVCDestination) Send(dp *NetToRingDataplane, pkt *respool.Packet) {
 	// FIXME(scrye): This should deliver to the correct IP address, based on
 	// information found in the overlay IP header.
+	// log.Info("grüezi, i ha es päckli für sie", "pkt", pkt) //BC
 	routingEntries := dp.RoutingTable.LookupService(pkt.Info.DstIA, addr.HostSVC(d), nil)
 	if len(routingEntries) == 0 {
 		metrics.M.AppNotFoundErrors().Inc()

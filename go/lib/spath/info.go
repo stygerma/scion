@@ -50,7 +50,7 @@ type InfoField struct {
 	TsInt uint32
 	// ISD denotes the origin ISD of a path segment.
 	ISD  uint16
-	Hops uint8
+	Hops uint8 //MS: length of hopfields for this path
 }
 
 func InfoFFromRaw(b []byte) (*InfoField, error) {

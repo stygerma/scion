@@ -65,6 +65,7 @@ func (r *Router) Start() {
 	go func() {
 		defer log.LogPanicAndExit()
 		r.PacketError()
+		log.Info("handled packet error")
 	}()
 	go func() {
 		defer log.LogPanicAndExit()
@@ -99,7 +100,7 @@ func (r *Router) handleSock(s *rctx.Sock, stop, stopped chan struct{}) {
 		}
 		for i := 0; i < n; i++ {
 			rp := pkts[i].(*rpkt.RtrPkt)
-			r.processPacket(rp)
+			r.processPacket(rp) //IMP: reference of processPacket method
 			rp.Release()
 			pkts[i] = nil
 		}
@@ -129,12 +130,14 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	rp.Logger = log.New("rpkt", rp.Id)
 	// XXX(kormat): uncomment for debugging:
 	//rp.Debug("processPacket", "raw", rp.Raw)
+	rp.Debug("new Packet processing", "rpkt", rp) //MS
 	if err := rp.Parse(); err != nil {
 		r.handlePktError(rp, err, "Error parsing packet")
 		l.Result = metrics.ErrParse
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
+	log.Debug("packet parsed", "rpkt", rp) //MS
 	// Validation looks for errors in the packet that didn't break basic
 	// parsing.
 	valid, err := rp.Validate()
@@ -144,6 +147,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
+	log.Debug("packet validated", "rpkt", rp) //MS
 	if !valid {
 		rp.Error("Error validating packet, no specific error")
 		l.Result = metrics.ErrValidate
@@ -152,6 +156,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	}
 	// Check if the packet needs to be processed locally, and if so register hooks for doing so.
 	rp.NeedsLocalProcessing()
+	log.Debug("packet checked for local processing", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
 	// Parse the packet payload, if a previous step has registered a relevant hook for doing so.
 	if _, err := rp.Payload(true); err != nil {
 		// Any errors at this point are application-level, and hence not
@@ -161,6 +166,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
+	log.Debug("packet payload checked if necessary", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
 	// Process the packet, if a previous step has registered a relevant hook for doing so.
 	if err := rp.Process(); err != nil {
 		r.handlePktError(rp, err, "Error processing packet")
@@ -168,10 +174,12 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
+	log.Debug("processed packet if necessary", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
 		r.handlePktError(rp, err, "Error routing packet")
 		l.Result = metrics.ErrRoute
 		metrics.Process.Pkts(l).Inc()
 	}
+	log.Debug("packet forwarded", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
 }

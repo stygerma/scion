@@ -53,16 +53,20 @@ func (r *Router) handlePktError(rp *rpkt.RtrPkt, perr error, desc string) {
 // PacketError creates an SCMP error for the given packet and sends it to its source.
 func (r *Router) PacketError() {
 	// Run forever.
-	for args := range r.pktErrorQ {
+	//log.Debug("============ MS ============ packet error with the following args", <-r.pktErrorQ, "============ MS ============")
+	for args := range r.pktErrorQ { //MS: pktErrorQ is a channel, i.e. range only assign to args if the pktErrorQ received error
 		r.doPktError(args.rp, args.perr)
 		args.rp.Release()
+		log.Debug("============ MS ============ handled this pkterr", args, "============ MS ============")
 	}
+	log.Debug("============ MS ============ PacketError() end (should not appear ============ MS ============")
 }
 
 // doPktError is called for protocol-level packet errors. If there's SCMP
 // metadata attached to the error object, then an SCMP error response is
 // generated and sent.
 func (r *Router) doPktError(rp *rpkt.RtrPkt, perr error) {
+	log.Debug("============ MS ============ doPktErro() beginning ============ MS ============")
 	var serr *scmp.Error
 	isSCMPErr := errors.As(perr, &serr)
 	if !isSCMPErr || rp.DirFrom == rcmn.DirSelf || rp.SCMPError {
@@ -80,7 +84,7 @@ func (r *Router) doPktError(rp *rpkt.RtrPkt, perr error) {
 		}
 	}
 	srcIA, err := rp.SrcIA()
-	if err != nil {
+	if err != nil { //MS: don't do anything if srcIA is unavailable
 		return
 	}
 	// Certain errors are not respondable to if the source lies in a remote AS.

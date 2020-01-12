@@ -45,7 +45,7 @@ func (rp *RtrPkt) validatePath(dirFrom rcmn.Dir) error {
 	}
 	// Check for shorcuts in packets from core links
 	if rp.infoF.Shortcut {
-		currentLinkType := rp.Ctx.Conf.BR.IFs[*rp.ifCurr].LinkType
+		currentLinkType := rp.Ctx.Conf.BR.IFs[*rp.ifCurr].LinkType //MS: one of the following unset, core, parent, child, peer
 		if currentLinkType == topology.Core {
 			return serrors.New("Shortcut not allowed on core segment")
 		}
@@ -326,7 +326,7 @@ func (rp *RtrPkt) IncPath() (bool, error) {
 	iOff := rp.CmnHdr.InfoFOffBytes()
 	hOff := rp.CmnHdr.HopFOffBytes()
 	hdrLen := rp.CmnHdr.HdrLenBytes()
-	vOnly := 0
+	vOnly := 0 //MS count for verify only HF
 	origConsDir := *rp.consDirFlag
 	for {
 		hOff += spath.HopFieldLength
@@ -354,7 +354,7 @@ func (rp *RtrPkt) IncPath() (bool, error) {
 		return false, common.NewBasicError("New HopF offset > header length", nil,
 			"max", hdrLen, "actual", hOff)
 	}
-	segChgd := iOff != rp.CmnHdr.InfoFOffBytes()
+	segChgd := iOff != rp.CmnHdr.InfoFOffBytes() //Q: what is this? maybe boolean for segment change
 	currInfoF := uint8(iOff / common.LineLen)
 	currHopF := uint8(hOff / common.LineLen)
 	// Check that there's no VERIFY_ONLY fields in the middle of a segment.

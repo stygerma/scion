@@ -128,8 +128,8 @@ func (t Type) Name(c Class) string {
 }
 
 type ClassType struct {
-	Class Class
-	Type  Type
+	Class Class //MS: one out of General, Routing, CmnHdr, Path, Ext, Sibra (handled with iota)
+	Type  Type  //MS: huge list above of the different types
 }
 
 func (ct ClassType) String() string {

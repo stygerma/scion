@@ -102,7 +102,12 @@ func realMain() int {
 	defer trCloser.Close()
 	opentracing.SetGlobalTracer(tracer)
 
+<<<<<<< HEAD
 	publicIP, err := net.ResolveUDPAddr("udp", cfg.SD.Address)
+=======
+	publicIP, err := net.ResolveUDPAddr("udp", cfg.SD.Public)
+	log.Info("This is the shits", "err", err, "addr", publicIP) //BC
+>>>>>>> e74d7c4... added some ways to log, some comments and a getter for hooks
 	if err != nil {
 		log.Crit("Unable to resolve listening address", "err", err, "addr", publicIP)
 		return 1
