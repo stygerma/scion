@@ -254,9 +254,6 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 		dstAddr, _ := rp.DstIA()
 		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {
 			log.Debug("It's destined for 1-ff00:0:110")
-			// r.queues[0].mutex.Lock()
-			// r.queues[0].queue = append(r.queues[0].queue, rp)
-			// r.queues[0].mutex.Unlock()
 			r.queues[0].enqueue(rp)
 
 		} else {
@@ -270,9 +267,6 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	} else {
 		log.Debug("In fact I am")
 		log.Debug("", r.Id, nil)
-		// r.queues[1].mutex.Lock()
-		// r.queues[1].queue = append(r.queues[1].queue, rp)
-		// r.queues[1].mutex.Unlock()
 		r.queues[1].enqueue(rp)
 	}
 
