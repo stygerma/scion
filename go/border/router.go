@@ -209,6 +209,7 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
 		r.handlePktError(rp, err, "Error routing packet")
+		// TODO: Add metrics again
 		// l.Result = metrics.ErrRoute
 		// metrics.Process.Pkts(l).Inc()
 	}
@@ -243,26 +244,15 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 		dstAddr, _ := rp.DstIA()
 		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {
 			log.Debug("It's destined for 1-ff00:0:110")
-			// r.queues[0].mutex.Lock()
-			// r.queues[0].queue = append(r.queues[0].queue, rp)
-			// r.queues[0].mutex.Unlock()
 			r.queues[0].enqueue(rp)
 
 		} else {
-
-			
-			// r.queues[1].mutex.Lock()
-			// r.queues[1].queue = append(r.queues[1].queue, rp)
-			// r.queues[1].mutex.Unlock()
 			r.queues[1].enqueue(rp)
 		}
 
 	} else {
 		log.Debug("In fact I am")
 		log.Debug("", r.Id, nil)
-		// r.queues[1].mutex.Lock()
-		// r.queues[1].queue = append(r.queues[1].queue, rp)
-		// r.queues[1].mutex.Unlock()
 		r.queues[1].enqueue(rp)
 	}
 
