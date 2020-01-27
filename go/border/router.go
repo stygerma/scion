@@ -18,7 +18,6 @@
 package main
 
 import (
-	"strings"
 	"sync"
 	"time"
 
@@ -238,22 +237,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	// Put packets destined for 1-ff00:0:110 on the slow queue
 	// Put all other packets from br2 on a faster queue but still delayed
 
-	if strings.Contains(r.Id, "br2-ff00_0_212") {
-		log.Debug("It's me br2-ff00_0_212")
-
-		dstAddr, _ := rp.DstIA()
-		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {
-			log.Debug("It's destined for 1-ff00:0:110")
-			r.queues[0].enqueue(rp)
-
-		} else {
-			r.queues[1].enqueue(rp)
-		}
-
-	} else {
-		log.Debug("In fact I am")
-		log.Debug("", r.Id, nil)
-		r.queues[1].enqueue(rp)
-	}
+	queueNo := getQueueNumberFor(rp, &r.rules)
+	r.queues[queueNo].enqueue(rp)
 
 }
