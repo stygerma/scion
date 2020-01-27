@@ -57,35 +57,6 @@ type Router struct {
 	rules []classRule
 }
 
-// Rule contains a rule for matching packets
-type classRule struct {
-	// This is currently means the ID of the sending border router
-	sourceAs    	string
-	nextHopAs		string
-	destinationAs	string
-	queueNumber 	int
-}
-
-// Queue is a single queue
-type packetQueue struct {
-	// Id string
-
-	mutex *sync.Mutex
-
-	queue     	[]*rpkt.RtrPkt
-	maxLength 	int
-	priority  	int
-}
-
-
-var (
-	ticker = 0
-	// queue  []rpkt.RtrPkt
-
-	fastQueue []*rpkt.RtrPkt
-	slowQueue []*rpkt.RtrPkt
-)
-
 // NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
 	r := &Router{Id: id, confDir: confDir}
@@ -244,15 +215,9 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 }
 
 func (r *Router) dequeue(i int) {
-
-	r.queues[i].mutex.Lock()
-	defer r.queues[i].mutex.Unlock()
-
-	for len(r.queues[i].queue) > 0 {
-		r.forwardPacket(r.queues[i].queue[0])
-		r.queues[i].queue = r.queues[i].queue[1:]
+	for r.queues[i].getLength() > 0 {
+		r.forwardPacket(r.queues[i].pop())
 	}
-
 }
 
 func (r *Router) dequeuer() {
@@ -278,24 +243,27 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 		dstAddr, _ := rp.DstIA()
 		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {
 			log.Debug("It's destined for 1-ff00:0:110")
-			r.queues[0].mutex.Lock()
-			r.queues[0].queue = append(r.queues[0].queue, rp)
-			r.queues[0].mutex.Unlock()
+			// r.queues[0].mutex.Lock()
+			// r.queues[0].queue = append(r.queues[0].queue, rp)
+			// r.queues[0].mutex.Unlock()
+			r.queues[0].enqueue(rp)
 
 		} else {
 
-			r.queues[1].mutex.Lock()
-			r.queues[1].queue = append(r.queues[1].queue, rp)
-			r.queues[1].mutex.Unlock()
-
+			
+			// r.queues[1].mutex.Lock()
+			// r.queues[1].queue = append(r.queues[1].queue, rp)
+			// r.queues[1].mutex.Unlock()
+			r.queues[1].enqueue(rp)
 		}
 
 	} else {
 		log.Debug("In fact I am")
 		log.Debug("", r.Id, nil)
-		r.queues[1].mutex.Lock()
-		r.queues[1].queue = append(r.queues[1].queue, rp)
-		r.queues[1].mutex.Unlock()
+		// r.queues[1].mutex.Lock()
+		// r.queues[1].queue = append(r.queues[1].queue, rp)
+		// r.queues[1].mutex.Unlock()
+		r.queues[1].enqueue(rp)
 	}
 
 }
