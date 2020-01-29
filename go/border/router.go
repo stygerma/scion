@@ -54,7 +54,7 @@ type Router struct {
 
 	queues []packetQueue
 	rules []classRule
-	flag chan bool
+	flag chan int
 }
 
 // NewRouter returns a new router
@@ -74,7 +74,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 	r.rules = append(r.rules, rul)
 
-	r.flag = make(chan bool, 1)
+	r.flag = make(chan int, len(r.queues))
 
 	return r, nil
 }
@@ -222,30 +222,21 @@ func (r *Router) dequeue(i int) {
 
 	length := r.queues[i].getLength()
 
-	// This is awfully slow, idk why though
-	// if (length > 0) {
-	// 	qps := r.queues[i].popMultiple(length - 1)
-	// 	for _, qp := range qps {
-	// 		r.forwardPacket(qp.rp)
-	// 	}
-	// }
-
-	for length > 0 {
-		qp := r.queues[i].pop()
-		r.forwardPacket(qp.rp)
-
-		length = length - 1
-
+	if (length > 0) {
+		qps := r.queues[i].popMultiple(length)
+		for _, qp := range qps {
+			r.forwardPacket(qp.rp)
+		}
 	}
 }
 
 func (r *Router) dequeuer() {
 	for {
-		<-r.flag
-
+		j := <-r.flag
 		i := 0
+
 		for i < len(r.queues) { 
-			r.dequeue(i)
+			r.dequeue((j + i) % (len(r.queues)))
 			i = i + 1
 		}
 	}
@@ -265,7 +256,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 
 	// According to gobyexample all sends are blocking and this is the standard way to do non-blocking sends (https://gobyexample.com/non-blocking-channel-operations)
 	select {
-    case r.flag <- true:
+    case r.flag <- queueNo:
     default:
 	}
 	
