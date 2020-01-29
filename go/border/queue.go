@@ -35,7 +35,7 @@ func (pq *packetQueue) enqueue(rp *qPkt) {
 
 func (pq *packetQueue) canDequeue() bool {
 
-	return pq.length > -1
+	return pq.length > 0
 }
 
 func (pq *packetQueue) getLength() int {
@@ -65,7 +65,7 @@ func (pq *packetQueue) popMultiple(number int) []*qPkt {
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
 
-	pkt := pq.queue[0:number]
+	pkt := pq.queue[:number]
 	pq.queue = pq.queue[number:]
 	pq.length = pq.length - number
 
