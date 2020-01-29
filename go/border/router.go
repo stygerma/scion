@@ -18,6 +18,7 @@
 package main
 
 import (
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -75,6 +76,8 @@ func NewRouter(id, confDir string) (*Router, error) {
 	rul := classRule{sourceAs: "br2-ff00_0_212", destinationAs: "1-ff00:0:110", queueNumber: 0}
 
 	r.rules = append(r.rules, rul)
+
+	r.flag = make(chan bool, 1)
 
 	return r, nil
 }
@@ -210,14 +213,28 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 }
 
 func (r *Router) dequeue(i int) {
-	for r.queues[i].getLength() > 0 {
-		r.forwardPacket(r.queues[i].pop())
+	log.Debug("The queue has length " + strconv.Itoa(r.queues[i].getLength()))
+
+	length := r.queues[i].getLength()
+
+	// This is awfully slow, idk why though
+	// if (length > 0) {
+	// 	qps := r.queues[i].popMultiple(length - 1)
+	// 	for _, qp := range qps {
+	// 		r.forwardPacket(qp.rp)
+	// 	}
+	// }
+
+	for length > 0 {
+		qp := r.queues[i].pop()
+		r.forwardPacket(qp.rp)
+
+		length = length - 1
+
 	}
 }
 
 func (r *Router) dequeuer() {
-
-	i := 0
 	for {
 		if len(r.queues[i].queue) > r.queues[i].maxLength {
 			for len(r.queues[i].queue) > 0 {
@@ -237,6 +254,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 
 	// Put packets destined for 1-ff00:0:110 on the slow queue
 	// Put all other packets from br2 on a faster queue but still delayed
+	// At the moment no queue is slow
 
 	if strings.Contains(r.Id, "br2-ff00_0_212") {
 		log.Debug("It's me br2-ff00_0_212")
