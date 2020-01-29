@@ -77,7 +77,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 	r.rules = append(r.rules, rul)
 
-	r.flag = make(chan bool, 1)
+	r.flag = make(chan int, len(r.queues))
 
 	return r, nil
 }
@@ -217,20 +217,11 @@ func (r *Router) dequeue(i int) {
 
 	length := r.queues[i].getLength()
 
-	// This is awfully slow, idk why though
-	// if (length > 0) {
-	// 	qps := r.queues[i].popMultiple(length - 1)
-	// 	for _, qp := range qps {
-	// 		r.forwardPacket(qp.rp)
-	// 	}
-	// }
-
-	for length > 0 {
-		qp := r.queues[i].pop()
-		r.forwardPacket(qp.rp)
-
-		length = length - 1
-
+	if length > 0 {
+		qps := r.queues[i].popMultiple(length)
+		for _, qp := range qps {
+			r.forwardPacket(qp.rp)
+		}
 	}
 }
 
