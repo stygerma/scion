@@ -10,34 +10,10 @@ import (
 type tokenBucket struct {
 	MaxBandWidth     int // In bps
 	tokens           int // One token is 1 b
+	tokenSpent		 int
 	timerGranularity int
 	lastRefill       time.Time
 	mutex            *sync.Mutex
-}
-
-func (tb *tokenBucket) start() {
-
-	tb.mutex.Lock()
-	defer tb.mutex.Unlock()
-
-	tb.tokens = tb.MaxBandWidth
-	tb.lastRefill = time.Now()
-
-	// timer1 := time.NewTimer(10 * time.Millisecond)
-
-	// go func() {
-	// 	for {
-	// 		<-timer1.C
-	// 		// TODO for some reason I can't import math and can't use the max function. Maybe this resolves itself magically in the future
-	// 		tb.mutex.Lock()
-	// 		if(tb.tokens+(tb.MaxBandWidth/100) > tb.MaxBandWidth) {
-	// 			tb.tokens = tb.MaxBandWidth
-	// 		} else {
-	// 			tb.tokens = tb.tokens+(tb.MaxBandWidth/100)
-	// 		}
-	// 		tb.mutex.Unlock()
-	// 	}
-	// }()
 }
 
 func (tb * tokenBucket) refill() {
@@ -46,14 +22,16 @@ func (tb * tokenBucket) refill() {
 
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
-	log.Debug("Last update was ", "Update time", timeSinceLastUpdate)
+	log.Debug("Last update was ", "ms ago", timeSinceLastUpdate)
 
 	if timeSinceLastUpdate > 100 {
 
-		newTokens := ((tb.MaxBandWidth) * int(timeSinceLastUpdate)) / (1000 * 10)
+		newTokens := ((tb.MaxBandWidth) * int(timeSinceLastUpdate)) / (1000)
 		tb.lastRefill = now
 
 		log.Debug("Add new tokens ", "#tokens", newTokens)
+		log.Debug("Spent token in last period ", "#tokens", tb.tokenSpent)
+		tb.tokenSpent = 0
 
 		if tb.tokens + newTokens > tb.MaxBandWidth {
 			tb.tokens = tb.MaxBandWidth
@@ -68,9 +46,9 @@ func (pq *packetQueue) police(qp *qPkt) policeAction {
 	pq.tb.mutex.Lock()
 	defer pq.tb.mutex.Unlock()
 
-	packetSize := (qp.rp.Bytes().Len()) // In b
+	packetSize := (qp.rp.Bytes().Len()) // In byte
 
-	tokenForPacket := packetSize // In b
+	tokenForPacket := packetSize * 8 // In bit
 
 	log.Debug("Available bandwidth before refill", "bandwidth", pq.tb.tokens)
 
@@ -82,6 +60,7 @@ func (pq *packetQueue) police(qp *qPkt) policeAction {
 
 	if pq.tb.tokens - tokenForPacket > 0 {
 		pq.tb.tokens = pq.tb.tokens - tokenForPacket
+		pq.tb.tokenSpent += tokenForPacket
 	} else {
 		qp.act.action = DROP
 		qp.act.reason = BandWidthExceeded
