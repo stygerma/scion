@@ -20,6 +20,7 @@ package main
 import (
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/scionproto/scion/go/border/brconf"
 	"github.com/scionproto/scion/go/border/internal/metrics"
@@ -69,7 +70,9 @@ func NewRouter(id, confDir string) (*Router, error) {
 	}
 
 	for w := 0; w < 2; w++ {
-		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: tokenBucket{MaxBandWidth: 15 * 1024, mutex: &sync.Mutex{}}}
+		bandwidth := 100 * 1024 // 100kb
+		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: bucket}
 		que.tb.start()
 		r.queues = append(r.queues, que)
 	}
