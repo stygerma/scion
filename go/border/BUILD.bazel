@@ -58,6 +58,7 @@ go_test(
     srcs = [
         "io_test.go",
         "setup_test.go",
+        "policer_test.go"
     ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
