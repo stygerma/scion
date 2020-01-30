@@ -40,6 +40,8 @@ import (
 
 const processBufCnt = 128
 
+const maxNotificationCount = 512
+
 // Router struct
 type Router struct {
 	// Id is the SCION element ID, e.g. "br4-ff00:0:2f".
@@ -67,17 +69,19 @@ func NewRouter(id, confDir string) (*Router, error) {
 		return nil, err
 	}
 
-	que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}}
-	r.queues = append(r.queues, que)
-
-	que = packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}}
-	r.queues = append(r.queues, que)
+	for w := 0; w < 2; w++ {
+		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: tokenBucket{MaxBandWidth: 15 * 1024, mutex: &sync.Mutex{}}}
+		que.tb.start()
+		r.queues = append(r.queues, que)
+	}
 
 	rul := classRule{sourceAs: "br2-ff00_0_212", destinationAs: "1-ff00:0:110", queueNumber: 0}
 
 	r.rules = append(r.rules, rul)
 
 	r.flag = make(chan int, len(r.queues))
+
+	r.notifications = make(chan *qPkt, maxNotificationCount)
 
 	return r, nil
 }
@@ -195,6 +199,13 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	}
 
 	r.qosConfig.QueuePacket(rp)
+}
+
+func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
+	defer rp.Release()
+
+	// TODO: We probably want some metrics here
+
 }
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
