@@ -6,8 +6,38 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
+type policeAction int
+
+const (
+	// PASS Pass the packet
+	PASS policeAction = 0 
+	// NOTIFY Notify the sending host of the packet
+	NOTIFY policeAction = 1
+	// DROP Drop the packet
+	DROP  policeAction = 2
+	// DROPNOTIFY Drop and then notify someone
+	DROPNOTIFY = 3
+)
+
+type violation int
+const (
+	// None none
+	None = 0
+	// BandWidthExceeded ...
+	BandWidthExceeded = 1
+	// queueFull
+	queueFull = 2
+)
+
+type action struct {
+	reason violation
+	action policeAction
+}
+
+
 type qPkt struct {
 	queueNo int
+	act action
 	rp *rpkt.RtrPkt
 }
 
@@ -21,6 +51,7 @@ type packetQueue struct {
 	length int
 	maxLength int
 	priority  int
+	tb tokenBucket
 }
 
 func (pq *packetQueue) enqueue(rp *qPkt) {
