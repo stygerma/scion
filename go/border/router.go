@@ -76,7 +76,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 		r.queues = append(r.queues, que)
 	}
 
-	rul := classRule{sourceAs: "br2-ff00_0_212", destinationAs: "1-ff00:0:110", queueNumber: 0}
+	rul := classRule{sourceAs: "2-ff00:0:212", destinationAs: "1-ff00:0:110", queueNumber: 1}
 
 	r.rules = append(r.rules, rul)
 
