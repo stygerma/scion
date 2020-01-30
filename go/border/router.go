@@ -69,10 +69,9 @@ func NewRouter(id, confDir string) (*Router, error) {
 	}
 
 	for w := 0; w < 2; w++ {
-		bandwidth := 100 * 1024 // 100kb
+		bandwidth := 5 * 1000 * 1000 // 5Mbit
 		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth , lastRefill: time.Now(), mutex: &sync.Mutex{}}
 		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: bucket}
-		que.tb.start()
 		r.queues = append(r.queues, que)
 	}
 
@@ -284,10 +283,14 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 		qp.sendNotification()
 	} else if polAct == DROP {
 		// TODO we currently do not drop packets
-		// r.queues[queueNo].enqueue(&qp)
-		// log.Debug("We should drop this packet!")
-		log.Debug("Exceeding bandwidth, drop packet")
-		r.dropPacket(qp.rp)
+
+		if(queueNo == 1) {
+			log.Debug("Exceeding bandwidth, drop packet")
+			r.dropPacket(qp.rp)
+		} else {
+			log.Debug("We should drop this packet!")
+			r.queues[queueNo].enqueue(&qp)
+		}
 	} else {
 		// This should never happen
 		r.queues[queueNo].enqueue(&qp)
