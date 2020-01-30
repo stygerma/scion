@@ -73,7 +73,6 @@ func NewRouter(id, confDir string) (*Router, error) {
 		bandwidth := 100 * 1024 // 100kb
 		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: bucket}
-		que.tb.start()
 		r.queues = append(r.queues, que)
 	}
 
