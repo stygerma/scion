@@ -18,8 +18,9 @@
 package main
 
 import (
-	"sync"
 	"strconv"
+	"sync"
+	"time"
 
 	"github.com/scionproto/scion/go/border/brconf"
 	"github.com/scionproto/scion/go/border/internal/metrics"
@@ -54,10 +55,10 @@ type Router struct {
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
 
-	queues []packetQueue
-	rules []classRule
+	queues        []packetQueue
+	rules         []classRule
 	notifications chan *qPkt
-	flag chan int
+	flag          chan int
 }
 
 // NewRouter returns a new router
@@ -68,10 +69,12 @@ func NewRouter(id, confDir string) (*Router, error) {
 	}
 
 	for w := 0; w < 2; w++ {
-		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: tokenBucket{MaxBandWidth: 15 * 1024, mutex: &sync.Mutex{}}}
+		bandwidth := 100 * 1024 // 100kb
+		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth , lastRefill: time.Now(), mutex: &sync.Mutex{}}
+		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: bucket}
 		que.tb.start()
 		r.queues = append(r.queues, que)
-    }
+	}
 
 	rul := classRule{sourceAs: "br2-ff00_0_212", destinationAs: "1-ff00:0:110", queueNumber: 0}
 
@@ -234,7 +237,7 @@ func (r *Router) dequeue(i int) {
 
 	length := r.queues[i].getLength()
 
-	if (length > 0) {
+	if length > 0 {
 		qps := r.queues[i].popMultiple(length)
 		for _, qp := range qps {
 			r.forwardPacket(qp.rp)
@@ -247,7 +250,7 @@ func (r *Router) dequeuer() {
 		j := <-r.flag
 		i := 0
 
-		for i < len(r.queues) { 
+		for i < len(r.queues) {
 			r.dequeue((j + i) % (len(r.queues)))
 			i = i + 1
 		}
@@ -270,16 +273,16 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 
 	_ = polAct
 
-	if(polAct == PASS) {
+	if polAct == PASS {
 		r.queues[queueNo].enqueue(&qp)
-	} else if(polAct == NOTIFY) {
+	} else if polAct == NOTIFY {
 		r.queues[queueNo].enqueue(&qp)
 		// TODO Check with Marc whether he wants all notifications or if it is fine if we drop some, or what should happen if we drop some
 		qp.sendNotification()
-	} else if(polAct == DROPNOTIFY) {
+	} else if polAct == DROPNOTIFY {
 		r.queues[queueNo].enqueue(&qp)
 		qp.sendNotification()
-	} else if (polAct == DROP) {
+	} else if polAct == DROP {
 		// TODO we currently do not drop packets
 		// r.queues[queueNo].enqueue(&qp)
 		// log.Debug("We should drop this packet!")
@@ -292,8 +295,8 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 
 	// According to gobyexample all sends are blocking and this is the standard way to do non-blocking sends (https://gobyexample.com/non-blocking-channel-operations)
 	select {
-    case r.flag <- queueNo:
-    default:
+	case r.flag <- queueNo:
+	default:
 	}
 
 }
