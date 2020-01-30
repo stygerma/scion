@@ -7,6 +7,8 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
+// TODO: Matching rules is currently based on string comparisons
+
 // Rule contains a rule for matching packets
 type classRule struct {
 	// This is currently means the ID of the sending border router
@@ -18,13 +20,14 @@ type classRule struct {
 
 func getQueueNumberFor(rp *rpkt.RtrPkt, crs *[]classRule) int {
 
+	queueNo := 0
+
 	for _, cr := range *crs {
 		if (cr.matchRule(rp)) {
-			return cr.queueNumber
+			queueNo = cr.queueNumber
 		}
 	}
-
-	return 0
+	return queueNo
 }
 
 func (cr *classRule) matchRule(rp *rpkt.RtrPkt) bool {
