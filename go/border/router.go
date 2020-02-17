@@ -219,8 +219,6 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	droppedPackets = droppedPackets + 1
 	log.Debug("Dropped Packet", "dropped", droppedPackets)
 
-	// This does not seem to work for some reason. On 9375 packets 5282 were reported as dropped by the router. But 7687.5 were reported as dropped by the bwtester.
-
 	// TODO: We probably want some metrics here
 
 }
