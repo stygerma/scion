@@ -42,6 +42,8 @@ const processBufCnt = 128
 
 const maxNotificationCount = 512
 
+var droppedPackets = 0
+
 // Router struct
 type Router struct {
 	// Id is the SCION element ID, e.g. "br4-ff00:0:2f".
@@ -204,6 +206,10 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 
 func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
+	droppedPackets = droppedPackets + 1
+	log.Debug("Dropped Packet", "dropped", droppedPackets)
+
+	// This does not seem to work for some reason. On 9375 packets 5282 were reported as dropped by the router. But 7687.5 were reported as dropped by the bwtester.
 
 	// TODO: We probably want some metrics here
 
