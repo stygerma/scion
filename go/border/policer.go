@@ -72,6 +72,8 @@ func (pq *packetQueue) police(qp *qPkt, shouldLog bool) policeAction {
 	if pq.tb.tokens-tokenForPacket > 0 {
 		pq.tb.tokens = pq.tb.tokens - tokenForPacket
 		pq.tb.tokenSpent += tokenForPacket
+		qp.act.action = PASS
+		qp.act.reason = None
 	} else {
 		qp.act.action = DROP
 		qp.act.reason = BandWidthExceeded
