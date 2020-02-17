@@ -19,6 +19,7 @@ package main
 
 import (
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -71,7 +72,13 @@ func NewRouter(id, confDir string) (*Router, error) {
 	}
 
 	for w := 0; w < 2; w++ {
-		bandwidth := 5 * 1000 * 1000 // 5Mbit
+		bandwidth := 50 * 1000 * 1000 // 50Mbit
+		if strings.Contains(r.Id, "br2-ff00_0_212") {
+			if w == 1 {
+				log.Debug("It's me br2-ff00_0_212-1")
+				bandwidth = 5 * 1000 * 1000 // 5Mbit
+			}
+		}
 		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: bucket}
 		r.queues = append(r.queues, que)
@@ -218,8 +225,6 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	droppedPackets = droppedPackets + 1
 	log.Debug("Dropped Packet", "dropped", droppedPackets)
 
-	// This does not seem to work for some reason. On 9375 packets 5282 were reported as dropped by the router. But 7687.5 were reported as dropped by the bwtester.
-
 	// TODO: We probably want some metrics here
 
 }
@@ -274,9 +279,6 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	qp := qPkt{rp: rp, queueNo: queueNo}
 
 	polAct := r.queues[queueNo].police(&qp, queueNo == 1)
-	// r.queues[queueNo].enqueue(&qp)
-
-	_ = polAct
 
 	if polAct == PASS {
 		r.queues[queueNo].enqueue(&qp)
@@ -288,13 +290,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 		r.queues[queueNo].enqueue(&qp)
 		qp.sendNotification()
 	} else if polAct == DROP {
-		if queueNo == 1 {
-			log.Debug("Exceeding bandwidth, drop packet")
-			r.dropPacket(qp.rp)
-		} else {
-			log.Debug("We should drop this packet!")
-			r.queues[queueNo].enqueue(&qp)
-		}
+		r.dropPacket(qp.rp)
 	} else {
 		// This should never happen
 		r.queues[queueNo].enqueue(&qp)
