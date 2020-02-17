@@ -39,6 +39,8 @@ const processBufCnt = 128
 
 const maxNotificationCount = 512
 
+var droppedPackets = 0
+
 // Router struct
 type Router struct {
 	// Id is the SCION element ID, e.g. "br4-ff00:0:2f".
@@ -70,7 +72,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 	for w := 0; w < 2; w++ {
 		bandwidth := 5 * 1000 * 1000 // 5Mbit
-		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth , lastRefill: time.Now(), mutex: &sync.Mutex{}}
+		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: bucket}
 		r.queues = append(r.queues, que)
 	}
@@ -213,6 +215,10 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 
 func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
+	droppedPackets = droppedPackets + 1
+	log.Debug("Dropped Packet", "dropped", droppedPackets)
+
+	// This does not seem to work for some reason. On 9375 packets 5282 were reported as dropped by the router. But 7687.5 were reported as dropped by the bwtester.
 
 	// TODO: We probably want some metrics here
 
@@ -267,7 +273,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	queueNo := getQueueNumberFor(rp, &r.rules)
 	qp := qPkt{rp: rp, queueNo: queueNo}
 
-	polAct := r.queues[queueNo].police(&qp)
+	polAct := r.queues[queueNo].police(&qp, queueNo == 1)
 	// r.queues[queueNo].enqueue(&qp)
 
 	_ = polAct
@@ -282,9 +288,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 		r.queues[queueNo].enqueue(&qp)
 		qp.sendNotification()
 	} else if polAct == DROP {
-		// TODO we currently do not drop packets
-
-		if(queueNo == 1) {
+		if queueNo == 1 {
 			log.Debug("Exceeding bandwidth, drop packet")
 			r.dropPacket(qp.rp)
 		} else {
