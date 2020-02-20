@@ -10,16 +10,17 @@ type policeAction int
 
 const (
 	// PASS Pass the packet
-	PASS policeAction = 0 
+	PASS policeAction = 0
 	// NOTIFY Notify the sending host of the packet
 	NOTIFY policeAction = 1
 	// DROP Drop the packet
-	DROP  policeAction = 2
+	DROP policeAction = 2
 	// DROPNOTIFY Drop and then notify someone
 	DROPNOTIFY = 3
 )
 
 type violation int
+
 const (
 	// None none
 	None = 0
@@ -34,11 +35,10 @@ type action struct {
 	action policeAction
 }
 
-
 type qPkt struct {
 	queueNo int
-	act action
-	rp *rpkt.RtrPkt
+	act     action
+	rp      *rpkt.RtrPkt
 }
 
 // Queue is a single queue
@@ -48,10 +48,10 @@ type packetQueue struct {
 	mutex *sync.Mutex
 
 	queue     []*qPkt
-	length int
+	length    int
 	maxLength int
 	priority  int
-	tb tokenBucket
+	tb        tokenBucket
 }
 
 func (pq *packetQueue) enqueue(rp *qPkt) {
