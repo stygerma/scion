@@ -27,7 +27,7 @@ func (r *Router) dequeuer() {
 	}
 }
 
-func (r *Router) wrrDequer() {
+func (r *Router) drrDequer() {
 
 	i := 0
 	qsum := 0
@@ -40,13 +40,13 @@ func (r *Router) wrrDequer() {
 		i := 0
 
 		for i < len(r.queues) {
-			r.wrrDequeue((j+i)%(len(r.queues)), 1)
+			r.drrDequeue((j+i)%(len(r.queues)), 1)
 			i = i + 1
 		}
 	}
 }
 
-func (r *Router) wrrDequeue(queueNo int, qsum int) {
+func (r *Router) drrDequeue(queueNo int, qsum int) {
 
 	length := r.queues[queueNo].getLength()
 	pktToDequeue := min(64*(r.queues[queueNo].priority/qsum), 1)
