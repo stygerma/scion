@@ -18,7 +18,6 @@
 package main
 
 import (
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -73,14 +72,16 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 	for w := 0; w < 2; w++ {
 		bandwidth := 50 * 1000 * 1000 // 50Mbit
+		priority := 0
 		if strings.Contains(r.Id, "br2-ff00_0_212") {
 			if w == 1 {
 				log.Debug("It's me br2-ff00_0_212-1")
 				bandwidth = 5 * 1000 * 1000 // 5Mbit
+				priority = 1
 			}
 		}
 		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
-		que := packetQueue{maxLength: 2, priority: 0, mutex: &sync.Mutex{}, tb: bucket}
+		que := packetQueue{maxLength: 2, priority: priority, mutex: &sync.Mutex{}, tb: bucket}
 		r.queues = append(r.queues, que)
 	}
 
@@ -239,31 +240,6 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 		// TODO: Add metrics again
 		// l.Result = metrics.ErrRoute
 		// metrics.Process.Pkts(l).Inc()
-	}
-}
-
-func (r *Router) dequeue(i int) {
-	log.Debug("The queue has length " + strconv.Itoa(r.queues[i].getLength()))
-
-	length := r.queues[i].getLength()
-
-	if length > 0 {
-		qps := r.queues[i].popMultiple(length)
-		for _, qp := range qps {
-			r.forwardPacket(qp.rp)
-		}
-	}
-}
-
-func (r *Router) dequeuer() {
-	for {
-		j := <-r.flag
-		i := 0
-
-		for i < len(r.queues) {
-			r.dequeue((j + i) % (len(r.queues)))
-			i = i + 1
-		}
 	}
 }
 
