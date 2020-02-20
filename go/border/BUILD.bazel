@@ -14,6 +14,7 @@ go_library(
         "queue.go",
         "classRule.go",
         "policer.go",
+        "scheduler.go",
         "setup-posix.go",
     ],
     importpath = "github.com/scionproto/scion/go/border",
