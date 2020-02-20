@@ -102,6 +102,7 @@ func (r *Router) Start() {
 	go func() {
 		defer log.HandlePanic()
 		r.bscNotify()
+		r.dequeuer()
 	}()
 	if err := r.startDiscovery(); err != nil {
 		fatal.Fatal(common.NewBasicError("Unable to start discovery", err))
