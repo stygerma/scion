@@ -111,7 +111,7 @@ func (r *Router) Start() {
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
 	}()
 	go func() {
-		r.dequeuer()
+		r.drrDequer()
 	}()
 	if err := r.startDiscovery(); err != nil {
 		fatal.Fatal(common.NewBasicError("Unable to start discovery", err))
