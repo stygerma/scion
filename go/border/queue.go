@@ -16,7 +16,7 @@ const (
 	// DROP Drop the packet
 	DROP policeAction = 2
 	// DROPNOTIFY Drop and then notify someone
-	DROPNOTIFY = 3
+	DROPNOTIFY policeAction = 3
 )
 
 type violation int
@@ -47,11 +47,13 @@ type packetQueue struct {
 
 	mutex *sync.Mutex
 
-	queue     []*qPkt
-	length    int
-	maxLength int
-	priority  int
-	tb        tokenBucket
+	queue        []*qPkt
+	length       int
+	maxLength    int
+	priority     int
+	minBandwidth int
+	maxBandwidth int
+	tb           tokenBucket
 }
 
 func (pq *packetQueue) enqueue(rp *qPkt) {
