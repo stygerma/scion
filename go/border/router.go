@@ -58,10 +58,12 @@ type Router struct {
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
 
-	queues        []packetQueue
-	rules         []classRule
-	notifications chan *qPkt
-	flag          chan int
+	queues              []packetQueue
+	rules               []classRule
+	notifications       chan *qPkt
+	flag                chan int
+	schedulerSurplus    int
+	schedulerSurplusMtx sync.Mutex
 }
 
 // NewRouter returns a new router
@@ -82,7 +84,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 			}
 		}
 		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
-		que := packetQueue{maxLength: 2, priority: priority, mutex: &sync.Mutex{}, tb: bucket}
+		que := packetQueue{maxLength: 2, minBandwidth: priority, maxBandwidth: priority, mutex: &sync.Mutex{}, tb: bucket}
 		r.queues = append(r.queues, que)
 	}
 
