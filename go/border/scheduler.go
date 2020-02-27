@@ -10,7 +10,7 @@ func (r *Router) dequeue(i int) {
 	if length > 0 {
 		qps := r.queues[i].popMultiple(length)
 		for _, qp := range qps {
-			r.forwardPacket(qp.rp)
+			r.forwarder(qp.rp)
 		}
 	}
 }
@@ -58,7 +58,7 @@ func (r *Router) drrDequeue(queueNo int, qsum int) {
 	if length > 0 {
 		qps := r.queues[queueNo].popMultiple(max(length, pktToDequeue))
 		for _, qp := range qps {
-			r.forwardPacket(qp.rp)
+			r.forwarder(qp.rp)
 		}
 	}
 }
@@ -88,7 +88,7 @@ func (r *Router) drrMinMaxDequeue(queueNo int, qsum int) {
 
 		qps := r.queues[queueNo].popMultiple(max(length, pktToDequeue))
 		for _, qp := range qps {
-			r.forwardPacket(qp.rp)
+			r.forwarder(qp.rp)
 		}
 	}
 }
