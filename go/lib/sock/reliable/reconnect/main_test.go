@@ -55,12 +55,12 @@ var (
 	connectErrorFromDispatcher = serrors.New("Port unavailable")
 )
 
-func MustParseSnet(str string) *snet.Addr {
-	address, err := snet.AddrFromString(str)
-	if err != nil {
+func MustParseSnet(str string) *snet.UDPAddr {
+	var a snet.UDPAddr
+	if err := a.Set(str); err != nil {
 		panic(fmt.Sprintf("bad snet string %v, err=%v", str, err))
 	}
-	return address
+	return &a
 }
 
 // tickerMultiplier computes durations relative to the default reconnect
@@ -79,6 +79,6 @@ func ctxMultiplier(multiplier time.Duration) context.Context {
 func TestMain(m *testing.M) {
 	// Inject a smaller timeout s.t. tests run quickly
 	reconnect.DefaultTickerInterval = 10 * time.Millisecond
-	log.Root().SetHandler(log.DiscardHandler())
+	log.Discard()
 	os.Exit(m.Run())
 }

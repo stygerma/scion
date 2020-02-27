@@ -19,8 +19,6 @@ import os
 # External packages
 import toml
 # SCION
-from lib.app.sciond import get_default_sciond_path
-from lib.packet.scion_addr import ISD_AS
 from lib.util import write_file
 from topology.common import (
     ArgsBase,
@@ -28,8 +26,10 @@ from topology.common import (
     json_default,
     remote_nets,
     sciond_svc_name,
+    SD_API_PORT,
     SIG_CONFIG_NAME
 )
+from topology.net import socket_address_str
 from topology.prometheus import SIG_PROM_PORT
 
 
@@ -86,7 +86,10 @@ class SIGGenerator(object):
         }
 
         net = self.args.networks['sig%s' % topo_id.file_fmt()][0]
-        entry['networks'][self.args.bridges[net['net']]] = {'ipv4_address': str(net['ipv4'])}
+        ipv = 'ipv4'
+        if ipv not in net:
+            ipv = 'ipv6'
+        entry['networks'][self.args.bridges[net['net']]] = {'%s_address' % ipv: str(net[ipv])}
         self.dc_conf['services']['scion_disp_sig_%s' % topo_id.file_fmt()] = entry
         vol_name = 'vol_scion_%sdisp_sig_%s' % (self.prefix, topo_id.file_fmt())
         self.dc_conf['volumes'][vol_name] = None
@@ -96,8 +99,8 @@ class SIGGenerator(object):
             'image': 'scion_sig_acceptance:latest',
             'container_name': 'scion_%ssig_%s' % (self.prefix, topo_id.file_fmt()),
             'depends_on': [
-               'scion_disp_sig_%s' % topo_id.file_fmt(),
-               sciond_svc_name(topo_id)
+                'scion_disp_sig_%s' % topo_id.file_fmt(),
+                sciond_svc_name(topo_id)
             ],
             'cap_add': ['NET_ADMIN'],
             'privileged': True,
@@ -107,7 +110,6 @@ class SIGGenerator(object):
             'volumes': [
                 *DOCKER_USR_VOL,
                 self._disp_vol(topo_id),
-                'vol_scion_%ssciond_%s:/run/shm/sciond:rw' % (self.prefix, topo_id.file_fmt()),
                 '/dev/net/tun:/dev/net/tun',
                 '%s/sig%s:/share/conf' % (base, topo_id.file_fmt()),
                 self._logs_vol()
@@ -134,23 +136,33 @@ class SIGGenerator(object):
         name = 'sig%s' % topo_id.file_fmt()
         net = self.args.networks[name][0]
         log_level = 'trace' if self.args.trace else 'debug'
+        ipv = 'ipv4'
+        if ipv not in net:
+            ipv = 'ipv6'
+
+        sciond_net = self.args.networks["sd" + topo_id.file_fmt()][0]
+        ipv = 'ipv4'
+        if ipv not in sciond_net:
+            ipv = 'ipv6'
+        sciond_ip = sciond_net[ipv]
+
         sig_conf = {
             'sig': {
                 'ID': name,
                 'SIGConfig': 'conf/cfg.json',
                 'IA': str(topo_id),
-                'IP': str(net['ipv4']),
+                'IP': str(net[ipv]),
             },
             'sd_client': {
-                'Path': get_default_sciond_path(ISD_AS(topo["ISD_AS"]))
+                'address': socket_address_str(sciond_ip, SD_API_PORT),
             },
-            'logging': {
+            'log': {
                 'file': {
-                    'Level': log_level,
-                    'Path': '/share/logs/%s.log' % name
+                    'level': log_level,
+                    'path': '/share/logs/%s.log' % name
                 },
                 'console': {
-                    'Level': 'error',
+                    'level': 'error',
                 }
             },
             'metrics': {

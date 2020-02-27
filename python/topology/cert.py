@@ -40,12 +40,12 @@ class CertGenerator(object):
         self.core_count = defaultdict(int)
 
     def generate(self, topo_dicts):
-        self.pki('v2', 'tmpl', 'topo', self.args.topo_config, '-d', self.args.output_dir)
-        self.pki('v2', 'keys', 'private', '*', '-d', self.args.output_dir)
-        self.pki('v2', 'keys', 'master', '*', '-d', self.args.output_dir)
-        self.pki('v2', 'trcs', 'gen', '*', '-d', self.args.output_dir)
-        self.pki('v2', 'certs', 'issuer', '*', '-d', self.args.output_dir)
-        self.pki('v2', 'certs', 'chain', '*', '-d', self.args.output_dir)
+        self.pki('tmpl', 'topo', self.args.topo_config, '-d', self.args.output_dir)
+        self.pki('keys', 'private', '*', '-d', self.args.output_dir)
+        self.pki('keys', 'master', '*', '-d', self.args.output_dir)
+        self.pki('trcs', 'gen', '*', '-d', self.args.output_dir)
+        self.pki('certs', 'issuer', '*', '-d', self.args.output_dir)
+        self.pki('certs', 'chain', '*', '-d', self.args.output_dir)
         self._master_keys(topo_dicts)
         self._copy_files(topo_dicts)
 
@@ -73,5 +73,5 @@ class CertGenerator(object):
             custom_dir = as_dir / 'customers'
             if not custom_dir.exists():
                 continue
-            for elem in as_topo["CertificateService"]:
+            for elem in as_topo["ControlService"]:
                 cp('-r', as_dir / 'customers', as_dir / elem / 'customers')

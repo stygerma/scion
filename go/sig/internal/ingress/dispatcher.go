@@ -16,20 +16,18 @@
 package ingress
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"time"
 
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
+	"github.com/scionproto/scion/go/lib/ctrl/sig_mgmt"
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
 	"github.com/scionproto/scion/go/lib/snet"
 	"github.com/scionproto/scion/go/lib/sock/reliable"
 	"github.com/scionproto/scion/go/sig/internal/metrics"
-	"github.com/scionproto/scion/go/sig/internal/sigcmn"
-	"github.com/scionproto/scion/go/sig/mgmt"
 )
 
 const (
@@ -43,28 +41,22 @@ const (
 // source ISD-AS -> source host Addr -> Sess Id and hands it off to the
 // appropriate Worker, starting a new one if none currently exists.
 type Dispatcher struct {
-	laddr              *snet.UDPAddr
 	workers            map[string]*Worker
 	extConn            snet.Conn
 	tunIO              io.ReadWriteCloser
 	framesRecvCounters map[metrics.CtrPairKey]metrics.CtrPair
 }
 
-func NewDispatcher(tio io.ReadWriteCloser) *Dispatcher {
+func NewDispatcher(tio io.ReadWriteCloser, conn snet.Conn) *Dispatcher {
 	return &Dispatcher{
 		tunIO:              tio,
+		extConn:            conn,
 		framesRecvCounters: make(map[metrics.CtrPairKey]metrics.CtrPair),
-		laddr:              sigcmn.EncapSnetAddr(),
 		workers:            make(map[string]*Worker),
 	}
 }
 
 func (d *Dispatcher) Run() error {
-	var err error
-	d.extConn, err = sigcmn.Network.Listen(context.Background(), "udp", d.laddr.Host, addr.SvcNone)
-	if err != nil {
-		return common.NewBasicError("Unable to initialize extConn", err)
-	}
 	return d.read()
 }
 
@@ -75,7 +67,7 @@ func (d *Dispatcher) read() error {
 		n := NewFrameBufs(frames)
 		for i := 0; i < n; i++ {
 			frame := frames[i].(*FrameBuf)
-			read, src, err := d.extConn.ReadFromSCION(frame.raw)
+			read, src, err := d.extConn.ReadFrom(frame.raw)
 			if err != nil {
 				log.Error("IngressDispatcher: Unable to read from external ingress", "err", err)
 				if reliable.IsDispatcherError(err) {
@@ -83,10 +75,15 @@ func (d *Dispatcher) read() error {
 				}
 				frame.Release()
 			} else {
-				frame.frameLen = read
-				frame.sessId = mgmt.SessionType((frame.raw[0]))
-				d.updateMetrics(src.IA.IAInt(), frame.sessId, read)
-				d.dispatch(frame, src)
+				switch v := src.(type) {
+				case *snet.UDPAddr:
+					frame.frameLen = read
+					frame.sessId = sig_mgmt.SessionType((frame.raw[0]))
+					d.updateMetrics(v.IA.IAInt(), frame.sessId, read)
+					d.dispatch(frame, v)
+				default:
+					return common.NewBasicError("Not valid snet address", nil)
+				}
 			}
 			// Clear FrameBuf reference
 			frames[i] = nil
@@ -100,7 +97,7 @@ func (d *Dispatcher) read() error {
 
 // dispatch dispatches a frame to the corresponding worker, spawning one if none
 // exist yet. Dispatching is done based on source ISD-AS -> source host Addr -> Sess Id.
-func (d *Dispatcher) dispatch(frame *FrameBuf, src *snet.Addr) {
+func (d *Dispatcher) dispatch(frame *FrameBuf, src *snet.UDPAddr) {
 	dispatchStr := fmt.Sprintf("%s/%s/%s", src.IA, src.Host, frame.sessId)
 	// Check if we already have a worker running and start one if not.
 	worker, ok := d.workers[dispatchStr]
@@ -108,7 +105,7 @@ func (d *Dispatcher) dispatch(frame *FrameBuf, src *snet.Addr) {
 		worker = NewWorker(src, frame.sessId, d.tunIO)
 		d.workers[dispatchStr] = worker
 		go func() {
-			defer log.LogPanicAndExit()
+			defer log.HandlePanic()
 			worker.Run()
 		}()
 	}
@@ -123,7 +120,7 @@ func (d *Dispatcher) cleanup() {
 		if worker.markedForCleanup {
 			delete(d.workers, key)
 			go func() {
-				defer log.LogPanicAndExit()
+				defer log.HandlePanic()
 				worker.Stop()
 			}()
 		} else {
@@ -132,7 +129,7 @@ func (d *Dispatcher) cleanup() {
 	}
 }
 
-func (d *Dispatcher) updateMetrics(remoteIA addr.IAInt, sessId mgmt.SessionType, read int) {
+func (d *Dispatcher) updateMetrics(remoteIA addr.IAInt, sessId sig_mgmt.SessionType, read int) {
 	key := metrics.CtrPairKey{RemoteIA: remoteIA, SessId: sessId}
 	counters, ok := d.framesRecvCounters[key]
 	if !ok {

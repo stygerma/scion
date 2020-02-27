@@ -16,6 +16,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"net/http"
@@ -57,7 +58,7 @@ func realMain() int {
 	}
 	defer log.Flush()
 	defer env.LogAppStopped("Dispatcher", cfg.Dispatcher.ID)
-	defer log.LogPanicAndExit()
+	defer log.HandlePanic()
 	if err := cfg.Validate(); err != nil {
 		log.Crit("Unable to validate config", "err", err)
 		return 1
@@ -74,7 +75,7 @@ func realMain() int {
 	}
 
 	go func() {
-		defer log.LogPanicAndExit()
+		defer log.HandlePanic()
 		err := RunDispatcher(
 			cfg.Dispatcher.DeleteSocket,
 			cfg.Dispatcher.ApplicationSocket,
@@ -87,7 +88,7 @@ func realMain() int {
 	}()
 	if cfg.Dispatcher.PerfData != "" {
 		go func() {
-			defer log.LogPanicAndExit()
+			defer log.HandlePanic()
 			err := http.ListenAndServe(cfg.Dispatcher.PerfData, nil)
 			if err != nil {
 				fatal.Fatal(err)
@@ -96,6 +97,8 @@ func realMain() int {
 	}
 
 	env.SetupEnv(nil)
+	http.HandleFunc("/config", configHandler)
+	http.HandleFunc("/info", env.InfoHandler)
 	cfg.Metrics.StartPrometheus()
 
 	returnCode := waitForTeardown()
@@ -105,7 +108,7 @@ func realMain() int {
 	// up the sockets and let the application close.
 	errDelete := deleteSocket(cfg.Dispatcher.ApplicationSocket)
 	if errDelete != nil {
-		log.Warn("Unable to delete socket when shutting down", errDelete)
+		log.Warn("Unable to delete socket when shutting down", "err", errDelete)
 	}
 	switch {
 	case returnCode != 0:
@@ -122,7 +125,7 @@ func setupBasic() error {
 		return err
 	}
 	cfg.InitDefaults()
-	if err := env.InitLogging(&cfg.Logging); err != nil {
+	if err := log.Setup(cfg.Logging); err != nil {
 		return err
 	}
 	prom.ExportElementID(cfg.Dispatcher.ID)
@@ -138,7 +141,6 @@ func RunDispatcher(deleteSocketFlag bool, applicationSocket string, socketFileMo
 		}
 	}
 	dispatcher := &network.Dispatcher{
-		RoutingTable:      network.NewIATable(1024, 65535),
 		OverlaySocket:     fmt.Sprintf(":%d", overlayPort),
 		ApplicationSocket: applicationSocket,
 		SocketFileMode:    socketFileMode,
@@ -176,4 +178,11 @@ func checkPerms() error {
 		return serrors.New("Running as root is not allowed for security reasons")
 	}
 	return nil
+}
+
+func configHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	var buf bytes.Buffer
+	toml.NewEncoder(&buf).Encode(cfg)
+	fmt.Fprint(w, buf.String())
 }

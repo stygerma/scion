@@ -20,19 +20,18 @@ import (
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/config"
 	"github.com/scionproto/scion/go/lib/env"
-	"github.com/scionproto/scion/go/lib/infra/modules/idiscovery"
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 var _ config.Config = (*Config)(nil)
 
 // Config is the border router configuration that is loaded from file.
 type Config struct {
-	General   env.General
-	Features  env.Features
-	Logging   env.Logging
-	Metrics   env.Metrics
-	Discovery Discovery
-	BR        BR
+	General  env.General
+	Features env.Features
+	Logging  log.Config `toml:"log,omitempty"`
+	Metrics  env.Metrics
+	BR       BR
 }
 
 func (cfg *Config) InitDefaults() {
@@ -41,7 +40,6 @@ func (cfg *Config) InitDefaults() {
 		&cfg.Features,
 		&cfg.Logging,
 		&cfg.Metrics,
-		&cfg.Discovery,
 		&cfg.BR,
 	)
 }
@@ -52,7 +50,6 @@ func (cfg *Config) Validate() error {
 		&cfg.Features,
 		&cfg.Logging,
 		&cfg.Metrics,
-		&cfg.Discovery,
 		&cfg.BR,
 	)
 }
@@ -63,7 +60,6 @@ func (cfg *Config) Sample(dst io.Writer, path config.Path, _ config.CtxMap) {
 		&cfg.Features,
 		&cfg.Logging,
 		&cfg.Metrics,
-		&cfg.Discovery,
 		&cfg.BR,
 	)
 }
@@ -99,20 +95,6 @@ func (cfg *BR) Sample(dst io.Writer, path config.Path, _ config.CtxMap) {
 
 func (cfg *BR) ConfigName() string {
 	return "br"
-}
-
-var _ config.Config = (*Discovery)(nil)
-
-type Discovery struct {
-	idiscovery.Config
-	// AllowSemiMutable indicates whether changes to the semi-mutable
-	// section in the static topology are allowed.
-	AllowSemiMutable bool
-}
-
-func (cfg *Discovery) Sample(dst io.Writer, path config.Path, ctx config.CtxMap) {
-	config.WriteString(dst, discoverySample)
-	cfg.Config.Sample(dst, path, ctx)
 }
 
 type FailAction string

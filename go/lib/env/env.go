@@ -123,41 +123,44 @@ func (cfg *General) ConfigName() string {
 	return "general"
 }
 
-var _ config.Config = (*SciondClient)(nil)
+var _ config.Config = (*SCIONDClient)(nil)
 
-// SciondClient contains information for running snet with sciond.
-type SciondClient struct {
-	// Path is the sciond path. It defaults to sciond.DefaultSCIONDPath.
-	Path string
+// SCIONDClient contains information for running snet with sciond.
+type SCIONDClient struct {
+	// Address of the SCIOND server the client should connect to. Defaults to
+	// 127.0.0.1:30255.
+	Address string
 	// InitialConnectPeriod is the maximum amount of time spent attempting to
 	// connect to sciond on start.
 	InitialConnectPeriod util.DurWrap
 	// FakeData can be used to replace the local SCIOND with a fake data source.
 	// It must point to a fake SCIOND configuration file.
 	FakeData string
+	// PathCount is the maximum number of paths returned to the user.
+	PathCount uint16
 }
 
-func (cfg *SciondClient) InitDefaults() {
-	if cfg.Path == "" {
-		cfg.Path = sciond.DefaultSCIONDPath
+func (cfg *SCIONDClient) InitDefaults() {
+	if cfg.Address == "" {
+		cfg.Address = sciond.DefaultSCIONDAddress
 	}
 	if cfg.InitialConnectPeriod.Duration == 0 {
 		cfg.InitialConnectPeriod.Duration = SciondInitConnectPeriod
 	}
 }
 
-func (cfg *SciondClient) Validate() error {
+func (cfg *SCIONDClient) Validate() error {
 	if cfg.InitialConnectPeriod.Duration == 0 {
 		return serrors.New("InitialConnectPeriod must not be zero")
 	}
 	return nil
 }
 
-func (cfg *SciondClient) Sample(dst io.Writer, path config.Path, _ config.CtxMap) {
+func (cfg *SCIONDClient) Sample(dst io.Writer, path config.Path, _ config.CtxMap) {
 	config.WriteString(dst, sciondClientSample)
 }
 
-func (cfg *SciondClient) ConfigName() string {
+func (cfg *SCIONDClient) ConfigName() string {
 	return "sd_client"
 }
 
@@ -176,14 +179,14 @@ func setupSignals(reloadF func()) {
 	signal.Notify(sig, os.Interrupt)
 	signal.Notify(sig, syscall.SIGTERM)
 	go func() {
-		defer log.LogPanicAndExit()
+		defer log.HandlePanic()
 		s := <-sig
 		log.Info("Received signal, exiting...", "signal", s)
 		fatal.Shutdown(ShutdownGraceInterval)
 	}()
 	if reloadF != nil {
 		go func() {
-			defer log.LogPanicAndExit()
+			defer log.HandlePanic()
 			for range sighupC {
 				log.Info("Received config reload signal")
 				reloadF()
@@ -198,7 +201,7 @@ func ReloadTopology(topologyPath string) {
 		log.Error("Unable to reload topology", "err", err)
 		return
 	}
-	if _, _, err := itopo.SetStatic(topo, true); err != nil {
+	if err := itopo.Update(topo); err != nil {
 		log.Error("Unable to set topology", "err", err)
 		return
 	}
@@ -229,7 +232,7 @@ func (cfg *Metrics) StartPrometheus() {
 		http.Handle("/metrics", promhttp.Handler())
 		log.Info("Exporting prometheus metrics", "addr", cfg.Prometheus)
 		go func() {
-			defer log.LogPanicAndExit()
+			defer log.HandlePanic()
 			if err := http.ListenAndServe(cfg.Prometheus, nil); err != nil {
 				fatal.Fatal(common.NewBasicError("HTTP ListenAndServe error", err))
 			}
@@ -299,4 +302,17 @@ func (cfg *QUIC) Sample(dst io.Writer, path config.Path, _ config.CtxMap) {
 
 func (cfg *QUIC) ConfigName() string {
 	return "quic"
+}
+
+func InfoHandler(w http.ResponseWriter, r *http.Request) {
+	info := VersionInfo()
+	inDocker, err := util.RunsInDocker()
+	if err == nil {
+		info += fmt.Sprintf("  In docker:     %v\n", inDocker)
+	}
+	info += fmt.Sprintf("  pid:           %d\n", os.Getpid())
+	info += fmt.Sprintf("  euid/egid:     %d %d\n", os.Geteuid(), os.Getegid())
+	info += fmt.Sprintf("  cmd line:      %q\n", os.Args)
+	w.Header().Set("Content-Type", "text/plain")
+	fmt.Fprintf(w, info)
 }
