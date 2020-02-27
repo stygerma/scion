@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"strings"
 
 	"github.com/scionproto/scion/go/border/rpkt"
@@ -26,10 +25,9 @@ func getQueueNumberFor(rp *rpkt.RtrPkt, crs *[]classRule) int {
 
 	srcIA, _ := rp.SrcIA()
 	dstIA, _ := rp.DstIA()
-
 	if (dstIA == addr.IA{I: 2, A: 10} &&
 		srcIA == addr.IA{I: 1, A: 10}) {
-		panic(errors.New("We have received the testpacket! 🥳"))
+		// panic(errors.New("We have received the testpacket! 🥳"))
 	}
 
 	for _, cr := range *crs {
