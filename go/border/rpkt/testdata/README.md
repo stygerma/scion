@@ -1,5 +1,7 @@
 # RPKT testdata
 
+First the Wireshark and Tshark packet disector must be installed as described in https://docs.scionlab.org/content/tools/wireshark.html
+
 The raw packets were created as follows:
 
 ```bash
