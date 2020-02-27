@@ -63,6 +63,7 @@ type Router struct {
 	flag                chan int
 	schedulerSurplus    int
 	schedulerSurplusMtx sync.Mutex
+	forwarder           func(rp *rpkt.RtrPkt)
 }
 
 // NewRouter returns a new router
@@ -72,6 +73,12 @@ func NewRouter(id, confDir string) (*Router, error) {
 		return nil, err
 	}
 
+	r.initQueueing()
+
+	return r, nil
+}
+
+func (r *Router) initQueueing() {
 	for w := 0; w < 2; w++ {
 		bandwidth := 50 * 1000 * 1000 // 50Mbit
 		priority := 0
@@ -95,7 +102,11 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 	r.notifications = make(chan *qPkt, maxNotificationCount)
 
-	return r, nil
+	r.forwarder = r.forwardPacket
+
+	go func() {
+		r.drrDequer()
+	}()
 }
 
 // Start sets up networking, and starts go routines for handling the main packet
@@ -108,9 +119,6 @@ func (r *Router) Start() {
 	go func() {
 		defer log.HandlePanic()
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
-	}()
-	go func() {
-		r.drrDequer()
 	}()
 }
 
