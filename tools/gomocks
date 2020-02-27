@@ -32,11 +32,13 @@ STD_LIB_MOCKS_DIRECTORY = os.path.join("go", "lib", "mocks")
 
 MOCK_TARGETS = [
         ("net", "Addr,Conn,PacketConn"),
-        (SCION_PACKAGE_PREFIX + "/go/beacon_srv/internal/beacon", "DB,Transaction"),
-        (SCION_PACKAGE_PREFIX + "/go/beacon_srv/internal/beaconing",
-            "BeaconInserter,BeaconProvider,SegmentProvider"),
-        (SCION_PACKAGE_PREFIX + "/go/beacon_srv/internal/keepalive", "IfStatePusher,RevDropper"),
-        (SCION_PACKAGE_PREFIX + "/go/beacon_srv/internal/revocation", "Store"),
+        (SCION_PACKAGE_PREFIX + "/go/cs/beacon", "DB,Transaction"),
+        (SCION_PACKAGE_PREFIX + "/go/cs/beaconing",
+            "BeaconInserter,BeaconProvider,SegmentProvider,SegmentStore"),
+        (SCION_PACKAGE_PREFIX + "/go/cs/keepalive", "IfStatePusher,RevDropper"),
+        (SCION_PACKAGE_PREFIX + "/go/cs/revocation", "Store"),
+        (SCION_PACKAGE_PREFIX + "/go/cs/segreq", "LocalInfo"),
+        (SCION_PACKAGE_PREFIX + "/go/cs/segutil", "Policy"),
         (SCION_PACKAGE_PREFIX + "/go/hidden_path_srv/internal/registration", "Validator"),
         (SCION_PACKAGE_PREFIX + "/go/hidden_path_srv/internal/hpsegreq", "Fetcher"),
         (SCION_PACKAGE_PREFIX + "/go/lib/ctrl/seg", "Signer"),
@@ -47,13 +49,13 @@ MOCK_TARGETS = [
             "DstProvider,ReplyHandler,Requester,RequestAPI,Resolver," +
             "Splitter,Validator"),
         (SCION_PACKAGE_PREFIX + "/go/lib/infra/modules/seghandler", "Storage,Verifier"),
-        (SCION_PACKAGE_PREFIX + "/go/lib/infra/modules/trust/trustdb", "TrustDB"),
-        (SCION_PACKAGE_PREFIX + "/go/lib/infra/modules/trust/v2",
+        (SCION_PACKAGE_PREFIX + "/go/lib/infra/modules/trust",
             "CryptoProvider,DB,KeyRing,Inserter,Recurser,Resolver,Router,RPC"),
         (SCION_PACKAGE_PREFIX + "/go/lib/l4", "L4Header"),
         (SCION_PACKAGE_PREFIX + "/go/lib/log", "Handler,Logger"),
         (SCION_PACKAGE_PREFIX + "/go/lib/overlay/conn", "Conn"),
         (SCION_PACKAGE_PREFIX + "/go/lib/pathdb", "PathDB,Transaction,ReadWrite"),
+        (SCION_PACKAGE_PREFIX + "/go/lib/pathmgr", "Policy,Querier,Resolver"),
         (SCION_PACKAGE_PREFIX + "/go/lib/revcache", "RevCache"),
         (SCION_PACKAGE_PREFIX + "/go/lib/sciond", "Service,Connector"),
         (SCION_PACKAGE_PREFIX + "/go/lib/snet", "Conn,PacketDispatcherService,Network,PacketConn," +
@@ -65,10 +67,7 @@ MOCK_TARGETS = [
         (SCION_PACKAGE_PREFIX + "/go/lib/topology", "Topology"),
         (SCION_PACKAGE_PREFIX + "/go/lib/periodic/internal/metrics", "ExportMetric"),
         (SCION_PACKAGE_PREFIX + "/go/lib/xtest", "Callback"),
-        (SCION_PACKAGE_PREFIX + "/go/path_srv/internal/segreq", "LocalInfo"),
-        (SCION_PACKAGE_PREFIX + "/go/path_srv/internal/segutil", "Policy"),
         (SCION_PACKAGE_PREFIX + "/go/sciond/internal/fetcher", "Policy"),
-        (SCION_PACKAGE_PREFIX + "/go/sig/internal/pathmgr", "Policy,Querier,Resolver"),
         (SCION_PACKAGE_PREFIX + "/go/sig/egress/iface", "Session"),
         (SCION_PACKAGE_PREFIX + "/go/sig/egress/worker", "SCIONWriter"),
 ]
@@ -114,6 +113,7 @@ def is_scion_package(target_package: str) -> bool:
 
 def strip_scion_package_prefix(target_package: str) -> str:
     return target_package[len(SCION_PACKAGE_PREFIX)+1:]
+
 
 if __name__ == "__main__":
     main()

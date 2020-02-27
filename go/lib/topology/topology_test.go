@@ -38,7 +38,7 @@ func TestMeta(t *testing.T) {
 	assert.Equal(t, time.Hour, c.TTL, "Field 'TTL'")
 	assert.Equal(t, addr.IA{I: 1, A: 0xff0000000311}, c.IA, "Field 'ISD_AS'")
 	assert.Equal(t, 1472, c.MTU, "Field 'MTU'")
-	assert.False(t, c.Core, "Field 'Core'")
+	assert.Empty(t, c.Attributes, "Field 'Attributes'")
 }
 
 func Test_Active(t *testing.T) {
@@ -117,10 +117,8 @@ func TestServiceCount(t *testing.T) {
 	// testing is done elsewhere
 	// The simple counting check for CS is done in the detailed population test as well
 	c := MustLoadTopo(t, "testdata/basic.json")
-	assert.Len(t, c.BS, 3, "BS")
-	assert.Len(t, c.PS, 2, "PS")
+	assert.Len(t, c.CS, 2, "CS")
 	assert.Len(t, c.SIG, 2, "SIG")
-	assert.Len(t, c.DS, 2, "DS")
 }
 
 func TestIFInfoMap(t *testing.T) {

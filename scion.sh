@@ -35,7 +35,7 @@ cmd_topology() {
         ./tools/quiet ./tools/dc run utils_chowner
     fi
     run_jaeger
-    load_cust_keys
+    #FIXME(lukedirtwalker): Re-enalbe for v2 trust: load_cust_keys
     if [ ! -e "gen-certs/tls.pem" -o ! -e "gen-certs/tls.key" ]; then
         local old=$(umask)
         echo "Generating TLS cert"
@@ -52,12 +52,8 @@ cmd_run() {
         echo "Compiling..."
         make -s || exit 1
         if is_docker_be; then
-            echo "Build scion_base image"
-            ./tools/quiet ./docker.sh base
-            echo "Build scion image"
-            ./tools/quiet ./docker.sh build
             echo "Build perapp images"
-            ./tools/quiet make -C docker/perapp
+            ./tools/quiet make -C docker/perapp bazel
             echo "Build scion tester"
             ./tools/quiet ./docker.sh tester
         fi
@@ -65,7 +61,11 @@ cmd_run() {
     run_setup
     echo "Running the network..."
     # Start dispatcher first, as it is requrired by the border routers.
-    ./tools/quiet ./scion.sh mstart '*disp*'
+    if is_docker_be; then
+        ./tools/quiet ./scion.sh mstart '*disp*' # for dockerized
+    else
+        ./tools/quiet ./scion.sh mstart '*dispatcher*' # for supervisor
+    fi
     # Start border routers before all other services to provide connectivity.
     ./tools/quiet ./scion.sh mstart '*br*'
     # Run with docker-compose or supervisor
@@ -291,7 +291,7 @@ go_lint() {
     local TMPDIR=$(mktemp -d /tmp/scion-lint.XXXXXXX)
     local LOCAL_DIRS="$(find go/* -maxdepth 0 -type d | grep -v vendor)"
     # Find go files to lint, excluding generated code. For linelen and misspell.
-    find go -type f -iname '*.go' \
+    find go acceptance -type f -iname '*.go' \
       -a '!' -ipath 'go/proto/structs.gen.go' \
       -a '!' -ipath 'go/proto/*.capnp.go' \
       -a '!' -ipath '*mock_*' \
@@ -304,12 +304,13 @@ go_lint() {
     lint_step "impi"
     # Skip CGO (https://github.com/pavius/impi/issues/5) files.
     $TMPDIR/impi --local github.com/scionproto/scion --scheme stdThirdPartyLocal --skip '/c\.go$' --skip 'mock_' --skip 'go/proto/.*\.capnp\.go' --skip 'go/proto/structs.gen.go' ./go/... || ret=1
+    $TMPDIR/impi --local github.com/scionproto/scion --scheme stdThirdPartyLocal ./acceptance/... || ret=1
     lint_step "gofmt"
     # TODO(sustrik): At the moment there are no bazel rules for gofmt.
     # See: https://github.com/bazelbuild/rules_go/issues/511
     # Instead we'll just run the commands from Go SDK directly.
     GOSDK=$(bazel info output_base)/external/go_sdk/bin
-    out=$($GOSDK/gofmt -d -s $LOCAL_DIRS);
+    out=$($GOSDK/gofmt -d -s $LOCAL_DIRS ./acceptance);
     if [ -n "$out" ]; then echo "$out"; ret=1; fi
     lint_step "linelen (lll)"
     out=$($TMPDIR/lll -w 4 -l 100 --files -e '`comment:"|`ini:"|https?:' < $TMPDIR/gofiles.list);
@@ -317,7 +318,7 @@ go_lint() {
     lint_step "misspell"
     xargs -a $TMPDIR/gofiles.list $TMPDIR/misspell -error || ret=1
     lint_step "ineffassign"
-    $TMPDIR/ineffassign -exclude ineffassign.json go || ret=1
+    $TMPDIR/ineffassign -exclude ineffassign.json go acceptance || ret=1
     lint_step "bazel"
     make gazelle GAZELLE_MODE=diff || ret=1
     # Clean up the binaries

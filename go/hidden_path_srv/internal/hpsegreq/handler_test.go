@@ -40,7 +40,7 @@ import (
 )
 
 func TestSegReq(t *testing.T) {
-	log.Root().SetHandler(log.DiscardHandler())
+	log.Discard()
 	newTestGraph(t, gomock.NewController(t))
 	tests := map[string]func(*testing.T, context.Context, infra.Handler, *mocks){
 		"valid request": func(t *testing.T, ctx context.Context, handler infra.Handler, m *mocks) {
@@ -48,9 +48,7 @@ func TestSegReq(t *testing.T) {
 				RawDstIA: ia111.IAInt(),
 				GroupIds: []*path_mgmt.HPGroupId{group1.Id.ToMsg()},
 			}
-			peer := &snet.Addr{
-				Host: addr.NewSVCUDPAppAddr(addr.SvcHPS),
-			}
+			peer := &snet.UDPAddr{IA: addr.IA{}}
 			req := infra.NewRequest(ctx, msg, nil, peer, 0)
 			recs := []*path_mgmt.HPSegRecs{
 				{
@@ -101,9 +99,7 @@ func TestSegReq(t *testing.T) {
 				RawDstIA: ia111.IAInt(),
 				GroupIds: []*path_mgmt.HPGroupId{group1.Id.ToMsg()},
 			}
-			peer := &snet.Addr{
-				Host: addr.NewSVCUDPAppAddr(addr.SvcHPS),
-			}
+			peer := &snet.UDPAddr{IA: addr.IA{}}
 			req := infra.NewRequest(ctx, msg, nil, peer, 0)
 			m.fetcher.EXPECT().Fetch(gomock.Any(), gomock.Any(),
 				gomock.Any()).Return(nil, errors.New("dummy"))
