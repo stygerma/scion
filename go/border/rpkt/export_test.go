@@ -13,7 +13,6 @@ import (
 	"github.com/scionproto/scion/go/lib/topology"
 )
 
-//TODO: Make this be not dumb, I just want this export for tests. But for some reason it doesn't work.
 func JFPrepareRtrPacketSample(t *testing.T) *RtrPkt {
 	r := NewRtrPkt()
 	// r.Raw = xtest.MustReadFromFile(t, rawUdpPkt)
