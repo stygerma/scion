@@ -21,12 +21,12 @@
 // context.
 //
 // A connection can be created by calling Dial or Listen; both functions
-// register an address-port pair with the local dispatcher. For Dial, the remote
-// address is fixed, meaning only Read and Write can be used. Attempting to
-// ReadFrom or WriteTo a connection created by Dial is an invalid operation. For
-// Listen, the remote address cannot be fixed. ReadFrom, ReadFromSCION can be
-// used to read from the connection and find out the sender's address; WriteTo
-// and WriteToSCION can be used to send a message to a chosen destination.
+// register an address-port pair with the local dispatcher. For Dial, the
+// remote address is fixed, meaning only Read and Write can be used. Attempting
+// to ReadFrom or WriteTo a connection created by Dial is an invalid operation.
+// For Listen, the remote address cannot be fixed. ReadFrom can be used to read
+// from the connection and find out the sender's address; and WriteTo can be
+// used to send a message to a chosen destination.
 //
 // Multiple networking contexts can share the same SCIOND and/or dispatcher.
 //
@@ -113,7 +113,7 @@ func (n *SCIONNetwork) Dial(ctx context.Context, network string, listen *net.UDP
 		return nil, err
 	}
 	snetConn := conn.(*SCIONConn)
-	snetConn.remote = NewUDPAddr(remote.IA, remote.Path.Copy(), remote.NextHop, remote.Host)
+	snetConn.remote = remote.Copy()
 	return conn, nil
 }
 
@@ -144,7 +144,7 @@ func (n *SCIONNetwork) Listen(ctx context.Context, network string, listen *net.U
 		return nil, serrors.New("nil listen addr not supported")
 	}
 	if listen.IP == nil {
-		return nil, serrors.New("nil listen IP no supported")
+		return nil, serrors.New("nil listen IP not supported")
 	}
 	if listen.IP.IsUnspecified() {
 		return nil, serrors.New("unspecified listen IP not supported")
@@ -153,11 +153,7 @@ func (n *SCIONNetwork) Listen(ctx context.Context, network string, listen *net.U
 		net:      network,
 		scionNet: n,
 		svc:      svc,
-		listen: &net.UDPAddr{
-			IP:   append(listen.IP[:0:0], listen.IP...),
-			Port: listen.Port,
-			Zone: listen.Zone,
-		},
+		listen:   CopyUDPAddr(listen),
 	}
 	packetConn, port, err := conn.scionNet.dispatcher.Register(ctx, n.localIA, listen, svc)
 	if err != nil {
@@ -167,6 +163,6 @@ func (n *SCIONNetwork) Listen(ctx context.Context, network string, listen *net.U
 		// Update port
 		conn.listen.Port = int(port)
 	}
-	log.Debug("Registered with dispatcher", "addr", conn.listen)
+	log.Debug("Registered with dispatcher", "addr", &UDPAddr{IA: n.localIA, Host: conn.listen})
 	return newSCIONConn(conn, n.querier, packetConn), nil
 }

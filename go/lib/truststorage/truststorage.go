@@ -24,8 +24,8 @@ import (
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/config"
 	"github.com/scionproto/scion/go/lib/infra/modules/db"
-	"github.com/scionproto/scion/go/lib/infra/modules/trust/v2"
-	"github.com/scionproto/scion/go/lib/infra/modules/trust/v2/trustdbsqlite"
+	"github.com/scionproto/scion/go/lib/infra/modules/trust"
+	"github.com/scionproto/scion/go/lib/infra/modules/trust/trustdbsqlite"
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/serrors"
 	"github.com/scionproto/scion/go/lib/util"
@@ -102,6 +102,13 @@ func (cfg *TrustDBConf) validateBackend() error {
 		return serrors.New("No backend set")
 	}
 	return common.NewBasicError("Unsupported backend", nil, "backend", cfg.Backend())
+}
+
+func (cfg *TrustDBConf) validateConnection() error {
+	if cfg.Connection() == "" {
+		return serrors.New("empty connection not allowed")
+	}
+	return nil
 }
 
 // New creates a trust database from the config.

@@ -68,13 +68,15 @@ type Path interface {
 // that packages which can not depend on snet can still implement the snet.Path
 // interface.
 type PathInterface interface {
+	// ID is the ID of the interface.
 	ID() common.IFIDType
+	// IA is the ISD AS identifier of the interface.
 	IA() addr.IA
 }
 
 // partialPath is a path object with incomplete metadata. It is used as a
 // temporary solution where a full path cannot be reconstituted from other
-// objects, notably snet.Addr.
+// objects, notably snet.UDPAddr and snet.SVCAddr.
 type partialPath struct {
 	spath       *spath.Path
 	overlay     *net.UDPAddr

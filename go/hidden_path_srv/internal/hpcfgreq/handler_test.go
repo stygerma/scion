@@ -83,7 +83,7 @@ var group4 = &hiddenpath.Group{
 }
 
 func TestCfgReq(t *testing.T) {
-	log.Root().SetHandler(log.DiscardHandler())
+	log.Discard()
 	tests := map[string]func(*testing.T, context.Context, infra.Handler,
 		*mock_infra.MockResponseWriter){
 
@@ -92,9 +92,7 @@ func TestCfgReq(t *testing.T) {
 			msg := &path_mgmt.HPCfgReq{
 				ChangedSince: 0,
 			}
-			peer := &snet.Addr{
-				IA: ia110,
-			}
+			peer := &snet.UDPAddr{IA: ia110}
 			req := infra.NewRequest(ctx, msg, nil, peer, 0)
 			reply := &path_mgmt.HPCfgReply{
 				Cfgs: []*path_mgmt.HPCfg{group1.ToMsg(), group2.ToMsg(), group3.ToMsg()},
@@ -139,10 +137,7 @@ func TestCfgReq(t *testing.T) {
 			msg := &path_mgmt.HPCfgReq{
 				ChangedSince: 0,
 			}
-			peer := &snet.Addr{
-				IA:   ia111,
-				Host: addr.NewSVCUDPAppAddr(addr.SvcHPS),
-			}
+			peer := &snet.UDPAddr{IA: ia111}
 			req := infra.NewRequest(ctx, msg, nil, peer, 0)
 			ack := ack.Ack{
 				Err:     proto.Ack_ErrCode_reject,

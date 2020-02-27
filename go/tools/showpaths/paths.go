@@ -32,38 +32,40 @@ import (
 )
 
 var (
-	dstIAStr     = flag.String("dstIA", "", "Destination IA address: ISD-AS")
-	srcIAStr     = flag.String("srcIA", "", "Source IA address: ISD-AS")
-	sciondPath   = flag.String("sciond", "", "SCIOND socket path")
-	timeout      = flag.Duration("timeout", 5*time.Second, "Timeout in seconds")
-	maxPaths     = flag.Int("maxpaths", 10, "Maximum number of paths")
-	sciondFromIA = flag.Bool("sciondFromIA", false, "SCIOND socket path from IA address:ISD-AS")
-	expiration   = flag.Bool("expiration", false, "Show path expiration timestamps")
-	refresh      = flag.Bool("refresh", false, "Set refresh flag for SCIOND path request")
-	status       = flag.Bool("p", false, "Probe the paths and print out the statuses")
-	version      = flag.Bool("version", false, "Output version information and exit.")
+	dstIAStr   = flag.String("dstIA", "", "Destination IA address: ISD-AS")
+	srcIAStr   = flag.String("srcIA", "", "Source IA address: ISD-AS")
+	sciondAddr = flag.String("sciond", sciond.DefaultSCIONDAddress, "SCIOND address")
+	timeout    = flag.Duration("timeout", 5*time.Second, "Timeout in seconds")
+	maxPaths   = flag.Int("maxpaths", 10, "Maximum number of paths")
+	expiration = flag.Bool("expiration", false, "Show path expiration timestamps")
+	refresh    = flag.Bool("refresh", false, "Set refresh flag for SCIOND path request")
+	status     = flag.Bool("p", false, "Probe the paths and print out the statuses")
+	version    = flag.Bool("version", false, "Output version information and exit.")
 )
 
 var (
-	dstIA addr.IA
-	srcIA addr.IA
-	local snet.Addr
+	dstIA      addr.IA
+	srcIA      addr.IA
+	local      snet.UDPAddr
+	logConsole string
 )
 
 func init() {
-	flag.Var((*snet.Addr)(&local), "local", "Local address to use for health checks")
+	flag.Var(&local, "local", "Local address to use for health checks")
 	flag.Usage = flagUsage
 }
 
 func main() {
-	log.AddLogConsFlags()
+	flag.StringVar(&logConsole, "log.console", "info",
+		"Console logging level: trace|debug|info|warn|error|crit")
 	validateFlags()
-	if err := log.SetupFromFlags(""); err != nil {
+	logCfg := log.Config{Console: log.ConsoleConfig{Level: logConsole}}
+	if err := log.Setup(logCfg); err != nil {
 		fmt.Fprintf(os.Stderr, "ERROR: %s", err)
 		flag.Usage()
 		os.Exit(1)
 	}
-	defer log.LogPanicAndExit()
+	defer log.HandlePanic()
 
 	ctx, cancelF := context.WithTimeout(context.Background(), *timeout)
 	defer cancelF()
@@ -117,18 +119,6 @@ func validateFlags() {
 		}
 	}
 
-	if *sciondFromIA {
-		if *sciondPath != "" {
-			LogFatal("Only one of -sciond or -sciondFromIA can be specified")
-		}
-		if srcIA.IsZero() {
-			LogFatal("-srcIA flag is missing")
-		}
-		*sciondPath = sciond.GetDefaultSCIONDPath(&srcIA)
-	} else if *sciondPath == "" {
-		*sciondPath = sciond.GetDefaultSCIONDPath(nil)
-	}
-
 	if *status && (local.IA.IsZero() || local.Host == nil) {
 		LogFatal("Local address is required for health checks")
 	}
@@ -138,12 +128,12 @@ func validateFlags() {
 // possibility to have the same functionality, i.e. refresh, fetch all paths.
 // https://github.com/scionproto/scion/issues/3348
 func getPaths(ctx context.Context) ([]snet.Path, error) {
-	sdConn, err := sciond.NewService(*sciondPath).Connect(ctx)
+	sdConn, err := sciond.NewService(*sciondAddr).Connect(ctx)
 	if err != nil {
 		return nil, serrors.WrapStr("failed to connect to SCIOND", err)
 	}
-	paths, err := sdConn.Paths(ctx, dstIA, srcIA, uint16(*maxPaths),
-		sciond.PathReqFlags{Refresh: *refresh})
+	paths, err := sdConn.Paths(ctx, dstIA, srcIA,
+		sciond.PathReqFlags{Refresh: *refresh, PathCount: uint16(*maxPaths)})
 	if err != nil {
 		return nil, serrors.WrapStr("failed to retrieve paths from SCIOND", err)
 	}

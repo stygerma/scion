@@ -22,6 +22,7 @@ import (
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/config"
 	"github.com/scionproto/scion/go/lib/env"
+	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/serrors"
 )
 
@@ -36,9 +37,9 @@ var _ config.Config = (*Config)(nil)
 
 type Config struct {
 	Features env.Features
-	Logging  env.Logging
+	Logging  log.Config `toml:"log,omitempty"`
 	Metrics  env.Metrics
-	Sciond   env.SciondClient `toml:"sd_client"`
+	Sciond   env.SCIONDClient `toml:"sd_client"`
 	Sig      SigConf
 }
 
@@ -102,6 +103,10 @@ type SigConf struct {
 	SrcIP4 net.IP
 	// IPv6 source address hint to put into routing table.
 	SrcIP6 net.IP
+	// DispatcherBypass is the overlay address (e.g. ":30041") to use when bypassing SCION
+	// dispatcher. If the field is empty bypass is not done and SCION dispatcher is used
+	// instead.
+	DispatcherBypass string
 }
 
 // InitDefaults sets the default values to unset values.

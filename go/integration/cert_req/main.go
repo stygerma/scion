@@ -31,8 +31,8 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/sciond"
 	"github.com/scionproto/scion/go/lib/scrypto"
-	"github.com/scionproto/scion/go/lib/scrypto/cert/v2"
-	"github.com/scionproto/scion/go/lib/scrypto/trc/v2"
+	"github.com/scionproto/scion/go/lib/scrypto/cert"
+	"github.com/scionproto/scion/go/lib/scrypto/trc"
 	"github.com/scionproto/scion/go/lib/snet"
 	"github.com/scionproto/scion/go/lib/tracing"
 )
@@ -47,7 +47,7 @@ func main() {
 }
 
 func realMain() int {
-	defer log.LogPanicAndExit()
+	defer log.HandlePanic()
 	defer log.Flush()
 	addFlags()
 	integration.Setup()
@@ -74,7 +74,7 @@ func (c client) run() int {
 	network := integration.InitNetwork()
 	var err error
 	c.conn, err = network.Listen(context.Background(), "udp",
-		integration.Local.ToNetUDPAddr(), addr.SvcNone)
+		integration.Local.Host, addr.SvcNone)
 	if err != nil {
 		integration.LogFatal("Unable to listen", "err", err)
 	}
@@ -224,7 +224,7 @@ func getRemote() error {
 	if svcHost, err = getSVCAddress(); err != nil {
 		return err
 	}
-	svc = snet.NewUDPAddr(integration.Local.IA, nil, nil, svcHost)
+	svc = &snet.UDPAddr{IA: integration.Local.IA, Host: svcHost}
 	return nil
 }
 
