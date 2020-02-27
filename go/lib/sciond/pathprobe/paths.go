@@ -88,7 +88,7 @@ func FilterEmptyPaths(paths []snet.Path) []snet.Path {
 // Prober can be used to get the status of a path.
 type Prober struct {
 	DstIA    addr.IA
-	Local    snet.Addr
+	Local    snet.UDPAddr
 	DispPath string
 }
 
@@ -114,7 +114,7 @@ func (p Prober) GetStatuses(ctx context.Context,
 			SCMPHandler: scmpH,
 		},
 	)
-	snetConn, err := network.Listen(ctx, "udp", p.Local.ToNetUDPAddr(), addr.SvcNone)
+	snetConn, err := network.Listen(ctx, "udp", p.Local.Host, addr.SvcNone)
 	if err != nil {
 		return nil, common.NewBasicError("listening failed", err)
 	}
@@ -143,13 +143,11 @@ func (p Prober) GetStatuses(ctx context.Context,
 }
 
 func (p Prober) send(scionConn snet.Conn, path snet.Path) error {
-	addr := &snet.Addr{
-		IA: p.DstIA,
-		Host: &addr.AppAddr{
-			L3: addr.HostSVCFromString("NONE"),
-		},
-		NextHop: path.OverlayNextHop(),
+	addr := &snet.SVCAddr{
+		IA:      p.DstIA,
 		Path:    path.Path(),
+		NextHop: path.OverlayNextHop(),
+		SVC:     addr.SvcNone,
 	}
 	log.Debug("Sending test packet.", "path", fmt.Sprintf("%s", path))
 	_, err := scionConn.WriteTo([]byte{}, addr)
@@ -161,7 +159,7 @@ func (p Prober) send(scionConn snet.Conn, path snet.Path) error {
 
 func (p Prober) receive(scionConn snet.Conn) error {
 	b := make([]byte, 1500, 1500)
-	_, _, err := scionConn.ReadFromSCION(b)
+	_, _, err := scionConn.ReadFrom(b)
 	if err == nil {
 		// We've got an actual reply instead of SCMP error. This should not happen.
 		return nil

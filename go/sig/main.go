@@ -16,9 +16,11 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"os/user"
@@ -33,10 +35,10 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/prom"
 	"github.com/scionproto/scion/go/lib/serrors"
+	"github.com/scionproto/scion/go/lib/sigdisp"
 	"github.com/scionproto/scion/go/sig/config"
 	"github.com/scionproto/scion/go/sig/egress"
 	"github.com/scionproto/scion/go/sig/internal/base"
-	"github.com/scionproto/scion/go/sig/internal/disp"
 	"github.com/scionproto/scion/go/sig/internal/ingress"
 	"github.com/scionproto/scion/go/sig/internal/metrics"
 	"github.com/scionproto/scion/go/sig/internal/sigcmn"
@@ -69,7 +71,7 @@ func realMain() int {
 	}
 	defer log.Flush()
 	defer env.LogAppStopped("SIG", cfg.Sig.ID)
-	defer log.LogPanicAndExit()
+	defer log.HandlePanic()
 	if err := validateConfig(); err != nil {
 		log.Crit("Validation of config failed", "err", err)
 		return 1
@@ -91,7 +93,7 @@ func realMain() int {
 			log.Info("reloadOnSIGHUP: reload done", "success", success)
 		},
 	)
-	disp.Init(sigcmn.CtrlConn, false)
+	sigdisp.Init(sigcmn.CtrlConn, false)
 	// Parse sig config
 	if loadConfig(cfg.Sig.SIGConfig) != true {
 		log.Crit("Unable to load sig config on startup")
@@ -99,11 +101,13 @@ func realMain() int {
 	}
 	// Reply to probes from other SIGs.
 	go func() {
-		defer log.LogPanicAndExit()
+		defer log.HandlePanic()
 		base.PollReqHdlr()
 	}()
 	egress.Init(tunIO)
 	ingress.Init(tunIO)
+	http.HandleFunc("/config", configHandler)
+	http.HandleFunc("/info", env.InfoHandler)
 	cfg.Metrics.StartPrometheus()
 	select {
 	case <-fatal.ShutdownChan():
@@ -117,11 +121,11 @@ func realMain() int {
 func setupBasic() error {
 	// Load and initialize config.
 	if _, err := toml.DecodeFile(env.ConfigFile(), &cfg); err != nil {
-		return err
+		return serrors.New("Failed to load config", "err", err, "file", env.ConfigFile())
 	}
 	cfg.InitDefaults()
-	if err := env.InitLogging(&cfg.Logging); err != nil {
-		return err
+	if err := log.Setup(cfg.Logging); err != nil {
+		return serrors.New("Failed to initialize logging", "err", err)
 	}
 	prom.ExportElementID(cfg.Sig.ID)
 	return env.LogAppStarted("SIG", cfg.Sig.ID)
@@ -202,4 +206,11 @@ func loadConfig(path string) bool {
 	}
 	atomic.StoreUint64(&metrics.ConfigVersion, cfg.ConfigVersion)
 	return true
+}
+
+func configHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	var buf bytes.Buffer
+	toml.NewEncoder(&buf).Encode(cfg)
+	fmt.Fprint(w, buf.String())
 }

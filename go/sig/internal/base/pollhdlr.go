@@ -18,18 +18,18 @@ package base
 import (
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/ctrl"
+	"github.com/scionproto/scion/go/lib/ctrl/sig_mgmt"
 	"github.com/scionproto/scion/go/lib/infra"
 	"github.com/scionproto/scion/go/lib/log"
+	"github.com/scionproto/scion/go/lib/sigdisp"
 	"github.com/scionproto/scion/go/lib/snet"
-	"github.com/scionproto/scion/go/sig/internal/disp"
 	"github.com/scionproto/scion/go/sig/internal/sigcmn"
-	"github.com/scionproto/scion/go/sig/mgmt"
 )
 
 func PollReqHdlr() {
 	log.Info("PollReqHdlr: starting")
-	for rpld := range disp.Dispatcher.PollReqC {
-		req, ok := rpld.P.(*mgmt.PollReq)
+	for rpld := range sigdisp.Dispatcher.PollReqC {
+		req, ok := rpld.P.(*sig_mgmt.PollReq)
 		if !ok {
 			log.Error("PollReqHdlr: non-SIGPollReq payload received",
 				"src", rpld.Addr, "type", common.TypeOf(rpld.P), "Id", rpld.Id, "pld", rpld.P)
@@ -37,7 +37,7 @@ func PollReqHdlr() {
 		}
 		//log.Debug("PollReqHdlr: got PollReq", "src", rpld.Addr, "pld", req,
 		//	"replyAddr", sigcmn.MgmtAddr, "replySession", req.Session)
-		spld, err := mgmt.NewPld(rpld.Id, mgmt.NewPollRep(sigcmn.MgmtAddr, req.Session))
+		spld, err := sig_mgmt.NewPld(rpld.Id, sig_mgmt.NewPollRep(sigcmn.MgmtAddr, req.Session))
 		if err != nil {
 			log.Error("PollReqHdlr: Error creating SIGCtrl payload", "err", err)
 			break
@@ -57,12 +57,12 @@ func PollReqHdlr() {
 			log.Error("PollReqHdlr: Error packing signed Ctrl payload", "err", err)
 			break
 		}
-		sigCtrlAddr := snet.NewUDPAddr(
-			rpld.Addr.IA,
-			rpld.Addr.Path,
-			snet.CopyUDPAddr(rpld.Addr.NextHop),
-			req.Addr.Ctrl.UDP(),
-		)
+		sigCtrlAddr := &snet.UDPAddr{
+			IA:      rpld.Addr.IA,
+			Path:    rpld.Addr.Path,
+			NextHop: snet.CopyUDPAddr(rpld.Addr.NextHop),
+			Host:    req.Addr.Ctrl.UDP(),
+		}
 		_, err = sigcmn.CtrlConn.WriteTo(raw, sigCtrlAddr)
 		if err != nil {
 			log.Error("PollReqHdlr: Error sending Ctrl payload", "dest", rpld.Addr, "err", err)

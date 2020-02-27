@@ -15,8 +15,6 @@
 package metrics
 
 import (
-	"strconv"
-
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/scionproto/scion/go/lib/prom"
@@ -24,20 +22,19 @@ import (
 
 // HandlerLabels defines the handler labels.
 type HandlerLabels struct {
-	Client    string
-	ReqType   string
-	CacheOnly bool
-	Result    string
+	Client  string
+	ReqType string
+	Result  string
 }
 
 // Labels returns the list of labels.
 func (l HandlerLabels) Labels() []string {
-	return []string{"client", "req_type", "cache_only", prom.LabelResult}
+	return []string{"client", "req_type", prom.LabelResult}
 }
 
 // Values returns the label values in the order defined by Labels.
 func (l HandlerLabels) Values() []string {
-	return []string{l.Client, l.ReqType, strconv.FormatBool(l.CacheOnly), l.Result}
+	return []string{l.Client, l.ReqType, l.Result}
 }
 
 // WithResult returns the handler labels with the modified result.

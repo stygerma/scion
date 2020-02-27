@@ -77,21 +77,20 @@ func (r AddressRewriter) RedirectToQUIC(ctx context.Context,
 	// FIXME(scrye): This is not legitimate use. It's only included for
 	// compatibility with older unit tests. See
 	// https://github.com/scionproto/scion/issues/2611.
-	if address == nil || r.SVCResolutionFraction <= 0.0 {
+	if address == nil {
 		return address, false, nil
 	}
 
 	switch a := address.(type) {
 	case *snet.UDPAddr:
 		return a, false, nil
-	case *snet.Addr:
-		logger.Trace("Legacy snet.Addr is still being used", "addr", fmt.Sprintf("%v(%T)", a, a))
-		return r.RedirectToQUIC(ctx, a.ToXAddr())
 	case *snet.SVCAddr:
-
 		fa, err := r.buildFullAddress(ctx, a)
 		if err != nil {
 			return nil, false, err
+		}
+		if r.SVCResolutionFraction <= 0.0 {
+			return fa, false, nil
 		}
 
 		path, err := fa.GetPath()
@@ -112,7 +111,7 @@ func (r AddressRewriter) RedirectToQUIC(ctx context.Context,
 			return a, false, err
 		}
 
-		ret := snet.NewUDPAddr(fa.IA, p.Path(), fa.NextHop, u)
+		ret := &snet.UDPAddr{IA: fa.IA, Path: p.Path(), NextHop: fa.NextHop, Host: u}
 		return ret, quicRedirect, err
 	}
 
@@ -128,12 +127,17 @@ func (r AddressRewriter) buildFullAddress(ctx context.Context,
 	s *snet.SVCAddr) (*snet.SVCAddr, error) {
 
 	if s.Path != nil {
-		ret := snet.NewSVCAddr(s.IA, s.Path.Copy(), snet.CopyUDPAddr(s.NextHop), s.SVC)
+		ret := &snet.SVCAddr{
+			IA:      s.IA,
+			Path:    s.Path.Copy(),
+			NextHop: snet.CopyUDPAddr(s.NextHop),
+			SVC:     s.SVC,
+		}
 		log.Trace("[Acceptance]", "overlay", ret.NextHop)
 		return ret, nil
 	}
 
-	ret := snet.NewSVCAddr(s.IA, nil, nil, s.SVC)
+	ret := &snet.SVCAddr{IA: s.IA, SVC: s.SVC}
 	p, err := r.Router.Route(ctx, s.IA)
 	if err != nil {
 		return nil, err
