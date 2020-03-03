@@ -9,7 +9,7 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
-var packets = make(chan *rpkt.RtrPkt)
+var packets = make(chan *rpkt.RtrPkt, 100)
 
 /*
 Things to do:
@@ -95,26 +95,6 @@ func TestCallPacketGen(t *testing.T) {
 	_ = rpkt.JFPrepareRtrPacketSample(t)
 }
 
-// If you want the error to be thrown enable the panic with 🥳 in classRule.go
-// func TestThrowPanic(t *testing.T) {
-
-// 	r, oldCtx := setupTestRouter(t)
-
-// 	r.initQueueing()
-
-// 	rp := rpkt.JFPrepareRtrPacketSample(t)
-
-// 	r.forwarder = r.forwardPacketTest
-
-// 	_ = r
-// 	_ = oldCtx
-// 	_ = rpkt.NewRtrPkt()
-// 	_ = rp
-
-// 	r.queuePacket(rp)
-
-// }
-
 func TestBasicRoute(t *testing.T) {
 
 	r, _ := setupTestRouter(t)
@@ -147,4 +127,35 @@ func (r *Router) forwardPacketTest(rp *rpkt.RtrPkt) {
 
 	packets <- rp
 
+}
+
+func TestHundredPacketQueue(t *testing.T) {
+
+	r, _ := setupTestRouter(t)
+
+	r.initQueueing()
+	r.forwarder = r.forwardPacketTest
+
+	ps := make([]*rpkt.RtrPkt, 100)
+
+	for i := 0; i < 100; i++ {
+		rp := rpkt.JFPrepareRtrPacketSample(t)
+		r.queuePacket(rp)
+		ps[i] = rp
+	}
+
+	time.Sleep(2 * time.Second)
+
+	for i := 0; i < 100; i++ {
+		select {
+		case returnedPacket := <-packets:
+			if returnedPacket != ps[i] {
+				t.Errorf("Returned wrong packet!")
+			} else {
+				fmt.Println("We got the packet back 🥳👯‍♂️👯‍♀️")
+			}
+		default:
+			t.Errorf("Returned no packet!")
+		}
+	}
 }
