@@ -8,7 +8,7 @@ import (
 )
 
 type tokenBucket struct {
-	MaxBandWidth     int `yaml:"policeRate"` // In bps
+	MaxBandWidth     int // In bps
 	tokens           int // One token is 1 b
 	tokenSpent       int
 	timerGranularity int
