@@ -18,7 +18,9 @@
 package main
 
 import (
-	"strings"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -33,6 +35,7 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
 	_ "github.com/scionproto/scion/go/lib/scrypto" // Make sure math/rand is seeded
+	"gopkg.in/yaml.v2"
 )
 
 const processBufCnt = 128
@@ -57,12 +60,17 @@ type Router struct {
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
 
-	queues              []packetQueue
-	rules               []classRule
+	config              RouterConfig
 	notifications       chan *qPkt
 	flag                chan int
 	schedulerSurplus    int
 	schedulerSurplusMtx sync.Mutex
+}
+
+// RouterConfig is what I am loading from the config file
+type RouterConfig struct {
+	Queues []packetQueue `yaml:"Queues"`
+	Rules  []classRule   `yaml:"Rules"`
 }
 
 // NewRouter returns a new router
@@ -77,27 +85,45 @@ func NewRouter(id, confDir string) (*Router, error) {
 	return r, nil
 }
 
-func (r *Router) initQueueing() {
-	for w := 0; w < 2; w++ {
-		bandwidth := 50 * 1000 * 1000 // 50Mbit
-		priority := 0
-		if strings.Contains(r.Id, "br2-ff00_0_212") {
-			if w == 1 {
-				log.Debug("It's me br2-ff00_0_212-1")
-				bandwidth = 5 * 1000 * 1000 // 5Mbit
-				priority = 1
-			}
-		}
-		bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
-		que := packetQueue{maxLength: 2, minBandwidth: priority, maxBandwidth: priority, mutex: &sync.Mutex{}, tb: bucket}
-		r.queues = append(r.queues, que)
+func (r *Router) loadConfigFile(path string) {
+
+	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+
+	log.Info("Current Path is", "path", dir)
+
+	yamlFile, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Info("yamlFile.Get ", "error", err)
+	}
+	err = yaml.Unmarshal(yamlFile, &r.config)
+	if err != nil {
+		log.Error("Unmarshal: ", "error", err)
 	}
 
-	rul := classRule{sourceAs: "2-ff00:0:212", destinationAs: "1-ff00:0:110", queueNumber: 1}
+}
 
-	r.rules = append(r.rules, rul)
+func (r *Router) initQueueing() {
 
-	r.flag = make(chan int, len(r.queues))
+	//TODO: Figure out the actual path where the other config files are loaded
+	r.loadConfigFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
+
+	// Initialise other data structures
+
+	log.Info("We have policeRate in token bucket: ", "MaxBandWidth", r.config.Queues[0].tb.MaxBandWidth)
+
+	for i := 0; i < len(r.config.Queues); i++ {
+		r.config.Queues[i].mutex = &sync.Mutex{}
+		r.config.Queues[i].length = 0
+		r.config.Queues[i].tb = tokenBucket{
+			MaxBandWidth: r.config.Queues[i].PoliceRate,
+			tokens:       r.config.Queues[i].PoliceRate,
+			lastRefill:   time.Now(),
+			mutex:        &sync.Mutex{}}
+	}
+
+	log.Info("We have queues: ", "numberOfQueues", len(r.config.Queues))
+
+	r.flag = make(chan int, len(r.config.Queues))
 
 	r.notifications = make(chan *qPkt, maxNotificationCount)
 
@@ -127,6 +153,7 @@ func (r *Router) Start() {
 	}
 }
 
+// TODO: Do we want to we also want to reload the queue config
 // ReloadConfig handles reloading the configuration when SIGHUP is received.
 func (r *Router) ReloadConfig() error {
 	var err error
@@ -266,25 +293,32 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	// Put all other packets from br2 on a faster queue but still delayed
 	// At the moment no queue is slow
 
-	queueNo := getQueueNumberFor(rp, &r.rules)
+	queueNo := getQueueNumberFor(rp, &r.config.Rules)
 	qp := qPkt{rp: rp, queueNo: queueNo}
 
-	polAct := r.queues[queueNo].police(&qp, queueNo == 1)
+	log.Info("Queuenumber is ", "queuenumber", queueNo)
+	log.Info("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
+
+	polAct := r.config.Queues[queueNo].police(&qp, queueNo == 1)
+
+	// if queueNo == 1 {
+	// 	panic("We have received a packet on queue 1 🥳")
+	// }
 
 	if polAct == PASS {
-		r.queues[queueNo].enqueue(&qp)
+		r.config.Queues[queueNo].enqueue(&qp)
 	} else if polAct == NOTIFY {
-		r.queues[queueNo].enqueue(&qp)
+		r.config.Queues[queueNo].enqueue(&qp)
 		// TODO Check with Marc whether he wants all notifications or if it is fine if we drop some, or what should happen if we drop some
 		qp.sendNotification()
 	} else if polAct == DROPNOTIFY {
-		r.queues[queueNo].enqueue(&qp)
+		r.config.Queues[queueNo].enqueue(&qp)
 		qp.sendNotification()
 	} else if polAct == DROP {
 		r.dropPacket(qp.rp)
 	} else {
 		// This should never happen
-		r.queues[queueNo].enqueue(&qp)
+		r.config.Queues[queueNo].enqueue(&qp)
 	}
 
 	// According to gobyexample all sends are blocking and this is the standard way to do non-blocking sends (https://gobyexample.com/non-blocking-channel-operations)
