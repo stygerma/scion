@@ -25,7 +25,7 @@ func setupQueue() packetQueue {
 	priority := 1
 
 	bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
-	que := packetQueue{maxLength: 128, minBandwidth: priority, maxBandwidth: priority, mutex: &sync.Mutex{}, tb: bucket}
+	que := packetQueue{MaxLength: 128, MinBandwidth: priority, MaxBandWidth: priority, mutex: &sync.Mutex{}, tb: bucket}
 
 	return que
 

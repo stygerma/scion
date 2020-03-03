@@ -4,11 +4,11 @@ import "github.com/scionproto/scion/go/lib/log"
 
 func (r *Router) dequeue(i int) {
 
-	length := r.queues[i].getLength()
+	length := r.config.Queues[i].getLength()
 	log.Debug("The queue has length", "length", length)
 
 	if length > 0 {
-		qps := r.queues[i].popMultiple(length)
+		qps := r.config.Queues[i].popMultiple(length)
 		for _, qp := range qps {
 			r.forwarder(qp.rp)
 		}
@@ -20,8 +20,8 @@ func (r *Router) dequeuer() {
 		j := <-r.flag
 		i := 0
 
-		for i < len(r.queues) {
-			r.dequeue((j + i) % (len(r.queues)))
+		for i < len(r.config.Queues) {
+			r.dequeue((j + i) % (len(r.config.Queues)))
 			i = i + 1
 		}
 	}
@@ -31,8 +31,8 @@ func (r *Router) drrDequer() {
 
 	i := 0
 	qsum := 0
-	for i < len(r.queues) {
-		qsum = qsum + r.queues[i].priority
+	for i < len(r.config.Queues) {
+		qsum = qsum + r.config.Queues[i].priority
 		i++
 	}
 
@@ -40,8 +40,8 @@ func (r *Router) drrDequer() {
 		j := <-r.flag
 		i := 0
 
-		for i < len(r.queues) {
-			r.drrMinMaxDequeue((j+i)%(len(r.queues)), 1)
+		for i < len(r.config.Queues) {
+			r.drrMinMaxDequeue((j+i)%(len(r.config.Queues)), 1)
 			i++
 		}
 	}
@@ -49,14 +49,14 @@ func (r *Router) drrDequer() {
 
 func (r *Router) drrDequeue(queueNo int, qsum int) {
 
-	length := r.queues[queueNo].getLength()
-	pktToDequeue := min(64*(r.queues[queueNo].priority/qsum), 1)
+	length := r.config.Queues[queueNo].getLength()
+	pktToDequeue := min(64*(r.config.Queues[queueNo].priority/qsum), 1)
 
 	log.Debug("The queue has length", "length", length)
 	log.Debug("Dequeueing packets", "quantum", pktToDequeue)
 
 	if length > 0 {
-		qps := r.queues[queueNo].popMultiple(max(length, pktToDequeue))
+		qps := r.config.Queues[queueNo].popMultiple(max(length, pktToDequeue))
 		for _, qp := range qps {
 			r.forwarder(qp.rp)
 		}
@@ -65,8 +65,8 @@ func (r *Router) drrDequeue(queueNo int, qsum int) {
 
 func (r *Router) drrMinMaxDequeue(queueNo int, qsum int) {
 
-	length := r.queues[queueNo].getLength()
-	pktToDequeue := min(64*(r.queues[queueNo].minBandwidth/qsum), 1)
+	length := r.config.Queues[queueNo].getLength()
+	pktToDequeue := min(64*(r.config.Queues[queueNo].MinBandwidth/qsum), 1)
 
 	log.Debug("The queue has length", "length", length)
 	log.Debug("Dequeueing packets", "quantum", pktToDequeue)
@@ -86,7 +86,7 @@ func (r *Router) drrMinMaxDequeue(queueNo int, qsum int) {
 			}
 		}
 
-		qps := r.queues[queueNo].popMultiple(max(length, pktToDequeue))
+		qps := r.config.Queues[queueNo].popMultiple(max(length, pktToDequeue))
 		for _, qp := range qps {
 			r.forwarder(qp.rp)
 		}
@@ -103,11 +103,11 @@ func (r *Router) getFromSurplus(queueNo int, request int) int {
 
 	i := 0
 	qsum := 0
-	for i < len(r.queues) {
-		qsum = qsum + r.queues[i].minBandwidth
+	for i < len(r.config.Queues) {
+		qsum = qsum + r.config.Queues[i].MinBandwidth
 		i++
 	}
-	upperLimit := min(64*(r.queues[queueNo].maxBandwidth/qsum), 1)
+	upperLimit := min(64*(r.config.Queues[queueNo].MaxBandWidth/qsum), 1)
 
 	credit := min(r.schedulerSurplus, upperLimit)
 
