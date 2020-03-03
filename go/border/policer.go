@@ -8,7 +8,7 @@ import (
 )
 
 type tokenBucket struct {
-	MaxBandWidth     int // In bps
+	MaxBandWidth     int `yaml:"policeRate"` // In bps
 	tokens           int // One token is 1 b
 	tokenSpent       int
 	timerGranularity int
@@ -56,7 +56,7 @@ func (pq *packetQueue) police(qp *qPkt, shouldLog bool) policeAction {
 	tokenForPacket := packetSize * 8 // In bit
 
 	if shouldLog {
-		log.Debug("Overall available bandwidth per second", "maxBandwidth", pq.tb.MaxBandWidth)
+		log.Debug("Overall available bandwidth per second", "MaxBandWidth", pq.tb.MaxBandWidth)
 		log.Debug("Spent token in last period", "#tokens", pq.tb.tokenSpent)
 		log.Debug("Available bandwidth before refill", "bandwidth", pq.tb.tokens)
 	}
