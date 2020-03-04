@@ -105,7 +105,8 @@ func (r *Router) loadConfigFile(path string) {
 func (r *Router) initQueueing() {
 
 	//TODO: Figure out the actual path where the other config files are loaded
-	r.loadConfigFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
+	r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
+	// r.loadConfigFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
 
 	// Initialise other data structures
 
