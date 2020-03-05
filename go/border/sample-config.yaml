@@ -42,12 +42,32 @@ Queues :
                 fill-level: 80
                 prob: 50
                 action: 2
+    -
+        name: "Droppy Queue"
+        id: 2
+        CIR: 0 #Previously named min-bandwidth
+        PIR: 70 #Previously named max-bandwidth
+        policeRate: 5000000 #5Mbit/s
+        maxLength: 1024
+        priority: 1
+        profile:
+            - 
+                fill-level: 0
+                prob: 25
+                action: 2
 # Rules
 Rules :
     - 
         name: "Test rule"
-        sourceAs: "2-ff00_0_212"
+        sourceAs: "2-ff00:0:212"
         nextHopAs: ""
         destinationAs: "1-ff00:0:110"
         L4Type: -1
         queueNumber: 1
+    - 
+        name: "Drop Test Rule"
+        sourceAs: "1-ff00:0:110"
+        nextHopAs: ""
+        destinationAs: "1-ff00:0:111"
+        L4Type: -1
+        queueNumber: 2

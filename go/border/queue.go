@@ -80,6 +80,11 @@ func (pq *packetQueue) canDequeue() bool {
 	return pq.length > 0
 }
 
+func (pq *packetQueue) getFillLevel() int {
+
+	return pq.length / pq.MaxLength
+}
+
 func (pq *packetQueue) getLength() int {
 
 	return pq.length
