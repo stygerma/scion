@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math/rand"
 	"sync"
 	"time"
 
@@ -84,6 +85,45 @@ func (pq *packetQueue) police(qp *qPkt, shouldLog bool) policeAction {
 	}
 
 	return qp.act.action
+}
+
+func (pq *packetQueue) checkAction() policeAction {
+
+	level := pq.getFillLevel()
+
+	log.Info("Current level is", "level", level)
+	log.Info("Profiles are", "profiles", pq.Profile)
+
+	for j := len(pq.Profile) - 1; j >= 0; j-- {
+		if level >= pq.Profile[j].FillLevel {
+			log.Info("Matched a rule!")
+			if rand.Intn(100) < (pq.Profile[j].Prob) {
+				log.Info("Take Action!")
+				return pq.Profile[j].Action
+			} else {
+				log.Info("Do not take Action")
+			}
+		}
+	}
+
+	return PASS
+}
+
+func returnAction(polAction policeAction, profAction policeAction) policeAction {
+
+	if polAction == DROPNOTIFY || profAction == DROPNOTIFY {
+		return DROPNOTIFY
+	}
+
+	if polAction == DROP || profAction == DROP {
+		return DROP
+	}
+
+	if polAction == NOTIFY || profAction == NOTIFY {
+		return NOTIFY
+	}
+
+	return PASS
 }
 
 func (qp *qPkt) sendNotification() {
