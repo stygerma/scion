@@ -294,6 +294,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	// Put all other packets from br2 on a faster queue but still delayed
 	// At the moment no queue is slow
 
+<<<<<<< 816f501720ce6c2c5fcd7d3adb1badc7dd8249a6
 	if strings.Contains(r.Id, "br2-ff00_0_212") {
 		log.Debug("It's me br2-ff00_0_212")
 
@@ -303,6 +304,37 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 			r.queues[0].enqueue(rp)
 
 		} else {
+=======
+	queueNo := getQueueNumberFor(rp, &r.config.Rules)
+	qp := qPkt{rp: rp, queueNo: queueNo}
+
+	log.Info("Queuenumber is ", "queuenumber", queueNo)
+	log.Info("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
+
+	polAct := r.config.Queues[queueNo].police(&qp, queueNo == 1)
+	profAct := r.config.Queues[queueNo].checkAction()
+
+	act := returnAction(polAct, profAct)
+
+	// if queueNo == 1 {
+	// 	panic("We have received a packet on queue 1 🥳")
+	// }
+
+	if act == PASS {
+		r.config.Queues[queueNo].enqueue(&qp)
+	} else if act == NOTIFY {
+		r.config.Queues[queueNo].enqueue(&qp)
+		qp.sendNotification()
+	} else if act == DROPNOTIFY {
+		r.config.Queues[queueNo].enqueue(&qp)
+		qp.sendNotification()
+	} else if act == DROP {
+		r.dropPacket(qp.rp)
+	} else {
+		// This should never happen
+		r.config.Queues[queueNo].enqueue(&qp)
+	}
+>>>>>>> Use actionProfiles
 
 			// r.queues[1].mutex.Lock()
 			// r.queues[1].queue = append(r.queues[1].queue, rp)
