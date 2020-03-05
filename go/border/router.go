@@ -301,21 +301,23 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	log.Info("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
 
 	polAct := r.config.Queues[queueNo].police(&qp, queueNo == 1)
+	profAct := r.config.Queues[queueNo].checkAction()
+
+	act := returnAction(polAct, profAct)
 
 	// if queueNo == 1 {
 	// 	panic("We have received a packet on queue 1 🥳")
 	// }
 
-	if polAct == PASS {
+	if act == PASS {
 		r.config.Queues[queueNo].enqueue(&qp)
-	} else if polAct == NOTIFY {
-		r.config.Queues[queueNo].enqueue(&qp)
-		// TODO Check with Marc whether he wants all notifications or if it is fine if we drop some, or what should happen if we drop some
-		qp.sendNotification()
-	} else if polAct == DROPNOTIFY {
+	} else if act == NOTIFY {
 		r.config.Queues[queueNo].enqueue(&qp)
 		qp.sendNotification()
-	} else if polAct == DROP {
+	} else if act == DROPNOTIFY {
+		r.config.Queues[queueNo].enqueue(&qp)
+		qp.sendNotification()
+	} else if act == DROP {
 		r.dropPacket(qp.rp)
 	} else {
 		// This should never happen
