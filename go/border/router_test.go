@@ -16,8 +16,6 @@ func TestLoadSampleConfig(t *testing.T) {
 
 }
 
-// TODO: Check whether everything is initialised correctly
-
 func TestLoadSampleConfigQueues(t *testing.T) {
 	r, _ := setupTestRouter(t)
 
