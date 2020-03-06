@@ -277,8 +277,6 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	droppedPackets = droppedPackets + 1
 	log.Debug("Dropped Packet", "dropped", droppedPackets)
 
-	// TODO: We probably want some metrics here
-
 }
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
@@ -288,9 +286,12 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
 		r.handlePktError(rp, err, "Error routing packet")
-		// TODO: Add metrics again
-		// l.Result = metrics.ErrRoute
-		// metrics.Process.Pkts(l).Inc()
+		l := metrics.ProcessLabels{
+			IntfIn:  metrics.IntfToLabel(rp.Ingress.IfID),
+			IntfOut: metrics.Drop,
+		}
+		l.Result = metrics.ErrRoute
+		metrics.Process.Pkts(l).Inc()
 	}
 }
 
