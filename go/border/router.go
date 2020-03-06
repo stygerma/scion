@@ -42,6 +42,8 @@ const processBufCnt = 128
 
 const maxNotificationCount = 512
 
+const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
+
 var droppedPackets = 0
 
 // Router struct
@@ -85,7 +87,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 	return r, nil
 }
 
-func (r *Router) loadConfigFile(path string) {
+func (r *Router) loadConfigFile(path string) error {
 
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 
@@ -94,23 +96,29 @@ func (r *Router) loadConfigFile(path string) {
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Info("yamlFile.Get ", "error", err)
+		return err
 	}
 	err = yaml.Unmarshal(yamlFile, &r.config)
 	if err != nil {
 		log.Error("Unmarshal: ", "error", err)
+		return err
 	}
 
+	return nil
 }
 
 func (r *Router) initQueueing() {
 
 	//TODO: Figure out the actual path where the other config files are loaded
 	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
-	r.loadConfigFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
+	err := r.loadConfigFile(configFileLocation)
+
+	if err != nil {
+		log.Error("Loading config file failed", "error", err)
+		panic("Loading config file failed")
+	}
 
 	// Initialise other data structures
-
-	log.Info("We have policeRate in token bucket: ", "MaxBandWidth", r.config.Queues[0].tb.MaxBandWidth)
 
 	for i := 0; i < len(r.config.Queues); i++ {
 		r.config.Queues[i].mutex = &sync.Mutex{}
@@ -125,9 +133,7 @@ func (r *Router) initQueueing() {
 	log.Info("We have queues: ", "numberOfQueues", len(r.config.Queues))
 
 	r.flag = make(chan int, len(r.config.Queues))
-
 	r.notifications = make(chan *qPkt, maxNotificationCount)
-
 	r.forwarder = r.forwardPacket
 
 	go func() {
@@ -154,7 +160,6 @@ func (r *Router) Start() {
 	}
 }
 
-// TODO: Do we want to we also want to reload the queue config
 // ReloadConfig handles reloading the configuration when SIGHUP is received.
 func (r *Router) ReloadConfig() error {
 	var err error
@@ -164,6 +169,9 @@ func (r *Router) ReloadConfig() error {
 	}
 	if err := r.setupCtxFromConfig(config); err != nil {
 		return common.NewBasicError("Unable to set up new context", err)
+	}
+	if err = r.loadConfigFile(configFileLocation); err != nil {
+		return common.NewBasicError("Unable to load QoS config", err)
 	}
 	return nil
 }
