@@ -24,7 +24,7 @@
 //    +--------+--------+--------+--------+--------+--------+--------+--------+
 //
 
-package scmp_auth
+package scmp_auth //IMP: this handles the DRKEY stuff for scmp
 
 import (
 	"bytes"
