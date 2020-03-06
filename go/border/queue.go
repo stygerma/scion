@@ -16,7 +16,7 @@ const (
 	// DROP Drop the packet
 	DROP policeAction = 2
 	// DROPNOTIFY Drop and then notify someone
-	DROPNOTIFY = 3
+	DROPNOTIFY policeAction = 3
 )
 
 type violation int
@@ -41,17 +41,28 @@ type qPkt struct {
 	rp      *rpkt.RtrPkt
 }
 
-// Queue is a single queue
 type packetQueue struct {
-	// Id string
+	Name         string          `yaml:"name"`
+	ID           int             `yaml:"id"`
+	MinBandwidth int             `yaml:"CIR"`
+	MaxBandWidth int             `yaml:"PIR"`
+	PoliceRate   int             `yaml:"policeRate"`
+	MaxLength    int             `yaml:"maxLength"`
+	priority     int             `yaml:"priority"`
+	Profile      []actionProfile `yaml:"profile"`
 
 	mutex *sync.Mutex
 
-	queue     []*qPkt
-	length    int
-	maxLength int
-	priority  int
-	tb        tokenBucket
+	queue  []*qPkt
+	length int
+	tb     tokenBucket
+}
+
+// TODO: Implement this. It currently does nothing
+type actionProfile struct {
+	FillLevel int          `yaml:"fill-level"`
+	Prob      int          `yaml:"prob"`
+	Action    policeAction `yaml:"action"`
 }
 
 func (pq *packetQueue) enqueue(rp *qPkt) {
@@ -67,6 +78,11 @@ func (pq *packetQueue) enqueue(rp *qPkt) {
 func (pq *packetQueue) canDequeue() bool {
 
 	return pq.length > 0
+}
+
+func (pq *packetQueue) getFillLevel() int {
+
+	return pq.length / pq.MaxLength
 }
 
 func (pq *packetQueue) getLength() int {
