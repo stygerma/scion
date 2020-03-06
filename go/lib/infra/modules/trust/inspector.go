@@ -22,9 +22,9 @@ import (
 
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/infra"
+	"github.com/scionproto/scion/go/lib/infra/modules/trust/internal/metrics"
 	"github.com/scionproto/scion/go/lib/scrypto"
 	"github.com/scionproto/scion/go/lib/scrypto/trc"
-	"github.com/scionproto/scion/go/lib/serrors"
 )
 
 // Inspector gives insights into the primary ASes of a given ISD.
@@ -44,10 +44,12 @@ type DefaultInspector struct {
 
 // ByAttributes returns a list of primary ASes in the specified ISD that hold
 // all the requested attributes.
-func (i DefaultInspector) ByAttributes(parentCtx context.Context, isd addr.ISD,
+func (i DefaultInspector) ByAttributes(ctx context.Context, isd addr.ISD,
 	opts infra.ASInspectorOpts) ([]addr.IA, error) {
 
-	span, ctx := opentracing.StartSpanFromContext(parentCtx, "by_attributes")
+	l := metrics.InspectorLabels{Type: metrics.ByAttributes}
+	ctx = metrics.CtxWith(ctx, metrics.ASInspector)
+	span, ctx := opentracing.StartSpanFromContext(ctx, "by_attributes")
 	defer span.Finish()
 	opentracingext.Component.Set(span, "trust")
 	span.SetTag("isd", isd)
@@ -55,8 +57,9 @@ func (i DefaultInspector) ByAttributes(parentCtx context.Context, isd addr.ISD,
 
 	trcOpts := infra.TRCOpts{TrustStoreOpts: opts.TrustStoreOpts}
 	t, err := i.Provider.GetTRC(ctx, TRCID{ISD: isd, Version: scrypto.LatestVer}, trcOpts)
+	defer metrics.Inspector.Request(l.WithResult(errToLabel(err))).Inc()
 	if err != nil {
-		return nil, serrors.WrapStr("unable to get latest TRC", err, "isd", isd)
+		return nil, err
 	}
 	ases := make([]addr.IA, 0, len(t.PrimaryASes))
 	for as, entry := range t.PrimaryASes {
@@ -72,6 +75,8 @@ func (i DefaultInspector) ByAttributes(parentCtx context.Context, isd addr.ISD,
 func (i DefaultInspector) HasAttributes(ctx context.Context, ia addr.IA,
 	opts infra.ASInspectorOpts) (bool, error) {
 
+	l := metrics.InspectorLabels{Type: metrics.HasAttributes}
+	ctx = metrics.CtxWith(ctx, metrics.ASInspector)
 	span, ctx := opentracing.StartSpanFromContext(ctx, "has_attributes")
 	defer span.Finish()
 	opentracingext.Component.Set(span, "trust")
@@ -80,8 +85,9 @@ func (i DefaultInspector) HasAttributes(ctx context.Context, ia addr.IA,
 
 	trcOpts := infra.TRCOpts{TrustStoreOpts: opts.TrustStoreOpts}
 	trc, err := i.Provider.GetTRC(ctx, TRCID{ISD: ia.I, Version: scrypto.LatestVer}, trcOpts)
+	defer metrics.Inspector.Request(l.WithResult(errToLabel(err))).Inc()
 	if err != nil {
-		return false, serrors.WrapStr("unable to get latest TRC", err, "isd", ia.I)
+		return false, err
 	}
 	entry, ok := trc.PrimaryASes[ia.A]
 	if !ok {

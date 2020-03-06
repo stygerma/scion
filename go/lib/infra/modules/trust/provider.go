@@ -25,6 +25,7 @@ import (
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/infra"
 	"github.com/scionproto/scion/go/lib/infra/modules/trust/internal/decoded"
+	"github.com/scionproto/scion/go/lib/infra/modules/trust/internal/metrics"
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/scrypto"
 	"github.com/scionproto/scion/go/lib/scrypto/cert"
@@ -38,6 +39,10 @@ var ErrInactive = serrors.New("inactive")
 // CryptoProvider provides crypto material. A crypto provider can spawn network
 // requests if necessary and permitted.
 type CryptoProvider interface {
+	// AnnounceTRC announces the existence of a TRC, it must be called before
+	// verifying a signature based on a certificate chain to ensure the TRC in
+	// the signature source is available to the CryptoProvider.
+	AnnounceTRC(context.Context, TRCID, infra.TRCOpts) error
 	// GetTRC asks the trust store to return a valid and active TRC for isd,
 	// unless inactive TRCs are specifically allowed. The optionally configured
 	// server is queried over the network if the TRC is not available locally.
@@ -78,19 +83,34 @@ type Provider struct {
 	Router   Router
 }
 
+// AnnounceTRC announces the existence of a TRC, it must be called before
+// verifying a signature based on a certificate chain to ensure the TRC in
+// the signature source is available to the CryptoProvider.
+func (p Provider) AnnounceTRC(ctx context.Context, id TRCID, opts infra.TRCOpts) error {
+	// This could be implemented more efficiently, but comes with additional
+	// complexity in the code.
+	opts.AllowInactive = true
+	_, _, err := p.getCheckedTRC(ctx, id, opts)
+	return err
+}
+
 // GetTRC asks the trust store to return a valid and active TRC for isd,
 // unless inactive TRCs are specifically allowed. The optionally configured
 // server is queried over the network if the TRC is not available locally.
 // Otherwise, the default server is queried. How the default server is
 // determined differs between implementations.
 func (p Provider) GetTRC(ctx context.Context, id TRCID, opts infra.TRCOpts) (*trc.TRC, error) {
+	l := metrics.ProviderLabels{Type: metrics.TRC, Trigger: metrics.FromCtx(ctx)}
 	t, _, err := p.getCheckedTRC(ctx, id, opts)
+	metrics.Provider.Request(l.WithResult(errToLabel(err))).Inc()
 	return t, err
 }
 
 // GetRawTRC behaves the same as GetTRC, except returning the raw signed TRC.
 func (p Provider) GetRawTRC(ctx context.Context, id TRCID, opts infra.TRCOpts) ([]byte, error) {
+	l := metrics.ProviderLabels{Type: metrics.TRC, Trigger: metrics.FromCtx(ctx)}
 	_, raw, err := p.getCheckedTRC(ctx, id, opts)
+	metrics.Provider.Request(l.WithResult(errToLabel(err))).Inc()
 	return raw, err
 }
 
@@ -106,7 +126,8 @@ func (p Provider) getCheckedTRC(parentCtx context.Context, id TRCID,
 
 	decTRC, err := p.getTRC(ctx, id, opts)
 	if err != nil {
-		return nil, nil, serrors.WrapStr("unable to get requested TRC", err)
+		return nil, nil, serrors.WrapStr("unable to get requested TRC", err,
+			"isd", id.ISD, "version", id.Version)
 	}
 	if opts.AllowInactive {
 		return decTRC.TRC, decTRC.Raw, nil
@@ -197,7 +218,8 @@ func (p Provider) fetchTRC(ctx context.Context, id TRCID,
 	}
 	decTRC, err := p.Resolver.TRC(ctx, req, server)
 	if err != nil {
-		return decoded.TRC{}, serrors.WrapStr("unable to resolve signed TRC from network", err)
+		return decoded.TRC{}, serrors.WrapStr("unable to fetch signed TRC from network", err,
+			"addr", server)
 	}
 	return decTRC, nil
 }
@@ -210,7 +232,9 @@ func (p Provider) fetchTRC(ctx context.Context, id TRCID,
 func (p Provider) GetRawChain(ctx context.Context, id ChainID,
 	opts infra.ChainOpts) ([]byte, error) {
 
+	l := metrics.ProviderLabels{Type: metrics.Chain, Trigger: metrics.FromCtx(ctx)}
 	chain, err := p.getCheckedChain(ctx, id, opts)
+	metrics.Provider.Request(l.WithResult(errToLabel(err))).Inc()
 	return chain.Raw, err
 }
 
@@ -219,7 +243,9 @@ func (p Provider) GetRawChain(ctx context.Context, id ChainID,
 func (p Provider) GetASKey(ctx context.Context, id ChainID,
 	opts infra.ChainOpts) (scrypto.KeyMeta, error) {
 
+	l := metrics.ProviderLabels{Type: metrics.ASKey, Trigger: metrics.FromCtx(ctx)}
 	chain, err := p.getCheckedChain(ctx, id, opts)
+	metrics.Provider.Request(l.WithResult(errToLabel(err))).Inc()
 	if err != nil {
 		return scrypto.KeyMeta{}, err
 	}
@@ -238,7 +264,8 @@ func (p Provider) getCheckedChain(parentCtx context.Context, id ChainID,
 
 	chain, err := p.getChain(ctx, id, opts)
 	if err != nil {
-		return decoded.Chain{}, serrors.WrapStr("unable to get requested certificate chain", err)
+		return decoded.Chain{}, serrors.WrapStr("unable to get requested certificate chain", err,
+			"ia", id.IA, "version", id.Version)
 	}
 	if opts.AllowInactive {
 		return chain, nil
@@ -265,7 +292,8 @@ func (p Provider) getCheckedChain(parentCtx context.Context, id ChainID,
 		}
 		if err := p.issuerActive(ctx, fetched, opts.TrustStoreOpts); err != nil {
 			return decoded.Chain{},
-				serrors.WrapStr("latest certificate chain from network not active", err)
+				serrors.WrapStr("latest certificate chain from network not active", err,
+					"chain", fetched)
 		}
 		return fetched, nil
 	}
@@ -302,12 +330,13 @@ func (p Provider) issuerActive(ctx context.Context, chain decoded.Chain,
 	if err != nil {
 		return serrors.WrapStr("unable to preload latest TRC", err)
 	}
-	iss, err := p.DB.GetIssuingKeyInfo(ctx, chain.Issuer.Subject, chain.Issuer.Issuer.TRCVersion)
+	iss, err := p.DB.GetIssuingGrantKeyInfo(ctx, chain.Issuer.Subject,
+		chain.Issuer.Issuer.TRCVersion)
 	if err != nil {
 		return serrors.WrapStr("unable to get issuing key info for issuing TRC", err,
 			"version", chain.Issuer.Issuer.TRCVersion)
 	}
-	latest, err := p.DB.GetIssuingKeyInfo(ctx, chain.Issuer.Subject, scrypto.LatestVer)
+	latest, err := p.DB.GetIssuingGrantKeyInfo(ctx, chain.Issuer.Subject, scrypto.LatestVer)
 	if err != nil {
 		return serrors.WrapStr("unable to get issuing key info for latest TRC", err)
 	}
@@ -319,7 +348,7 @@ func (p Provider) issuerActive(ctx context.Context, chain decoded.Chain,
 			"latest_trc_version", latest.TRC.Version,
 			"expected", iss.Version, "actual", latest.Version)
 	}
-	inGrace, err := p.DB.GetIssuingKeyInfo(ctx, chain.Issuer.Subject, latest.TRC.Version-1)
+	inGrace, err := p.DB.GetIssuingGrantKeyInfo(ctx, chain.Issuer.Subject, latest.TRC.Version-1)
 	if err != nil {
 		return serrors.WrapStr("unable to get issuing key info for TRC in grace period", err,
 			"version", latest.TRC.Version-1)
@@ -357,8 +386,8 @@ func (p Provider) fetchChain(ctx context.Context, id ChainID,
 	}
 	chain, err := p.Resolver.Chain(ctx, req, server)
 	if err != nil {
-		return decoded.Chain{}, serrors.WrapStr("unable to resolve signed certificate chain"+
-			"from network", err)
+		return decoded.Chain{}, serrors.WrapStr("unable to fetch signed certificate chain "+
+			"from network", err, "addr", server)
 	}
 	return chain, nil
 }

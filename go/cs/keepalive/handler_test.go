@@ -28,6 +28,7 @@ import (
 
 	"github.com/scionproto/scion/go/cs/ifstate"
 	"github.com/scionproto/scion/go/cs/keepalive/mock_keepalive"
+	"github.com/scionproto/scion/go/cs/metrics"
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/ctrl"
 	"github.com/scionproto/scion/go/lib/ctrl/ifid"
@@ -48,7 +49,8 @@ var (
 
 // Disable logging in all tests
 func TestMain(m *testing.M) {
-	log.Root().SetHandler(log.DiscardHandler())
+	metrics.InitBSMetrics()
+	log.Discard()
 	os.Exit(m.Run())
 }
 
@@ -77,7 +79,7 @@ func TestNewHandler(t *testing.T) {
 			RevDropper:    dropper,
 		})
 		req := infra.NewRequest(context.Background(), &ifid.IFID{OrigIfID: originIF}, nil,
-			&snet.Addr{IA: originIA, Path: testPath(localIF)}, 0)
+			&snet.UDPAddr{IA: originIA, Path: testPath(localIF)}, 0)
 		res := handler.Handle(req)
 		waitTimeout(t, wg)
 		assert.Equal(t, res, infra.MetricsResultOk)
@@ -89,7 +91,7 @@ func TestNewHandler(t *testing.T) {
 		intfs.Get(localIF).Activate(42)
 		handler := NewHandler(localIA, intfs, zeroCallTasks(mctrl))
 		req := infra.NewRequest(context.Background(), &ifid.IFID{OrigIfID: originIF}, nil,
-			&snet.Addr{IA: originIA, Path: testPath(localIF)}, 0)
+			&snet.UDPAddr{IA: originIA, Path: testPath(localIF)}, 0)
 		res := handler.Handle(req)
 		assert.Equal(t, res, infra.MetricsResultOk)
 	})
@@ -105,7 +107,7 @@ func TestNewHandler(t *testing.T) {
 			{
 				msg: "Wrong payload type",
 				req: infra.NewRequest(context.Background(), &ctrl.Pld{}, nil,
-					&snet.Addr{IA: originIA, Path: testPath(localIF)}, 0),
+					&snet.UDPAddr{IA: originIA, Path: testPath(localIF)}, 0),
 				exp: infra.MetricsErrInternal,
 			},
 			{
@@ -117,19 +119,19 @@ func TestNewHandler(t *testing.T) {
 			{
 				msg: "Invalid path",
 				req: infra.NewRequest(context.Background(), &ifid.IFID{OrigIfID: originIF}, nil,
-					&snet.Addr{IA: originIA, Path: &spath.Path{}}, 0),
+					&snet.UDPAddr{IA: originIA, Path: &spath.Path{}}, 0),
 				exp: infra.MetricsErrInvalid,
 			},
 			{
 				msg: "Invalid ConsIngress ifid",
 				req: infra.NewRequest(context.Background(), &ifid.IFID{OrigIfID: originIF}, nil,
-					&snet.Addr{IA: originIA, Path: testPath(originIF)}, 0),
+					&snet.UDPAddr{IA: originIA, Path: testPath(originIF)}, 0),
 				exp: infra.MetricsErrInvalid,
 			},
 			{
 				msg: "Invalid IA",
 				req: infra.NewRequest(context.Background(), &ifid.IFID{OrigIfID: originIF}, nil,
-					&snet.Addr{IA: localIA, Path: testPath(localIF)}, 0),
+					&snet.UDPAddr{IA: localIA, Path: testPath(localIF)}, 0),
 				exp: infra.MetricsErrInvalid,
 			},
 		}

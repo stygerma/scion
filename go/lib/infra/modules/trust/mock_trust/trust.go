@@ -42,6 +42,20 @@ func (m *MockCryptoProvider) EXPECT() *MockCryptoProviderMockRecorder {
 	return m.recorder
 }
 
+// AnnounceTRC mocks base method
+func (m *MockCryptoProvider) AnnounceTRC(arg0 context.Context, arg1 trust.TRCID, arg2 infra.TRCOpts) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AnnounceTRC", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AnnounceTRC indicates an expected call of AnnounceTRC
+func (mr *MockCryptoProviderMockRecorder) AnnounceTRC(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AnnounceTRC", reflect.TypeOf((*MockCryptoProvider)(nil).AnnounceTRC), arg0, arg1, arg2)
+}
+
 // GetASKey mocks base method
 func (m *MockCryptoProvider) GetASKey(arg0 context.Context, arg1 trust.ChainID, arg2 infra.ChainOpts) (scrypto.KeyMeta, error) {
 	m.ctrl.T.Helper()
@@ -169,19 +183,19 @@ func (mr *MockDBMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockDB)(nil).Close))
 }
 
-// GetIssuingKeyInfo mocks base method
-func (m *MockDB) GetIssuingKeyInfo(arg0 context.Context, arg1 addr.IA, arg2 scrypto.Version) (trust.KeyInfo, error) {
+// GetIssuingGrantKeyInfo mocks base method
+func (m *MockDB) GetIssuingGrantKeyInfo(arg0 context.Context, arg1 addr.IA, arg2 scrypto.Version) (trust.KeyInfo, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetIssuingKeyInfo", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "GetIssuingGrantKeyInfo", arg0, arg1, arg2)
 	ret0, _ := ret[0].(trust.KeyInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetIssuingKeyInfo indicates an expected call of GetIssuingKeyInfo
-func (mr *MockDBMockRecorder) GetIssuingKeyInfo(arg0, arg1, arg2 interface{}) *gomock.Call {
+// GetIssuingGrantKeyInfo indicates an expected call of GetIssuingGrantKeyInfo
+func (mr *MockDBMockRecorder) GetIssuingGrantKeyInfo(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIssuingKeyInfo", reflect.TypeOf((*MockDB)(nil).GetIssuingKeyInfo), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIssuingGrantKeyInfo", reflect.TypeOf((*MockDB)(nil).GetIssuingGrantKeyInfo), arg0, arg1, arg2)
 }
 
 // GetRawChain mocks base method

@@ -15,10 +15,12 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"flag"
 	"fmt"
 	"net"
+	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"path/filepath"
@@ -27,18 +29,16 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/opentracing/opentracing-go"
 
-	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
-	"github.com/scionproto/scion/go/lib/discovery"
 	"github.com/scionproto/scion/go/lib/env"
 	"github.com/scionproto/scion/go/lib/fatal"
 	"github.com/scionproto/scion/go/lib/infra"
 	"github.com/scionproto/scion/go/lib/infra/infraenv"
-	"github.com/scionproto/scion/go/lib/infra/messenger"
-	"github.com/scionproto/scion/go/lib/infra/modules/idiscovery"
+	"github.com/scionproto/scion/go/lib/infra/messenger/tcp"
 	"github.com/scionproto/scion/go/lib/infra/modules/itopo"
 	"github.com/scionproto/scion/go/lib/infra/modules/segfetcher"
 	"github.com/scionproto/scion/go/lib/infra/modules/trust"
+	"github.com/scionproto/scion/go/lib/infra/modules/trust/trustdbmetrics"
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/pathdb"
 	"github.com/scionproto/scion/go/lib/pathstorage"
@@ -58,8 +58,7 @@ const (
 )
 
 var (
-	cfg         config.Config
-	discRunners idiscovery.Runners
+	cfg config.Config
 )
 
 func init() {
@@ -83,13 +82,9 @@ func realMain() int {
 	}
 	defer log.Flush()
 	defer env.LogAppStopped("SD", cfg.General.ID)
-	defer log.LogPanicAndExit()
+	defer log.HandlePanic()
 	if err := setup(); err != nil {
 		log.Crit("Setup failed", "err", err)
-		return 1
-	}
-	if err := startDiscovery(cfg.Discovery); err != nil {
-		log.Crit("Unable to start topology fetcher", "err", err)
 		return 1
 	}
 	pathDB, revCache, err := pathstorage.NewPathStorage(cfg.SD.PathDB, cfg.SD.RevCache)
@@ -107,31 +102,18 @@ func realMain() int {
 	defer trCloser.Close()
 	opentracing.SetGlobalTracer(tracer)
 
+<<<<<<< HEAD
 	publicIP, err := net.ResolveUDPAddr("udp", cfg.SD.Public)
 	log.Info("This is the shits", "err", err, "addr", publicIP) //BC
+=======
+	publicIP, err := net.ResolveUDPAddr("udp", cfg.SD.Address)
+>>>>>>> master
 	if err != nil {
 		log.Crit("Unable to resolve listening address", "err", err, "addr", publicIP)
 		return 1
 	}
 
-	nc := infraenv.NetworkConfig{
-		IA:                    itopo.Get().IA(),
-		Public:                publicIP,
-		SVC:                   addr.SvcNone,
-		ReconnectToDispatcher: cfg.General.ReconnectToDispatcher,
-		QUIC: infraenv.QUIC{
-			Address:  cfg.QUIC.Address,
-			CertFile: cfg.QUIC.CertFile,
-			KeyFile:  cfg.QUIC.KeyFile,
-		},
-		SVCResolutionFraction: cfg.QUIC.ResolutionFraction,
-		SVCRouter:             messenger.NewSVCRouter(itopo.Provider()),
-	}
-	msger, err := nc.Messenger()
-	if err != nil {
-		log.Crit(infraenv.ErrAppUnableToInitMessenger.Error(), "err", err)
-		return 1
-	}
+	msger := tcp.NewClientMessenger(tcp.Client{TopologyProvider: itopo.Provider()})
 	defer msger.CloseServer()
 
 	trustDB, err := cfg.TrustDB.New()
@@ -139,6 +121,7 @@ func realMain() int {
 		log.Crit("Error initializing trust database", "err", err)
 		return 1
 	}
+	trustDB = trustdbmetrics.WithMetrics(string(cfg.TrustDB.Backend()), trustDB)
 	defer trustDB.Close()
 	inserter := trust.DefaultInserter{
 		BaseInserter: trust.BaseInserter{DB: trustDB},
@@ -150,6 +133,7 @@ func realMain() int {
 			DB:       trustDB,
 			Inserter: inserter,
 			RPC:      trust.DefaultRPC{Msgr: msger},
+			IA:       itopo.Get().IA(),
 		},
 		Router: trust.LocalRouter{IA: itopo.Get().IA()},
 	}
@@ -166,7 +150,6 @@ func realMain() int {
 		return 1
 	}
 
-	// Route messages to their correct handlers
 	handlers := servers.HandlerMap{
 		proto.SCIONDMsg_Which_pathReq: &servers.PathRequestHandler{
 			Fetcher: fetcher.NewFetcher(
@@ -196,13 +179,12 @@ func realMain() int {
 	rcCleaner := periodic.Start(revcache.NewCleaner(revCache, "sd_revocation"),
 		10*time.Second, 10*time.Second)
 	defer rcCleaner.Stop()
-	// Start servers
-	rsockServer, shutdownF := NewServer("rsock", cfg.SD.Reliable, handlers)
+	apiServer, shutdownF := NewServer("tcp", cfg.SD.Address, handlers)
 	defer shutdownF()
-	StartServer("ReliableSockServer", cfg.SD.Reliable, rsockServer)
-	unixpacketServer, shutdownF := NewServer("unixpacket", cfg.SD.Unix, handlers)
-	defer shutdownF()
-	StartServer("UnixServer", cfg.SD.Unix, unixpacketServer)
+	StartServer(cfg.SD.Address, apiServer)
+	http.HandleFunc("/config", configHandler)
+	http.HandleFunc("/info", env.InfoHandler)
+	http.HandleFunc("/topology", itopo.TopologyHandler)
 	cfg.Metrics.StartPrometheus()
 	select {
 	case <-fatal.ShutdownChan():
@@ -228,11 +210,11 @@ func (v verificationFactory) NewVerifier() infra.Verifier {
 
 func setupBasic() error {
 	if _, err := toml.DecodeFile(env.ConfigFile(), &cfg); err != nil {
-		return err
+		return serrors.New("Failed to load config", "err", err, "file", env.ConfigFile())
 	}
 	cfg.InitDefaults()
-	if err := env.InitLogging(&cfg.Logging); err != nil {
-		return err
+	if err := log.Setup(cfg.Logging); err != nil {
+		return serrors.New("Failed to initialize logging", "err", err)
 	}
 	prom.ExportElementID(cfg.General.ID)
 	return env.LogAppStarted("SD", cfg.General.ID)
@@ -242,29 +224,22 @@ func setup() error {
 	if err := cfg.Validate(); err != nil {
 		return common.NewBasicError("unable to validate config", err)
 	}
-	itopo.Init("", proto.ServiceType_unset, itopo.Callbacks{})
 	topo, err := topology.FromJSONFile(cfg.General.Topology)
 	if err != nil {
 		return common.NewBasicError("unable to load topology", err)
 	}
-	if _, _, err := itopo.SetStatic(topo, false); err != nil {
+	itopo.Init(&itopo.Config{})
+	if err := itopo.Update(topo); err != nil {
 		return common.NewBasicError("unable to set initial static topology", err)
 	}
 	infraenv.InitInfraEnvironment(cfg.General.Topology)
-	return cfg.SD.CreateSocketDirs()
-}
-
-func startDiscovery(file idiscovery.Config) error {
-	var err error
-	discRunners, err = idiscovery.StartRunners(file, discovery.Default,
-		idiscovery.TopoHandlers{}, nil, "sd")
-	return err
+	return nil
 }
 
 func NewServer(network string, rsockPath string,
 	handlers servers.HandlerMap) (*servers.Server, func()) {
 
-	server := servers.NewServer(network, rsockPath, os.FileMode(cfg.SD.SocketFileMode), handlers)
+	server := servers.NewServer(network, rsockPath, handlers)
 	shutdownF := func() {
 		ctx, cancelF := context.WithTimeout(context.Background(), ShutdownWaitTimeout)
 		server.Shutdown(ctx)
@@ -273,16 +248,18 @@ func NewServer(network string, rsockPath string,
 	return server, shutdownF
 }
 
-func StartServer(name, sockPath string, server *servers.Server) {
+func StartServer(address string, server *servers.Server) {
 	go func() {
-		defer log.LogPanicAndExit()
-		if cfg.SD.DeleteSocket {
-			if err := os.Remove(sockPath); err != nil && !os.IsNotExist(err) {
-				fatal.Fatal(common.NewBasicError("SocketRemoval error", err, "name", name))
-			}
-		}
+		defer log.HandlePanic()
 		if err := server.ListenAndServe(); err != nil {
-			fatal.Fatal(common.NewBasicError("ListenAndServe error", err, "name", name))
+			fatal.Fatal(common.NewBasicError("ListenAndServe error", err, "address", address))
 		}
 	}()
+}
+
+func configHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	var buf bytes.Buffer
+	toml.NewEncoder(&buf).Encode(cfg)
+	fmt.Fprint(w, buf.String())
 }

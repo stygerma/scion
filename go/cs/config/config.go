@@ -24,7 +24,7 @@ import (
 	"github.com/scionproto/scion/go/lib/config"
 	"github.com/scionproto/scion/go/lib/ctrl/path_mgmt"
 	"github.com/scionproto/scion/go/lib/env"
-	"github.com/scionproto/scion/go/lib/infra/modules/idiscovery"
+	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/pathstorage"
 	"github.com/scionproto/scion/go/lib/serrors"
 	"github.com/scionproto/scion/go/lib/truststorage"
@@ -81,20 +81,17 @@ var _ config.Config = (*Config)(nil)
 
 // Config is the beacon server configuration.
 type Config struct {
-	General        env.General
-	Features       env.Features
-	Logging        env.Logging
-	Metrics        env.Metrics
-	Tracing        env.Tracing
-	QUIC           env.QUIC         `toml:"quic"`
-	Sciond         env.SciondClient `toml:"sd_client"`
-	TrustDB        truststorage.TrustDBConf
-	BeaconDB       beaconstorage.BeaconDBConf
-	Discovery      idiscovery.Config
-	BS             BSConfig
-	CS             CSConfig
-	PS             PSConfig
-	EnableQUICTest bool
+	General  env.General
+	Features env.Features
+	Logging  log.Config `toml:"log,omitempty"`
+	Metrics  env.Metrics
+	Tracing  env.Tracing
+	QUIC     env.QUIC `toml:"quic"`
+	TrustDB  truststorage.TrustDBConf
+	BeaconDB beaconstorage.BeaconDBConf
+	BS       BSConfig
+	CS       CSConfig
+	PS       PSConfig
 }
 
 // InitDefaults initializes the default values for all parts of the config.
@@ -105,10 +102,8 @@ func (cfg *Config) InitDefaults() {
 		&cfg.Logging,
 		&cfg.Metrics,
 		&cfg.Tracing,
-		&cfg.Sciond,
 		&cfg.TrustDB,
 		&cfg.BeaconDB,
-		&cfg.Discovery,
 		&cfg.BS,
 		&cfg.CS,
 		&cfg.PS,
@@ -122,10 +117,8 @@ func (cfg *Config) Validate() error {
 		&cfg.Features,
 		&cfg.Logging,
 		&cfg.Metrics,
-		&cfg.Sciond,
 		&cfg.TrustDB,
 		&cfg.BeaconDB,
-		&cfg.Discovery,
 		&cfg.BS,
 		&cfg.CS,
 		&cfg.PS,
@@ -141,10 +134,8 @@ func (cfg *Config) Sample(dst io.Writer, path config.Path, _ config.CtxMap) {
 		&cfg.Metrics,
 		&cfg.Tracing,
 		&cfg.QUIC,
-		&cfg.Sciond,
 		&cfg.TrustDB,
 		&cfg.BeaconDB,
-		&cfg.Discovery,
 		&cfg.BS,
 		&cfg.CS,
 		&cfg.PS,

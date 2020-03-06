@@ -66,7 +66,7 @@ func (h *syncHandler) Handle() *infra.HandlerResult {
 		metrics.Sync.Registrations(labels).Inc()
 		return infra.MetricsErrInternal
 	}
-	snetPeer := h.request.Peer.(*snet.Addr)
+	snetPeer := h.request.Peer.(*snet.UDPAddr)
 	labels.Src = snetPeer.IA
 	rw, ok := infra.ResponseWriterFromContext(ctx)
 	if !ok {
@@ -89,8 +89,12 @@ func (h *syncHandler) Handle() *infra.HandlerResult {
 		metrics.Sync.Registrations(labels.WithResult(metrics.ErrParse)).Inc()
 		return infra.MetricsErrInvalid
 	}
-	svcToQuery := snet.NewSVCAddr(snetPeer.IA, peerPath.Path(),
-		peerPath.OverlayNextHop(), addr.SvcPS)
+	svcToQuery := &snet.SVCAddr{
+		IA:      snetPeer.IA,
+		Path:    peerPath.Path(),
+		NextHop: peerPath.OverlayNextHop(),
+		SVC:     addr.SvcPS,
+	}
 
 	segs := seghandler.Segments{
 		Segs:      segSync.Recs,

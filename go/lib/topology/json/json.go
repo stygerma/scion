@@ -1,4 +1,5 @@
 // Copyright 2019 ETH Zurich
+// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,25 +24,28 @@ import (
 	"strings"
 
 	"github.com/scionproto/scion/go/lib/common"
+	"github.com/scionproto/scion/go/lib/scrypto/trc"
 	"github.com/scionproto/scion/go/lib/serrors"
 )
 
 // Topology is the JSON type for the entire AS topology file.
 type Topology struct {
-	Timestamp          int64                  `json:"Timestamp"`
-	TimestampHuman     string                 `json:"TimestampHuman"`
-	TTL                uint32                 `json:"TTL"`
-	IA                 string                 `json:"ISD_AS"`
-	Overlay            string                 `json:"Overlay"`
-	MTU                int                    `json:"MTU"`
-	Core               bool                   `json:"Core"`
-	BorderRouters      map[string]*BRInfo     `json:"BorderRouters,omitempty"`
-	ZookeeperService   map[int]*Address       `json:"ZookeeperService,omitempty"`
-	BeaconService      map[string]*ServerInfo `json:"BeaconService,omitempty"`
-	CertificateService map[string]*ServerInfo `json:"CertificateService,omitempty"`
-	PathService        map[string]*ServerInfo `json:"PathService,omitempty"`
-	SIG                map[string]*ServerInfo `json:"SIG,omitempty"`
-	DiscoveryService   map[string]*ServerInfo `json:"DiscoveryService,omitempty"`
+	Timestamp      int64  `json:"Timestamp"`
+	TimestampHuman string `json:"TimestampHuman"`
+	TTL            uint32 `json:"TTL"`
+	IA             string `json:"ISD_AS"`
+	Overlay        string `json:"Overlay"`
+	MTU            int    `json:"MTU"`
+	// Attributes are the primary AS attributes as described in
+	// https://github.com/scionproto/scion/blob/master/doc/ControlPlanePKI.md#primary-ases
+	// We use the []trc.Attribute type so that we don't validate according to
+	// trc.Attributes, because that contains a length 0 check which is not
+	// suitable for topology.
+	Attributes       []trc.Attribute        `json:"Attributes"`
+	BorderRouters    map[string]*BRInfo     `json:"BorderRouters,omitempty"`
+	ZookeeperService map[int]*Address       `json:"ZookeeperService,omitempty"`
+	ControlService   map[string]*ServerInfo `json:"ControlService,omitempty"`
+	SIG              map[string]*ServerInfo `json:"SIG,omitempty"`
 }
 
 // ServerInfo contains the information for a SCION application running in the local AS.

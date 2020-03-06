@@ -45,7 +45,7 @@ func (r LocalRouter) ChooseServer(_ context.Context, _ addr.ISD) (net.Addr, erro
 }
 
 func (r LocalRouter) chooseServer() net.Addr {
-	return snet.NewSVCAddr(r.IA, nil, nil, addr.SvcCS)
+	return &snet.SVCAddr{IA: r.IA, SVC: addr.SvcCS}
 }
 
 // AuthRouter routes requests for missing crypto material to the authoritative
@@ -73,7 +73,12 @@ func (r AuthRouter) ChooseServer(ctx context.Context, subjectISD addr.ISD) (net.
 	if err != nil {
 		return nil, serrors.WrapStr("unable to find path to any core AS", err, "isd", dstISD)
 	}
-	ret := snet.NewSVCAddr(path.Destination(), path.Path(), path.OverlayNextHop(), addr.SvcCS)
+	ret := &snet.SVCAddr{
+		IA:      path.Destination(),
+		Path:    path.Path(),
+		NextHop: path.OverlayNextHop(),
+		SVC:     addr.SvcCS,
+	}
 	return ret, nil
 }
 
@@ -81,14 +86,19 @@ func (r AuthRouter) dstISD(ctx context.Context, destination addr.ISD) (addr.ISD,
 	if destination == r.ISD {
 		return r.ISD, nil
 	}
+	logger := log.FromCtx(ctx)
 	info, err := r.DB.GetTRCInfo(ctx, TRCID{ISD: destination, Version: scrypto.LatestVer})
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
+			logger.Info("[TrustStore:AuthRouter] Direct to ISD-local authoritative servers",
+				"reason", "remote TRC not found")
 			return r.ISD, nil
 		}
 		return 0, serrors.WrapStr("error querying DB for TRC", err)
 	}
 	if !info.Validity.Contains(time.Now()) {
+		logger.Info("[TrustStore:AuthRouter] Direct to ISD-local authoritative servers",
+			"reason", "remote TRC outside of validity period")
 		return r.ISD, nil
 	}
 	return destination, nil

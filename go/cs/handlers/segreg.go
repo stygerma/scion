@@ -66,7 +66,7 @@ func (h *segRegHandler) Handle() *infra.HandlerResult {
 		metrics.Registrations.ResultsTotal(labels).Inc()
 		return infra.MetricsErrInternal
 	}
-	snetPeer := h.request.Peer.(*snet.Addr)
+	snetPeer := h.request.Peer.(*snet.UDPAddr)
 	labels.Type = classifySegs(logger, segReg)
 	labels.Src = snetPeer.IA
 	rw, ok := infra.ResponseWriterFromContext(ctx)
@@ -92,8 +92,12 @@ func (h *segRegHandler) Handle() *infra.HandlerResult {
 		sendAck(proto.Ack_ErrCode_reject, messenger.AckRejectFailedToParse)
 		return infra.MetricsErrInvalid
 	}
-	svcToQuery := snet.NewSVCAddr(snetPeer.IA, peerPath.Path(),
-		peerPath.OverlayNextHop(), addr.SvcBS)
+	svcToQuery := &snet.SVCAddr{
+		IA:      snetPeer.IA,
+		Path:    peerPath.Path(),
+		NextHop: peerPath.OverlayNextHop(),
+		SVC:     addr.SvcBS,
+	}
 	segs := seghandler.Segments{
 		Segs:      segReg.Recs,
 		SRevInfos: segReg.SRevInfos,

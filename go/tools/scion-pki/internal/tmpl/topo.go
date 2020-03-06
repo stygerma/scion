@@ -75,7 +75,11 @@ func (g topoGen) setupDirs(topo topoFile) error {
 func (g topoGen) genTRCs(topo topoFile) (map[addr.ISD]conf.TRC, error) {
 	trcs := make(map[addr.ISD]conf.TRC)
 	for isd := range topo.ISDs() {
-		trcs[isd] = g.genTRC(isd, topo)
+		cfg, err := g.genTRC(isd, topo)
+		if err != nil {
+			return nil, serrors.WithCtx(err, "isd", isd)
+		}
+		trcs[isd] = cfg
 		var buf bytes.Buffer
 		if err := trcs[isd].Encode(&buf); err != nil {
 			return nil, serrors.WithCtx(err, "isd", isd)
@@ -88,8 +92,14 @@ func (g topoGen) genTRCs(topo topoFile) (map[addr.ISD]conf.TRC, error) {
 	return trcs, nil
 }
 
-func (g topoGen) genTRC(isd addr.ISD, topo topoFile) conf.TRC {
+func (g topoGen) genTRC(isd addr.ISD, topo topoFile) (conf.TRC, error) {
 	primaries := topo.Primaries(isd)
+	if primaries.Count(trc.Voting) == 0 {
+		return conf.TRC{}, serrors.New("no voting AS specified")
+	}
+	if primaries.Count(trc.Issuing) == 0 {
+		return conf.TRC{}, serrors.New("no issuing AS specified")
+	}
 	reset := true
 	cfg := conf.TRC{
 		Description: fmt.Sprintf("ISD %d", isd),
@@ -97,7 +107,7 @@ func (g topoGen) genTRC(isd addr.ISD, topo topoFile) conf.TRC {
 		BaseVersion: 1,
 		// XXX(roosd): Choose quorum according to your security needs.
 		// This simply serves an example.
-		VotingQuorum:      uint16(primaries.Voters()/2 + 1),
+		VotingQuorum:      uint16(primaries.Count(trc.Voting)/2 + 1),
 		TrustResetAllowed: &reset,
 		Votes:             []addr.AS{},
 		Validity:          g.Validity,
@@ -106,7 +116,7 @@ func (g topoGen) genTRC(isd addr.ISD, topo topoFile) conf.TRC {
 	for _, primaryAS := range primaries {
 		cfg.PrimaryASes[primaryAS.AS] = primaryAS.ToConf()
 	}
-	return cfg
+	return cfg, nil
 }
 
 func (g topoGen) genKeys(topo topoFile, cfg map[addr.ISD]conf.TRC) error {
@@ -138,15 +148,15 @@ func (g topoGen) genASKeys(as addr.AS, cfg conf.TRC) conf.Keys {
 	primary, ok := cfg.PrimaryASes[as]
 	_ = ok
 	if primary.Attributes.Contains(trc.Voting) {
-		keys.Primary[trc.OnlineKey] = map[scrypto.KeyVersion]conf.KeyMeta{
+		keys.Primary[trc.VotingOnlineKey] = map[scrypto.KeyVersion]conf.KeyMeta{
 			1: {Algorithm: scrypto.Ed25519, Validity: g.Validity},
 		}
-		keys.Primary[trc.OfflineKey] = map[scrypto.KeyVersion]conf.KeyMeta{
+		keys.Primary[trc.VotingOfflineKey] = map[scrypto.KeyVersion]conf.KeyMeta{
 			1: {Algorithm: scrypto.Ed25519, Validity: g.Validity},
 		}
 	}
 	if primary.Attributes.Contains(trc.Issuing) {
-		keys.Primary[trc.IssuingKey] = map[scrypto.KeyVersion]conf.KeyMeta{
+		keys.Primary[trc.IssuingGrantKey] = map[scrypto.KeyVersion]conf.KeyMeta{
 			1: {Algorithm: scrypto.Ed25519, Validity: g.Validity},
 		}
 		keys.Issuer[cert.IssuingKey] = map[scrypto.KeyVersion]conf.KeyMeta{
@@ -187,13 +197,13 @@ func (g topoGen) genIssuerCerts(topo topoFile) error {
 func (g topoGen) genIssuerCert(ia addr.IA) conf.Issuer {
 	issKey := scrypto.KeyVersion(1)
 	cfg := conf.Issuer{
-		Description:          fmt.Sprintf("Issuer certificate %s", ia),
-		Version:              1,
-		IssuingKeyVersion:    &issKey,
-		RevocationKeyVersion: nil,
-		TRCVersion:           1,
-		OptDistPoints:        []addr.IA{},
-		Validity:             g.Validity,
+		Description:            fmt.Sprintf("Issuer certificate %s", ia),
+		Version:                1,
+		IssuingGrantKeyVersion: &issKey,
+		RevocationKeyVersion:   nil,
+		TRCVersion:             1,
+		OptDistPoints:          []addr.IA{},
+		Validity:               g.Validity,
 	}
 	return cfg
 }
@@ -284,7 +294,7 @@ func (p primaryAS) ToConf() conf.Primary {
 	if p.Issuing {
 		iss := scrypto.KeyVersion(1)
 		cp.Attributes = append(cp.Attributes, trc.Issuing)
-		cp.IssuingKeyVersion = &iss
+		cp.IssuingGrantKeyVersion = &iss
 	}
 	if p.Voting {
 		on, off := scrypto.KeyVersion(1), scrypto.KeyVersion(1)
@@ -297,12 +307,19 @@ func (p primaryAS) ToConf() conf.Primary {
 
 type primaryASes []primaryAS
 
-func (p primaryASes) Voters() int {
-	voters := 0
-	for _, pAS := range p {
-		if pAS.Voting {
-			voters++
+func (p primaryASes) Count(attr trc.Attribute) int {
+	c := 0
+	for _, as := range p {
+		switch {
+		case attr == trc.Authoritative && as.Authoritative:
+			c++
+		case attr == trc.Core && as.Core:
+			c++
+		case attr == trc.Issuing && as.Issuing:
+			c++
+		case attr == trc.Voting && as.Voting:
+			c++
 		}
 	}
-	return voters
+	return c
 }

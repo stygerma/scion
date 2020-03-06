@@ -26,6 +26,7 @@ import (
 
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
+	"github.com/scionproto/scion/go/lib/scrypto/trc"
 	"github.com/scionproto/scion/go/lib/serrors"
 	jsontopo "github.com/scionproto/scion/go/lib/topology/json"
 	"github.com/scionproto/scion/go/lib/topology/overlay"
@@ -56,20 +57,17 @@ type (
 	// there is again a sorted slice of names of the servers that provide the service.
 	// Additionally, there is a map from those names to TopoAddr structs.
 	RWTopology struct {
-		Timestamp time.Time
-		TTL       time.Duration
-		IA        addr.IA
-		Core      bool
-		MTU       int
+		Timestamp  time.Time
+		TTL        time.Duration
+		IA         addr.IA
+		Attributes trc.Attributes
+		MTU        int
 
 		BR        map[string]BRInfo
 		BRNames   []string
 		IFInfoMap IfInfoMap
 
-		BS  IDAddrMap
 		CS  IDAddrMap
-		PS  IDAddrMap
-		DS  IDAddrMap
 		SIG IDAddrMap
 	}
 
@@ -118,7 +116,7 @@ type (
 	// the underlay to be used for contacting said service.
 	TopoAddr struct {
 		SCIONAddress    *net.UDPAddr
-		UnderlayAddress net.Addr
+		UnderlayAddress *net.UDPAddr
 	}
 )
 
@@ -126,11 +124,8 @@ type (
 func NewRWTopology() *RWTopology {
 	return &RWTopology{
 		BR:        make(map[string]BRInfo),
-		BS:        make(IDAddrMap),
 		CS:        make(IDAddrMap),
-		PS:        make(IDAddrMap),
 		SIG:       make(IDAddrMap),
-		DS:        make(IDAddrMap),
 		IFInfoMap: make(IfInfoMap),
 	}
 }
@@ -190,7 +185,7 @@ func (t *RWTopology) populateMeta(raw *jsontopo.Topology) error {
 		return err
 	}
 	t.MTU = raw.MTU
-	t.Core = raw.Core
+	t.Attributes = raw.Attributes
 	return nil
 }
 
@@ -235,7 +230,7 @@ func (t *RWTopology) populateBR(raw *jsontopo.Topology) error {
 				return err
 			}
 			ifinfo.LinkType = LinkTypeFromString(rawIntf.LinkTo)
-			if err = ifinfo.CheckLinks(t.Core, name); err != nil {
+			if err = ifinfo.CheckLinks(t.Attributes.Contains(trc.Core), name); err != nil {
 				return err
 			}
 			// These fields are only necessary for the border router.
@@ -272,25 +267,13 @@ func (t *RWTopology) populateBR(raw *jsontopo.Topology) error {
 
 func (t *RWTopology) populateServices(raw *jsontopo.Topology) error {
 	var err error
-	t.BS, err = svcMapFromRaw(raw.BeaconService)
-	if err != nil {
-		return serrors.WrapStr("unable to extract BS address", err)
-	}
-	t.CS, err = svcMapFromRaw(raw.CertificateService)
+	t.CS, err = svcMapFromRaw(raw.ControlService)
 	if err != nil {
 		return serrors.WrapStr("unable to extract CS address", err)
-	}
-	t.PS, err = svcMapFromRaw(raw.PathService)
-	if err != nil {
-		return serrors.WrapStr("unable to extract PS address", err)
 	}
 	t.SIG, err = svcMapFromRaw(raw.SIG)
 	if err != nil {
 		return serrors.WrapStr("unable to extract SIG address", err)
-	}
-	t.DS, err = svcMapFromRaw(raw.DiscoveryService)
-	if err != nil {
-		return serrors.WrapStr("unable to extract DS address", err)
 	}
 	return nil
 }
@@ -341,16 +324,10 @@ func (t *RWTopology) getSvcInfo(svc proto.ServiceType) (*svcInfo, error) {
 	switch svc {
 	case proto.ServiceType_unset:
 		return nil, serrors.New("Service type unset")
-	case proto.ServiceType_bs:
-		return &svcInfo{idTopoAddrMap: t.BS}, nil
-	case proto.ServiceType_ps:
-		return &svcInfo{idTopoAddrMap: t.PS}, nil
-	case proto.ServiceType_cs:
+	case proto.ServiceType_bs, proto.ServiceType_cs, proto.ServiceType_ps:
 		return &svcInfo{idTopoAddrMap: t.CS}, nil
 	case proto.ServiceType_sig:
 		return &svcInfo{idTopoAddrMap: t.SIG}, nil
-	case proto.ServiceType_ds:
-		return &svcInfo{idTopoAddrMap: t.DS}, nil
 	default:
 		return nil, common.NewBasicError("Unsupported service type", nil, "type", svc)
 	}
@@ -422,7 +399,7 @@ func (i IFInfo) String() string {
 // FIXME(scrye): This should be removed; applications should not need to look into the underlay
 // concrete type.
 func (a *TopoAddr) UnderlayAddr() *net.UDPAddr {
-	return a.UnderlayAddress.(*net.UDPAddr)
+	return a.UnderlayAddress
 }
 
 func (a *TopoAddr) String() string {
@@ -439,7 +416,7 @@ func (a *TopoAddr) copy() *TopoAddr {
 			IP:   append(a.SCIONAddress.IP[:0:0], a.SCIONAddress.IP...),
 			Port: a.SCIONAddress.Port,
 		},
-		UnderlayAddress: toUDPAddr(a.UnderlayAddress.(*net.UDPAddr)),
+		UnderlayAddress: toUDPAddr(a.UnderlayAddress),
 	}
 }
 
