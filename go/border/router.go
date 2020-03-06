@@ -275,8 +275,6 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	droppedPackets = droppedPackets + 1
 	log.Debug("Dropped Packet", "dropped", droppedPackets)
 
-	// TODO: We probably want some metrics here
-
 }
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
