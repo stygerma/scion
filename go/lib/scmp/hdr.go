@@ -24,7 +24,7 @@ import (
 	"github.com/scionproto/scion/go/lib/l4"
 )
 
-var _ l4.L4Header = (*Hdr)(nil)
+var _ l4.L4Header = (*Hdr)(nil) //MS: This is apparantly a interface assertion
 
 const (
 	HdrLen = 16

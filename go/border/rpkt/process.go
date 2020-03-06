@@ -112,7 +112,7 @@ func (rp *RtrPkt) processSCMPTraceRoute() error {
 	if err != nil {
 		return err
 	}
-	// Reply does not need to be HBH, so remove SCMP ext
+	// Reply does not need to be HBH, so remove SCMP ext IMP: SCMP is not required to be HBH
 	sp.HBHExt = sp.HBHExt[1:]
 	scmpHdr := sp.L4.(*scmp.Hdr)
 	scmpHdr.Type = scmp.T_G_TraceRouteReply
