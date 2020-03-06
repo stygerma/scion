@@ -324,7 +324,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 		r.config.Queues[queueNo].enqueue(&qp)
 		qp.sendNotification()
 	} else if act == DROPNOTIFY {
-		r.config.Queues[queueNo].enqueue(&qp)
+		r.dropPacket(qp.rp)
 		qp.sendNotification()
 	} else if act == DROP {
 		r.dropPacket(qp.rp)
