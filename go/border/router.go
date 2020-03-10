@@ -65,8 +65,13 @@ type Router struct {
 	config              RouterConfig
 	notifications       chan *qPkt
 	flag                chan int
-	schedulerSurplus    int
+	schedulerSurplus    surplus
 	schedulerSurplusMtx sync.Mutex
+}
+
+type surplus struct {
+	surplus  int
+	payments []int
 }
 
 // RouterConfig is what I am loading from the config file
