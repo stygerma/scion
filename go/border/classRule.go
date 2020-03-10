@@ -17,7 +17,7 @@ type classRule struct {
 	SourceAs      string `yaml:"sourceAs"`
 	NextHopAs     string `yaml:"nextHopAs"`
 	DestinationAs string `yaml:"DestinationAs"`
-	L4Type        int    `yaml:"L4Type"`
+	L4Type        []int  `yaml:"L4Type"`
 	QueueNumber   int    `yaml:"queueNumber"`
 }
 
@@ -58,5 +58,19 @@ func (cr *classRule) matchRule(rp *rpkt.RtrPkt) bool {
 		match = false
 	}
 
+	log.Debug("L4Type is", "L4Type", rp.L4Type)
+	if !contains(cr.L4Type, int(rp.L4Type)) {
+		match = false
+	}
+
 	return match
+}
+
+func contains(slice []int, term int) bool {
+	for _, item := range slice {
+		if item == term {
+			return true
+		}
+	}
+	return false
 }

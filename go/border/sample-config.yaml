@@ -45,8 +45,8 @@ Queues :
     -
         name: "Droppy Queue"
         id: 2
-        CIR: 0 #Previously named min-bandwidth
-        PIR: 70 #Previously named max-bandwidth
+        CIR: 50 #Previously named min-bandwidth
+        PIR: 80 #Previously named max-bandwidth
         policeRate: 5000000 #5Mbit/s
         maxLength: 1024
         priority: 1
@@ -62,12 +62,22 @@ Rules :
         sourceAs: "2-ff00:0:212"
         nextHopAs: ""
         destinationAs: "1-ff00:0:110"
-        L4Type: -1
+        L4Type:
+            - 0
+            - 1
+            - 6
+            - 17
+            - 222
         queueNumber: 1
     - 
         name: "Drop Test Rule"
         sourceAs: "1-ff00:0:110"
         nextHopAs: ""
         destinationAs: "1-ff00:0:111"
-        L4Type: -1
+        L4Type:
+            - 0
+            - 1
+            - 6
+            - 17
+            - 222
         queueNumber: 2
