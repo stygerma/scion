@@ -63,6 +63,11 @@ func (cr *classRule) matchRule(rp *rpkt.RtrPkt) bool {
 		match = false
 	}
 
+	log.Debug("L4Type is", "L4Type", rp.CmnHdr.NextHdr)
+	if !contains(cr.L4Type, int(rp.CmnHdr.NextHdr)) {
+		match = false
+	}
+
 	return match
 }
 
