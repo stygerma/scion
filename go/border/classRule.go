@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/scionproto/scion/go/border/rpkt"
-	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/log"
 )
 
@@ -24,13 +23,6 @@ type classRule struct {
 func getQueueNumberFor(rp *rpkt.RtrPkt, crs *[]classRule) int {
 
 	queueNo := 0
-
-	srcIA, _ := rp.SrcIA()
-	dstIA, _ := rp.DstIA()
-	if (dstIA == addr.IA{I: 2, A: 10} &&
-		srcIA == addr.IA{I: 1, A: 10}) {
-		// panic(errors.New("We have received the testpacket! 🥳"))
-	}
 
 	for _, cr := range *crs {
 		if cr.matchRule(rp) {
