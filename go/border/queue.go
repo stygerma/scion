@@ -60,7 +60,6 @@ type packetQueue struct {
 	tb     tokenBucket
 }
 
-// TODO: Implement this. It currently does nothing
 type actionProfile struct {
 	FillLevel int          `yaml:"fill-level"`
 	Prob      int          `yaml:"prob"`
