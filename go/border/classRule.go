@@ -67,18 +67,58 @@ func convClassRuleToInternal(cr classRule) (internalClassRule, error) {
 	if err != nil {
 		return internalClassRule{}, err
 	}
-	nextHopMatch, err := getMatchFromRule(cr, cr.NextHopMatchMode, cr.NextHopAs)
-	if err != nil {
-		return internalClassRule{}, err
-	}
 
-	return internalClassRule{
+	rule := internalClassRule{
 		Name:          cr.Name,
 		SourceAs:      sourceMatch,
-		NextHopAs:     nextHopMatch,
+		NextHopAs:     matchRule{},
 		DestinationAs: destinationMatch,
 		L4Type:        cr.L4Type,
-		QueueNumber:   cr.QueueNumber}, nil
+		QueueNumber:   cr.QueueNumber}
+
+	return rule, nil
+}
+
+func rulesToMap(crs []internalClassRule) (map[addr.IA][]*internalClassRule, map[addr.IA][]*internalClassRule) {
+	sourceRules := make(map[addr.IA][]*internalClassRule)
+	destinationRules := make(map[addr.IA][]*internalClassRule)
+
+	for _, cr := range crs {
+		if cr.SourceAs.matchMode == RANGE {
+			lowLimI := uint16(cr.SourceAs.lowLim.I)
+			upLimI := uint16(cr.SourceAs.upLim.I)
+			lowLimA := uint64(cr.SourceAs.lowLim.A)
+			upLimA := uint64(cr.SourceAs.upLim.A)
+
+			for i := lowLimI; i <= upLimI; i++ {
+				for j := lowLimA; j <= upLimA; j++ {
+					sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &cr)
+				}
+			}
+
+		} else {
+
+			sourceRules[cr.SourceAs.IA] = append(sourceRules[cr.SourceAs.IA], &cr)
+		}
+		if cr.DestinationAs.matchMode == RANGE {
+			lowLimI := uint16(cr.DestinationAs.lowLim.I)
+			upLimI := uint16(cr.DestinationAs.upLim.I)
+			lowLimA := uint64(cr.DestinationAs.lowLim.A)
+			upLimA := uint64(cr.DestinationAs.upLim.A)
+
+			for i := lowLimI; i <= upLimI; i++ {
+				for j := lowLimA; j <= upLimA; j++ {
+					addr := addr.IA{I: addr.ISD(i), A: addr.AS(j)}
+					destinationRules[addr] = append(destinationRules[addr], &cr)
+				}
+			}
+		} else {
+			destinationRules[cr.DestinationAs.IA] = append(destinationRules[cr.DestinationAs.IA], &cr)
+		}
+	}
+
+	return sourceRules, destinationRules
+
 }
 
 func getMatchFromRule(cr classRule, matchModeField int, matchRuleField string) (matchRule, error) {
@@ -112,11 +152,30 @@ func getMatchFromRule(cr classRule, matchModeField int, matchRuleField string) (
 	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil, "matchMode", matchModeField)
 }
 
-func getQueueNumberForInternal(rp *rpkt.RtrPkt, crs *[]internalClassRule) int {
+func (r *Router) getQueueNumberWithHashFor(rp *rpkt.RtrPkt) int {
+
+	srcAddr, _ := rp.SrcIA()
+	dstAddr, _ := rp.DstIA()
+
+	queues1 := r.config.SourceRules[srcAddr]
+	queues2 := r.config.DestinationRules[dstAddr]
+
+	for _, rul1 := range queues1 {
+		for _, rul2 := range queues2 {
+			if rul1 == rul2 {
+				return rul1.QueueNumber
+			}
+		}
+	}
+
+	return 0
+}
+
+func (r *Router) getQueueNumberIterativeForInternal(rp *rpkt.RtrPkt) int {
 
 	queueNo := 0
 
-	for _, cr := range *crs {
+	for _, cr := range r.config.Rules {
 		if cr.matchInternalRule(rp) {
 			queueNo = cr.QueueNumber
 		}
@@ -124,11 +183,11 @@ func getQueueNumberForInternal(rp *rpkt.RtrPkt, crs *[]internalClassRule) int {
 	return queueNo
 }
 
-func getQueueNumberFor(rp *rpkt.RtrPkt, crs *[]classRule) int {
+func (r *Router) getQueueNumberIterativeFor(rp *rpkt.RtrPkt) int {
 
 	queueNo := 0
 
-	for _, cr := range *crs {
+	for _, cr := range r.legacyConfig.Rules {
 		if cr.matchRule(rp) {
 			queueNo = cr.QueueNumber
 		}
