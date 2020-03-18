@@ -133,9 +133,9 @@ func (pq *packetQueue) checkAction() policeAction {
 			if rand.Intn(100) < (pq.Profile[j].Prob) {
 				log.Info("Take Action!")
 				return pq.Profile[j].Action
-			} else {
-				log.Info("Do not take Action")
 			}
+			log.Info("Do not take Action")
+
 		}
 	}
 

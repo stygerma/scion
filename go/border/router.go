@@ -62,7 +62,7 @@ type Router struct {
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
 
-	config              RouterConfig
+	config              InternalRouterConfig
 	notifications       chan *qPkt
 	flag                chan int
 	schedulerSurplus    surplus
@@ -100,6 +100,10 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 func (r *Router) loadConfigFile(path string) error {
 
+	var internalRules []internalClassRule
+
+	var rc RouterConfig
+
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 
 	log.Info("Current Path is", "path", dir)
@@ -109,11 +113,21 @@ func (r *Router) loadConfigFile(path string) error {
 		log.Info("yamlFile.Get ", "error", err)
 		return err
 	}
-	err = yaml.Unmarshal(yamlFile, &r.config)
+	err = yaml.Unmarshal(yamlFile, &rc)
 	if err != nil {
 		log.Error("Unmarshal: ", "error", err)
 		return err
 	}
+
+	for _, rule := range rc.Rules {
+		intRule, err := convClassRuleToInternal(rule)
+		if err != nil {
+			log.Error("Error reading config file", "error", err)
+		}
+		internalRules = append(internalRules, intRule)
+	}
+
+	r.config = InternalRouterConfig{Queues: rc.Queues, Rules: internalRules}
 
 	return nil
 }
@@ -128,18 +142,6 @@ func (r *Router) initQueueing() {
 		log.Error("Loading config file failed", "error", err)
 		panic("Loading config file failed")
 	}
-
-	var internalRules []internalClassRule
-
-	for _, rule := range r.config.Rules {
-		intRule, err := convClassRuleToInternal(rule)
-		if err != nil {
-			log.Error("Error reading config file", "error", err)
-		}
-		internalRules = append(internalRules, intRule)
-	}
-
-	_ = InternalRouterConfig{Queues: r.config.Queues, Rules: internalRules}
 
 	// Initialise other data structures
 
@@ -326,7 +328,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	// Put all other packets from br2 on a faster queue but still delayed
 	// At the moment no queue is slow
 
-	queueNo := getQueueNumberFor(rp, &r.config.Rules)
+	queueNo := getQueueNumberForInternal(rp, &r.config.Rules)
 	qp := qPkt{rp: rp, queueNo: queueNo}
 
 	log.Info("Queuenumber is ", "queuenumber", queueNo)
