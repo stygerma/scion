@@ -266,6 +266,18 @@ func (ia IA) Equal(other IA) bool {
 	return ia.I == other.I && ia.A == other.A
 }
 
+func (ia IA) SmallerThan(other IA) bool {
+	return ia.I < other.I && ia.A < other.A
+}
+
+func (ia IA) BiggerThan(other IA) bool {
+	a := (ia.I == 0 || other.I == 0) && ia.A > other.A
+	b := (ia.I > other.I) && (ia.A == 0 || other.A == 0)
+	c := ia.I > other.I && ia.A > other.A
+
+	return a || b || c
+}
+
 // IsWildcard returns whether the ia has a wildcard part (isd or as).
 func (ia IA) IsWildcard() bool {
 	return ia.I == 0 || ia.A == 0
