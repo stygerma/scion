@@ -80,6 +80,12 @@ type RouterConfig struct {
 	Rules  []classRule   `yaml:"Rules"`
 }
 
+// InternalRouterConfig is what I am loading from the config file
+type InternalRouterConfig struct {
+	Queues []packetQueue
+	Rules  []internalClassRule
+}
+
 // NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
 	r := &Router{Id: id, confDir: confDir}
@@ -122,6 +128,18 @@ func (r *Router) initQueueing() {
 		log.Error("Loading config file failed", "error", err)
 		panic("Loading config file failed")
 	}
+
+	var internalRules []internalClassRule
+
+	for _, rule := range r.config.Rules {
+		intRule, err := convClassRuleToInternal(rule)
+		if err != nil {
+			log.Error("Error reading config file", "error", err)
+		}
+		internalRules = append(internalRules, intRule)
+	}
+
+	_ = InternalRouterConfig{Queues: r.config.Queues, Rules: internalRules}
 
 	// Initialise other data structures
 
