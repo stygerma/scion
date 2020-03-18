@@ -10,6 +10,8 @@ func TestLoadSampleConfig(t *testing.T) {
 
 	r.loadConfigFile("sample-config.yaml")
 
+	fmt.Println("The config is: ", r.config)
+
 	fmt.Println("The Queue is: ", r.config.Queues[0])
 	fmt.Println("The Rule is: ", r.config.Rules[0])
 	// t.Errorf("Output: %v", r.config)

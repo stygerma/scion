@@ -93,6 +93,10 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 func (r *Router) loadConfigFile(path string) {
 
+	var internalRules []internalClassRule
+
+	var rc RouterConfig
+
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 
 	log.Info("Current Path is", "path", dir)
@@ -101,7 +105,7 @@ func (r *Router) loadConfigFile(path string) {
 	if err != nil {
 		log.Info("yamlFile.Get ", "error", err)
 	}
-	err = yaml.Unmarshal(yamlFile, &r.config)
+	err = yaml.Unmarshal(yamlFile, &rc)
 	if err != nil {
 		log.Error("Unmarshal: ", "error", err)
 	}
@@ -113,18 +117,6 @@ func (r *Router) initQueueing() {
 	//TODO: Figure out the actual path where the other config files are loaded
 	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
 	r.loadConfigFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
-
-	var internalRules []internalClassRule
-
-	for _, rule := range r.config.Rules {
-		intRule, err := convClassRuleToInternal(rule)
-		if err != nil {
-			log.Error("Error reading config file", "error", err)
-		}
-		internalRules = append(internalRules, intRule)
-	}
-
-	_ = InternalRouterConfig{Queues: r.config.Queues, Rules: internalRules}
 
 	// Initialise other data structures
 

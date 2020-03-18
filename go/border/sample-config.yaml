@@ -60,8 +60,11 @@ Rules :
     - 
         name: "Test rule"
         sourceAs: "2-ff00:0:212"
+        sourceMatchMode: 0
         nextHopAs: ""
+        nextHopMatchMode : 0 
         destinationAs: "1-ff00:0:110"
+        destinationMatchMode: 0
         L4Type:
             - 0
             - 1
@@ -72,8 +75,11 @@ Rules :
     - 
         name: "Drop Test Rule"
         sourceAs: "1-ff00:0:110"
+        sourceMatchMode: 0
         nextHopAs: ""
+        nextHopMatchMode : 0 
         destinationAs: "1-ff00:0:111"
+        destinationMatchMode: 0
         L4Type:
             # - 0
             - 1

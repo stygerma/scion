@@ -19,7 +19,7 @@ type classRule struct {
 	SourceMatchMode      int    `yaml:"sourceMatchMode"`
 	NextHopAs            string `yaml:"nextHopAs"`
 	NextHopMatchMode     int    `yaml:"nextHopMatchMode"`
-	DestinationAs        string `yaml:"DestinationAs"`
+	DestinationAs        string `yaml:"destinationAs"`
 	DestinationMatchMode int    `yaml:"destinationMatchMode"`
 	L4Type               []int  `yaml:"L4Type"`
 	QueueNumber          int    `yaml:"queueNumber"`
@@ -112,6 +112,18 @@ func getMatchFromRule(cr classRule, matchModeField int, matchRuleField string) (
 	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil, "matchMode", matchModeField)
 }
 
+func getQueueNumberForInternal(rp *rpkt.RtrPkt, crs *[]internalClassRule) int {
+
+	queueNo := 0
+
+	for _, cr := range *crs {
+		if cr.matchInternalRule(rp) {
+			queueNo = cr.QueueNumber
+		}
+	}
+	return queueNo
+}
+
 func getQueueNumberFor(rp *rpkt.RtrPkt, crs *[]classRule) int {
 
 	queueNo := 0
@@ -148,8 +160,9 @@ func (cr *internalClassRule) matchSingleRule(rp *rpkt.RtrPkt, matchRuleField *ma
 func (cr *internalClassRule) matchInternalRule(rp *rpkt.RtrPkt) bool {
 
 	sourceMatches := cr.matchSingleRule(rp, &cr.SourceAs, rp.SrcIA)
-	destinationMatches := cr.matchSingleRule(rp, &cr.SourceAs, rp.SrcIA)
-	nextHopMatches := cr.matchSingleRule(rp, &cr.SourceAs, rp.SrcIA)
+	destinationMatches := cr.matchSingleRule(rp, &cr.DestinationAs, rp.DstIA)
+	// nextHopMatches := cr.matchSingleRule(rp, &cr.NextHopAs, rp.SrcIA)
+	nextHopMatches := true
 
 	return sourceMatches && destinationMatches && nextHopMatches
 }
