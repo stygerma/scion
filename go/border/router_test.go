@@ -76,3 +76,55 @@ func TestMaps(t *testing.T) {
 	t.Errorf("See logs")
 
 }
+
+func TestLoadingToMaps(t *testing.T) {
+	r, _ := setupTestRouter(t)
+
+	r.loadConfigFile("sample-config.yaml")
+
+	r.initQueueing()
+
+	r.config.SourceRules, r.config.DestinationRules = rulesToMap(r.config.Rules)
+
+	search, _ := addr.IAFromString("1-ff00:0:110")
+	rule, found := r.config.SourceRules[search]
+	fmt.Println("We have found", found, rule)
+
+	if !found {
+		t.Errorf("See logs")
+	}
+
+	search, _ = addr.IAFromString("5-ff00:0:110")
+	rule, found = r.config.SourceRules[search]
+	fmt.Println("We have found", found, rule)
+
+	if found {
+		t.Errorf("See logs")
+	}
+
+}
+
+func TestMatchingRules(t *testing.T) {
+
+	r, _ := setupTestRouter(t)
+
+	r.loadConfigFile("sample-config.yaml")
+
+	r.initQueueing()
+
+	srcAddr, _ := addr.IAFromString("1-ff00:0:110")
+	dstAddr, _ := addr.IAFromString("1-ff00:0:111")
+
+	queues1 := r.config.SourceRules[srcAddr]
+	queues2 := r.config.DestinationRules[dstAddr]
+
+	for _, rul1 := range queues1 {
+		for _, rul2 := range queues2 {
+			if rul1 == rul2 {
+				if rul1.QueueNumber != 2 {
+					t.Errorf("See logs")
+				}
+			}
+		}
+	}
+}

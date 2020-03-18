@@ -30,6 +30,7 @@ import (
 	"github.com/scionproto/scion/go/border/rctrl"
 	"github.com/scionproto/scion/go/border/rctx"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/assert"
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/log"
@@ -63,6 +64,7 @@ type Router struct {
 	setCtxMtx sync.Mutex
 
 	config              InternalRouterConfig
+	legacyConfig        RouterConfig
 	notifications       chan *qPkt
 	flag                chan int
 	schedulerSurplus    surplus
@@ -82,8 +84,10 @@ type RouterConfig struct {
 
 // InternalRouterConfig is what I am loading from the config file
 type InternalRouterConfig struct {
-	Queues []packetQueue
-	Rules  []internalClassRule
+	Queues           []packetQueue
+	Rules            []internalClassRule
+	SourceRules      map[addr.IA][]*internalClassRule
+	DestinationRules map[addr.IA][]*internalClassRule
 }
 
 // NewRouter returns a new router
@@ -127,6 +131,7 @@ func (r *Router) loadConfigFile(path string) error {
 		internalRules = append(internalRules, intRule)
 	}
 
+	r.legacyConfig = rc
 	r.config = InternalRouterConfig{Queues: rc.Queues, Rules: internalRules}
 
 	return nil
@@ -328,7 +333,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	// Put all other packets from br2 on a faster queue but still delayed
 	// At the moment no queue is slow
 
-	queueNo := getQueueNumberForInternal(rp, &r.config.Rules)
+	queueNo := r.getQueueNumberWithHashFor(rp)
 	qp := qPkt{rp: rp, queueNo: queueNo}
 
 	log.Info("Queuenumber is ", "queuenumber", queueNo)
