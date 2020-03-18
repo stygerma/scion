@@ -220,7 +220,7 @@ func openConn(network, address string, p SocketMetaHandler) (net.PacketConn, err
 // registerIfSCMPRequest registers the ID of the SCMP Request, if it is an
 // SCMP::General::EchoRequest, SCMP::General::TraceRouteRequest or SCMP::General::RecordPathRequest
 // packet. It also increments SCMP-related metrics.
-func registerIfSCMPRequest(ref registration.RegReference, packet *spkt.ScnPkt) error {
+func registerIfSCMPRequest(ref registration.RegReference, packet *spkt.ScnPkt) error { //IMP: works with non error SCMPs
 	if scmpHdr, ok := packet.L4.(*scmp.Hdr); ok {
 		metrics.M.SCMPWritePkts(
 			metrics.SCMP{
