@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"testing"
+
+	"github.com/scionproto/scion/go/lib/addr"
 )
 
 func TestLoadSampleConfig(t *testing.T) {
@@ -41,4 +43,36 @@ func TestLoadSampleConfigQueues(t *testing.T) {
 	if r.config.Queues[1].Name != "Speedy Queue" {
 		t.Errorf("Incorrect Queue Name is %v but should be %v", r.config.Queues[0].Name, "Speedy Queue")
 	}
+}
+
+func TestMaps(t *testing.T) {
+	m := make(map[addr.IA]*internalClassRule)
+
+	IA1, _ := addr.IAFromString("1-ff00:0:110")
+	IA2, _ := addr.IAFromString("2-ff00:0:110")
+	IA3, _ := addr.IAFromString("3-ff00:0:110")
+	IA4, _ := addr.IAFromString("4-ff00:0:110")
+
+	rul1 := internalClassRule{Name: "Hello Test", SourceAs: matchRule{IA: IA1}}
+	rul2 := internalClassRule{Name: "Hello World", SourceAs: matchRule{IA: IA2}}
+	rul3 := internalClassRule{Name: "Hello SCION", SourceAs: matchRule{IA: IA3}}
+	rul4 := internalClassRule{Name: "Hello Internet", SourceAs: matchRule{IA: IA4}}
+
+	m[IA1] = &rul1
+	m[IA2] = &rul2
+	m[IA3] = &rul3
+	m[IA4] = &rul4
+
+	search, _ := addr.IAFromString("3-ff00:0:110")
+
+	rule, found := m[search]
+	fmt.Println("We have found", found, rule)
+
+	search, _ = addr.IAFromString("5-ff00:0:110")
+
+	rule, found = m[search]
+	fmt.Println("We have found", found, rule)
+
+	t.Errorf("See logs")
+
 }
