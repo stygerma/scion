@@ -32,6 +32,7 @@ import (
 	"github.com/scionproto/scion/go/border/rctrl"
 	"github.com/scionproto/scion/go/border/rctx"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/assert"
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/fatal"
@@ -75,8 +76,10 @@ type RouterConfig struct {
 
 // InternalRouterConfig is what I am loading from the config file
 type InternalRouterConfig struct {
-	Queues []packetQueue
-	Rules  []internalClassRule
+	Queues           []packetQueue
+	Rules            []internalClassRule
+	SourceRules      map[addr.IA][]*internalClassRule
+	DestinationRules map[addr.IA][]*internalClassRule
 }
 
 // NewRouter returns a new router
