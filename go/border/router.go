@@ -75,13 +75,13 @@ type surplus struct {
 
 // RouterConfig is what I am loading from the config file
 type RouterConfig struct {
-	Queues []packetSliceQueue `yaml:"Queues"`
-	Rules  []classRule        `yaml:"Rules"`
+	Queues []customPacketQueue `yaml:"Queues"`
+	Rules  []classRule         `yaml:"Rules"`
 }
 
 // InternalRouterConfig is what I am loading from the config file
 type InternalRouterConfig struct {
-	Queues           []packetSliceQueue
+	Queues           []customPacketQueue
 	Rules            []internalClassRule
 	SourceRules      map[addr.IA][]*internalClassRule
 	DestinationRules map[addr.IA][]*internalClassRule
