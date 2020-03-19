@@ -98,8 +98,8 @@ func TestCallPacketGen(t *testing.T) {
 func TestBasicRoute(t *testing.T) {
 
 	r, _ := setupTestRouter(t)
+	r.initQueueing("sample-config.yaml")
 
-	r.initQueueing()
 	r.forwarder = r.forwardPacketTest
 
 	rp := rpkt.JFPrepareRtrPacketSample(t)
@@ -133,7 +133,7 @@ func TestHundredPacketQueue(t *testing.T) {
 
 	r, _ := setupTestRouter(t)
 
-	r.initQueueing()
+	r.initQueueing("sample-config.yaml")
 	r.forwarder = r.forwardPacketTest
 
 	ps := make([]*rpkt.RtrPkt, 100)
