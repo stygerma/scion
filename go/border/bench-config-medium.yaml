@@ -1,0 +1,768 @@
+Queues:
+- name: General Queue
+  id: 0
+  CIR: 30
+  PIR: 70
+  policeRate: 50000000
+  maxLength: 1024
+  profile:
+  - fill-level: 20
+    prob: 10
+    action: 0
+  - fill-level: 50
+    prob: 20
+    action: 1
+  - fill-level: 80
+    prob: 50
+    action: 2
+- name: Speedy Queue
+  id: 1
+  CIR: 0
+  PIR: 70
+  policeRate: 5000000
+  maxLength: 1024
+  profile:
+  - fill-level: 20
+    prob: 10
+    action: 0
+  - fill-level: 50
+    prob: 20
+    action: 1
+  - fill-level: 80
+    prob: 50
+    action: 2
+- name: Droppy Queue
+  id: 2
+  CIR: 50
+  PIR: 80
+  policeRate: 5000000
+  maxLength: 1024
+  profile:
+  - fill-level: 0
+    prob: 25
+    action: 2
+Rules:
+- name: Test rule
+  sourceAs: 2-ff00:0:212
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 1-ff00:0:110
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 1
+- name: Drop Test Rule
+  sourceAs: 1-ff00:0:110
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 1-ff00:0:111
+  destinationMatchMode: 0
+  L4Type:
+  - 1
+  queueNumber: 2
+- name: 'Rule number: 0'
+  sourceAs: 21605-831680226
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 21230-1531672018
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 1'
+  sourceAs: 53082-3961134500
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 19626-27472267
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 2'
+  sourceAs: 21835-3590105848
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 42544-306571944
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 3'
+  sourceAs: 55392-944789066
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 31199-2987264824
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 4'
+  sourceAs: 48987-2492945734
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 58799-2936075559
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 5'
+  sourceAs: 56930-1922204169
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 39984-1984087151
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 6'
+  sourceAs: 55815-2162499904
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 8582-2200130868
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 7'
+  sourceAs: 43314-2040536783
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 61821-2062224442
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 8'
+  sourceAs: 29636-419892536
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 29080-1076235335
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 9'
+  sourceAs: 50695-1452789528
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 31549-1768521805
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 10'
+  sourceAs: 16342-3726919159
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 27212-1863625827
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 11'
+  sourceAs: 16169-3460553823
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 15391-2561001951
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 12'
+  sourceAs: 63738-1604710427
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 51674-2829875203
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 13'
+  sourceAs: 23295-3158848313
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 59680-1315405414
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 14'
+  sourceAs: 40609-280630005
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 64427-4034294817
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 15'
+  sourceAs: 32349-3270539261
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 16316-4199023788
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 16'
+  sourceAs: 51835-782409380
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 15530-1123718476
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 17'
+  sourceAs: 6660-2733934551
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 65136-54421956
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 18'
+  sourceAs: 11074-2663350954
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 25089-3506332827
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 19'
+  sourceAs: 38204-4082557870
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 27514-3679649751
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 20'
+  sourceAs: 14201-1355617188
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 33458-1842687381
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 21'
+  sourceAs: 59894-3484071337
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 30676-243351347
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 22'
+  sourceAs: 48497-3905540142
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 37571-1329526856
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 23'
+  sourceAs: 51490-1400589652
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 52298-72646646
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 24'
+  sourceAs: 17494-406701847
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 64984-2407248418
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 25'
+  sourceAs: 27862-1785246570
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 48697-3167349932
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 26'
+  sourceAs: 54152-3417508162
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 52532-382388183
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 27'
+  sourceAs: 19696-772707853
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 8584-2050605601
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 28'
+  sourceAs: 61448-3019315255
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 397-145218426
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 29'
+  sourceAs: 6834-3669768591
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 29498-2231612849
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 30'
+  sourceAs: 28039-1204700182
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 25858-3685700413
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 31'
+  sourceAs: 42497-396639495
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 36420-912138002
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 32'
+  sourceAs: 22110-958211843
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 51034-2906936897
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 33'
+  sourceAs: 46242-3540690604
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 54283-2885227452
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 34'
+  sourceAs: 28222-2315157837
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 21297-2625012983
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 35'
+  sourceAs: 757-4087262728
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 64275-2020112969
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 36'
+  sourceAs: 16983-1094631503
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 2121-4115670445
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 37'
+  sourceAs: 40910-86075662
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 12689-3950332145
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 38'
+  sourceAs: 49297-3849230875
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 31106-2900895736
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 39'
+  sourceAs: 5884-2486569612
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 34521-640813911
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 40'
+  sourceAs: 44095-4085145894
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 51336-3612477
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 41'
+  sourceAs: 374-1552610375
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 24351-2444302934
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 42'
+  sourceAs: 28726-2948517332
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 5185-3407828099
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 43'
+  sourceAs: 46455-2450047318
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 47568-3526743959
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 44'
+  sourceAs: 47190-4294817608
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 54222-2556443599
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 45'
+  sourceAs: 14298-963876114
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 55279-2202700589
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 46'
+  sourceAs: 44004-2046060552
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 41047-1144526966
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 47'
+  sourceAs: 15775-846192683
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 65321-3276682016
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 48'
+  sourceAs: 34545-4082984786
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 40453-2713240511
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
+- name: 'Rule number: 49'
+  sourceAs: 23189-3969069235
+  sourceMatchMode: 0
+  nextHopAs: ""
+  nextHopMatchMode: 0
+  destinationAs: 57792-3270325055
+  destinationMatchMode: 0
+  L4Type:
+  - 0
+  - 1
+  - 6
+  - 17
+  - 222
+  queueNumber: 0
