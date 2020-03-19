@@ -4,7 +4,6 @@ import (
 	"math/rand"
 	"sync"
 	"time"
-	"unsafe"
 
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
@@ -41,7 +40,9 @@ func (pq *packetBufQueue) initQueue(mutQue *sync.Mutex, mutTb *sync.Mutex) {
 		tokens:       pq.PoliceRate,
 		lastRefill:   time.Now(),
 		mutex:        mutTb}
-	pq.bufQueue = ringbuf.New(pq.MaxLength, nil, pq.Name)
+	pq.bufQueue = ringbuf.New(pq.MaxLength, func() interface{} {
+		return &qPkt{}
+	}, pq.Name)
 
 }
 
@@ -81,15 +82,15 @@ func (pq *packetBufQueue) popMultiple(number int) []*qPkt {
 
 	_, _ = pq.bufQueue.Read(pkts, false)
 
-	dubdub := (*[]*qPkt)(unsafe.Pointer(&pkts))
+	// dubdub := (*[]*qPkt)(unsafe.Pointer(&pkts))
 
-	retArr := *dubdub
+	// retArr := *dubdub
 
-	// retArr := make([]*qPkt, number)
+	retArr := make([]*qPkt, number)
 
-	// for k, pkt := range pkts {
-	// 	retArr[k] = pkt.(*qPkt)
-	// }
+	for k, pkt := range pkts {
+		retArr[k] = pkt.(*qPkt)
+	}
 
 	return retArr
 }
