@@ -6,7 +6,6 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 // TODO: Matching rules is currently based on string comparisons
@@ -152,7 +151,7 @@ func getMatchFromRule(cr classRule, matchModeField int, matchRuleField string) (
 	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil, "matchMode", matchModeField)
 }
 
-func (r *Router) getQueueNumberWithHashFor(rp *rpkt.RtrPkt) int {
+func getQueueNumberWithHashFor(r *Router, rp *rpkt.RtrPkt) int {
 
 	srcAddr, _ := rp.SrcIA()
 	dstAddr, _ := rp.DstIA()
@@ -171,7 +170,7 @@ func (r *Router) getQueueNumberWithHashFor(rp *rpkt.RtrPkt) int {
 	return 0
 }
 
-func (r *Router) getQueueNumberIterativeForInternal(rp *rpkt.RtrPkt) int {
+func getQueueNumberIterativeForInternal(r *Router, rp *rpkt.RtrPkt) int {
 
 	queueNo := 0
 
@@ -183,8 +182,7 @@ func (r *Router) getQueueNumberIterativeForInternal(rp *rpkt.RtrPkt) int {
 	return queueNo
 }
 
-func (r *Router) getQueueNumberIterativeFor(rp *rpkt.RtrPkt) int {
-
+func getQueueNumberIterativeFor(r *Router, rp *rpkt.RtrPkt) int {
 	queueNo := 0
 
 	for _, cr := range r.legacyConfig.Rules {
@@ -231,25 +229,25 @@ func (cr *classRule) matchRule(rp *rpkt.RtrPkt) bool {
 	match := true
 
 	srcAddr, _ := rp.SrcIA()
-	log.Debug("Source Address is " + srcAddr.String())
-	log.Debug("Comparing " + srcAddr.String() + " and " + cr.SourceAs)
+	// log.Debug("Source Address is " + srcAddr.String())
+	// log.Debug("Comparing " + srcAddr.String() + " and " + cr.SourceAs)
 	if !strings.Contains(srcAddr.String(), cr.SourceAs) {
 		match = false
 	}
 
 	dstAddr, _ := rp.DstIA()
-	log.Debug("Destination Address is " + dstAddr.String())
-	log.Debug("Comparing " + dstAddr.String() + " and " + cr.DestinationAs)
+	// log.Debug("Destination Address is " + dstAddr.String())
+	// log.Debug("Comparing " + dstAddr.String() + " and " + cr.DestinationAs)
 	if !strings.Contains(dstAddr.String(), cr.DestinationAs) {
 		match = false
 	}
 
-	log.Debug("L4Type is", "L4Type", rp.CmnHdr.NextHdr)
-	log.Debug("L4Type as int is", "L4TypeInt", int(rp.CmnHdr.NextHdr))
+	// log.Debug("L4Type is", "L4Type", rp.CmnHdr.NextHdr)
+	// log.Debug("L4Type as int is", "L4TypeInt", int(rp.CmnHdr.NextHdr))
 	if !contains(cr.L4Type, int(rp.CmnHdr.NextHdr)) {
 		match = false
 	} else {
-		log.Debug("Matched an L4Type!")
+		// log.Debug("Matched an L4Type!")
 	}
 
 	return match
