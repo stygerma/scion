@@ -29,8 +29,6 @@ type packetBufQueue struct {
 type qPktList []qPkt
 type qPktPointerList []*qPkt
 
-var pkts = make(ringbuf.EntryList, 1)
-
 func (pq *packetBufQueue) initQueue(mutQue *sync.Mutex, mutTb *sync.Mutex) {
 
 	pq.mutex = mutQue
@@ -69,7 +67,7 @@ func (pq *packetBufQueue) getLength() int {
 
 func (pq *packetBufQueue) pop() *qPkt {
 
-	// pkts := make(ringbuf.EntryList, 1)
+	pkts := make(ringbuf.EntryList, 1)
 
 	_, _ = pq.bufQueue.Read(pkts, false)
 
@@ -78,7 +76,7 @@ func (pq *packetBufQueue) pop() *qPkt {
 
 func (pq *packetBufQueue) popMultiple(number int) []*qPkt {
 
-	// pkts := make(ringbuf.EntryList, number)
+	pkts := make(ringbuf.EntryList, number)
 
 	_, _ = pq.bufQueue.Read(pkts, false)
 
