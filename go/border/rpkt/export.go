@@ -106,7 +106,7 @@ func JFPrepareRtrPacketWith(sourceIA addr.IA, destinationIA addr.IA, L4Type comm
 		Src:  sampleUDPAddr,
 		IfID: 0, IfLabel: "TODO set all of this stuff correctly"}
 	r.Egress = []EgressPair{EgressPair{S: nil, Dst: sampleUDPAddr}}
-	r.CmnHdr = spkt.CmnHdr{}
+	r.CmnHdr = spkt.CmnHdr{NextHdr: common.L4ProtocolType(L4Type)}
 	r.IncrementedPath = false
 	r.idxs = packetIdxs{} // packetIdxs provides offsets into a packet buffer to the start of various, we might actually need Raw
 	r.srcIA = sourceIA
@@ -129,4 +129,26 @@ func JFPrepareRtrPacketWith(sourceIA addr.IA, destinationIA addr.IA, L4Type comm
 	r.Ctx = rctx.New(config)
 	r.refCnt = -1
 	return r
+}
+
+//TODO: Make this be not dumb, I just want this export for tests. But for some reason it doesn't work.
+func JFPrepareRtrPacketWithSrings(sourceIA string, destinationIA string, L4Type int) *RtrPkt {
+
+	srcIA, err := addr.IAFromString(sourceIA)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	dstIA, err := addr.IAFromString(destinationIA)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	pkt := JFPrepareRtrPacketWith(
+		srcIA,
+		dstIA,
+		common.L4ProtocolType(L4Type))
+	return pkt
 }
