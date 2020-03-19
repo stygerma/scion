@@ -36,7 +36,7 @@ func (r *Router) drrDequer() {
 	i := 0
 	qsum := 0
 	for i < len(r.config.Queues) {
-		qsum = qsum + r.config.Queues[i].priority
+		qsum = qsum + r.config.Queues[i].getPriority()
 		i++
 	}
 
@@ -54,7 +54,7 @@ func (r *Router) drrDequer() {
 func (r *Router) drrDequeue(queueNo int, qsum int) {
 
 	length := r.config.Queues[queueNo].getLength()
-	pktToDequeue := min(64*(r.config.Queues[queueNo].priority/qsum), 1)
+	pktToDequeue := min(64*(r.config.Queues[queueNo].getPriority()/qsum), 1)
 
 	log.Debug("The queue has length", "length", length)
 	log.Debug("Dequeueing packets", "quantum", pktToDequeue)
@@ -74,7 +74,7 @@ func (r *Router) drrMinMaxDequer() {
 	i := 0
 	qsum := 0
 	for i < len(r.config.Queues) {
-		qsum = qsum + r.config.Queues[i].priority
+		qsum = qsum + r.config.Queues[i].getPriority()
 		i++
 	}
 
@@ -92,7 +92,7 @@ func (r *Router) drrMinMaxDequer() {
 func (r *Router) drrMinMaxDequeue(queueNo int, qsum int) {
 
 	length := r.config.Queues[queueNo].getLength()
-	pktToDequeue := min(64*(r.config.Queues[queueNo].MinBandwidth/qsum), 1)
+	pktToDequeue := min(64*(r.config.Queues[queueNo].getMinBandwidth()/qsum), 1)
 
 	log.Debug("The queue has length", "length", length)
 	log.Debug("Dequeueing packets", "quantum", pktToDequeue)
@@ -130,10 +130,10 @@ func (r *Router) getFromSurplus(queueNo int, request int) int {
 	i := 0
 	qsum := 0
 	for i < len(r.config.Queues) {
-		qsum = qsum + r.config.Queues[i].MinBandwidth
+		qsum = qsum + r.config.Queues[i].getMinBandwidth()
 		i++
 	}
-	upperLimit := min(64*(r.config.Queues[queueNo].MaxBandWidth/qsum), 1)
+	upperLimit := min(64*(r.config.Queues[queueNo].getMinBandwidth()/qsum), 1)
 
 	credit := min(r.schedulerSurplus.surplus, upperLimit)
 
