@@ -19,9 +19,12 @@ package main
 
 import (
 	"io/ioutil"
+<<<<<<< 1658d6d86e2b15e153f666d5e24a2d514dc23e90
 	"os"
 	"path/filepath"
 	"strings"
+=======
+>>>>>>> Use hash based packet classification
 	"sync"
 	"time"
 
@@ -89,7 +92,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 		return nil, err
 	}
 
-	r.initQueueing()
+	r.initQueueing(configFileLocation)
 
 	return r, nil
 }
@@ -100,26 +103,50 @@ func (r *Router) loadConfigFile(path string) {
 
 	var rc RouterConfig
 
-	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-
-	log.Info("Current Path is", "path", dir)
+	// dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	// log.Debug("Current Path is", "path", dir)
 
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
+<<<<<<< 1658d6d86e2b15e153f666d5e24a2d514dc23e90
 		log.Info("yamlFile.Get ", "error", err)
 	}
 	err = yaml.Unmarshal(yamlFile, &rc)
 	if err != nil {
 		log.Error("Unmarshal: ", "error", err)
+=======
+		return err
+	}
+	err = yaml.Unmarshal(yamlFile, &rc)
+	if err != nil {
+		return err
+	}
+
+	for _, rule := range rc.Rules {
+		intRule, err := convClassRuleToInternal(rule)
+		if err != nil {
+			log.Error("Error reading config file", "error", err)
+		}
+		internalRules = append(internalRules, intRule)
+>>>>>>> Use hash based packet classification
 	}
 
 }
 
-func (r *Router) initQueueing() {
+func (r *Router) initQueueing(location string) {
 
 	//TODO: Figure out the actual path where the other config files are loaded
 	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
+<<<<<<< 1658d6d86e2b15e153f666d5e24a2d514dc23e90
 	r.loadConfigFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
+=======
+	err := r.loadConfigFile(location)
+
+	if err != nil {
+		log.Error("Loading config file failed", "error", err)
+		panic("Loading config file failed")
+	}
+>>>>>>> Use hash based packet classification
 
 	// Initialise other data structures
 
@@ -135,7 +162,8 @@ func (r *Router) initQueueing() {
 			mutex:        &sync.Mutex{}}
 	}
 
-	log.Info("We have queues: ", "numberOfQueues", len(r.config.Queues))
+	// log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
+	// log.Debug("We have rules: ", "numberOfRules", len(r.config.Rules))
 
 	r.flag = make(chan int, len(r.config.Queues))
 
@@ -294,13 +322,22 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 
 	log.Debug("preRouteStep")
+	log.Debug("We have rules: ", "len(Rules)", len(r.config.Rules))
 
 	// Put packets destined for 1-ff00:0:110 on the slow queue
 	// Put all other packets from br2 on a faster queue but still delayed
 	// At the moment no queue is slow
 
+<<<<<<< 1658d6d86e2b15e153f666d5e24a2d514dc23e90
 	if strings.Contains(r.Id, "br2-ff00_0_212") {
 		log.Debug("It's me br2-ff00_0_212")
+=======
+	queueNo := getQueueNumberWithHashFor(r, rp)
+	qp := qPkt{rp: rp, queueNo: queueNo}
+
+	log.Debug("Queuenumber is ", "queuenumber", queueNo)
+	log.Debug("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
+>>>>>>> Use hash based packet classification
 
 		dstAddr, _ := rp.DstIA()
 		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {

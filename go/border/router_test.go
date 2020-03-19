@@ -16,7 +16,7 @@ func TestLoadSampleConfig(t *testing.T) {
 
 	fmt.Println("The Queue is: ", r.config.Queues[0])
 	fmt.Println("The Rule is: ", r.config.Rules[0])
-	// t.Errorf("Output: %v", r.config)
+	t.Errorf("Output: %v", r.config)
 
 }
 
@@ -80,9 +80,7 @@ func TestMaps(t *testing.T) {
 func TestLoadingToMaps(t *testing.T) {
 	r, _ := setupTestRouter(t)
 
-	r.loadConfigFile("sample-config.yaml")
-
-	r.initQueueing()
+	r.initQueueing("sample-config.yaml")
 
 	r.config.SourceRules, r.config.DestinationRules = rulesToMap(r.config.Rules)
 
@@ -108,9 +106,7 @@ func TestMatchingRules(t *testing.T) {
 
 	r, _ := setupTestRouter(t)
 
-	r.loadConfigFile("sample-config.yaml")
-
-	r.initQueueing()
+	r.initQueueing("sample-config.yaml")
 
 	srcAddr, _ := addr.IAFromString("1-ff00:0:110")
 	dstAddr, _ := addr.IAFromString("1-ff00:0:111")
