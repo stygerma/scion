@@ -48,15 +48,9 @@ func (pq *channelPacketQueue) initQueue(mutQue *sync.Mutex, mutTb *sync.Mutex) {
 
 func (pq *channelPacketQueue) enqueue(rp *qPkt) {
 
-	// TODO: Making this lockfree makes it 10 times faster
-	// pq.mutex.Lock()
-	// defer pq.mutex.Unlock()
-
-	// fmt.Println("Enqueue at", pq.tail, "Dequeue at", pq.head)
 	pq.queue <- rp
 
 	atomic.AddUint64(&pq.length, 1)
-	// pq.length = pq.length + 1
 
 }
 
@@ -87,13 +81,6 @@ func (pq *channelPacketQueue) peek() *qPkt {
 
 func (pq *channelPacketQueue) pop() *qPkt {
 
-	// pq.mutex.Lock()
-	// defer pq.mutex.Unlock()
-
-	// fmt.Println("Enqueue at", pq.tail, "Dequeue at", pq.head)
-
-	// pq.length = pq.length - 1
-
 	c := 1
 	atomic.AddUint64(&pq.length, ^uint64(c-1))
 
@@ -102,13 +89,8 @@ func (pq *channelPacketQueue) pop() *qPkt {
 
 func (pq *channelPacketQueue) popMultiple(number int) []*qPkt {
 
-	// TODO: Readd this as soon as popMultiple works as standalone
-	// pq.mutex.Lock()
-	// defer pq.mutex.Unlock()
-
 	c := number
 	atomic.AddUint64(&pq.length, ^uint64(c-1))
-	// pq.length = pq.length - number
 
 	pkts := make([]*qPkt, number)
 
