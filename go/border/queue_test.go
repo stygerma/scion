@@ -298,12 +298,12 @@ func BenchmarkEnqDequeSingleMult(b *testing.B) {
 		iterations            int
 		que                   packetQueue
 	}{
-		{"Buf Queue 80 Packets", 80, 8, &packetBufQueue{MaxLength: 80, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
-		{"Slice Queue 80 Packets", 80, 8, &packetSliceQueue{MaxLength: 80, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
-		{"Buf Queue 600 Packets", 600, 6, &packetBufQueue{MaxLength: 600, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
-		{"Slice Queue 600 Packets", 600, 6, &packetSliceQueue{MaxLength: 600, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
-		{"Buf Queue 7000 Packets", 7000, 7, &packetBufQueue{MaxLength: 7000, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
-		{"Slice Queue 7000 Packets", 7000, 7, &packetSliceQueue{MaxLength: 7000, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Buf Queue 64 Packets", 64, 8, &packetBufQueue{MaxLength: 64, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 64 Packets", 64, 8, &packetSliceQueue{MaxLength: 64, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Buf Queue 512 Packets", 512, 6, &packetBufQueue{MaxLength: 512, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 512 Packets", 512, 6, &packetSliceQueue{MaxLength: 512, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Buf Queue 8192 Packets", 8192, 7, &packetBufQueue{MaxLength: 8192, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 8192 Packets", 8192, 7, &packetSliceQueue{MaxLength: 8192, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
 	}
 
 	for _, bm := range benchmarks {
