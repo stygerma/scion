@@ -124,8 +124,7 @@ func BenchmarkBig(b *testing.B) {
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
-			_, arr := setupInterm(noPackets, bm.configuration)
-			_ = r
+			r, arr := setupInterm(noPackets, bm.configuration)
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				// fmt.Println("Rules", len(r.legacyConfig.Rules))

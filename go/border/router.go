@@ -20,7 +20,6 @@ package main
 import (
 	"io/ioutil"
 	"sync"
-	"time"
 
 	"github.com/scionproto/scion/go/border/brconf"
 	"github.com/scionproto/scion/go/border/internal/metrics"
@@ -76,13 +75,13 @@ type surplus struct {
 
 // RouterConfig is what I am loading from the config file
 type RouterConfig struct {
-	Queues []packetQueue `yaml:"Queues"`
-	Rules  []classRule   `yaml:"Rules"`
+	Queues []packetBufQueue `yaml:"Queues"`
+	Rules  []classRule      `yaml:"Rules"`
 }
 
 // InternalRouterConfig is what I am loading from the config file
 type InternalRouterConfig struct {
-	Queues           []packetQueue
+	Queues           []packetBufQueue
 	Rules            []internalClassRule
 	SourceRules      map[addr.IA][]*internalClassRule
 	DestinationRules map[addr.IA][]*internalClassRule
@@ -146,17 +145,13 @@ func (r *Router) initQueueing(location string) {
 	// Initialise other data structures
 
 	for i := 0; i < len(r.config.Queues); i++ {
-		r.config.Queues[i].mutex = &sync.Mutex{}
-		r.config.Queues[i].length = 0
-		r.config.Queues[i].tb = tokenBucket{
-			MaxBandWidth: r.config.Queues[i].PoliceRate,
-			tokens:       r.config.Queues[i].PoliceRate,
-			lastRefill:   time.Now(),
-			mutex:        &sync.Mutex{}}
+		muta := &sync.Mutex{}
+		mutb := &sync.Mutex{}
+		r.config.Queues[i].initQueue(muta, mutb)
 	}
 
-	// log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
-	// log.Debug("We have rules: ", "numberOfRules", len(r.config.Rules))
+	log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
+	log.Debug("We have rules: ", "numberOfRules", len(r.config.Rules))
 
 	r.flag = make(chan int, len(r.config.Queues))
 	r.notifications = make(chan *qPkt, maxNotificationCount)
@@ -165,6 +160,8 @@ func (r *Router) initQueueing(location string) {
 	go func() {
 		r.drrDequer()
 	}()
+
+	log.Debug("Finish init queueing")
 }
 
 // Start sets up networking, and starts go routines for handling the main packet
@@ -294,6 +291,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	// 	metrics.Process.Pkts(l).Inc()
 	// }
 
+	log.Debug("Should queue packet")
 	r.queuePacket(rp)
 	// r.forwardPacket(rp);
 }
