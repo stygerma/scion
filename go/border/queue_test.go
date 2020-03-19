@@ -209,7 +209,7 @@ func BenchmarkEnqOnly(b *testing.B) {
 		{"Slice Queue 10 Packets 100 times", 10, 10, &packetSliceQueue{MaxLength: 32, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
 		{"Buf Queue 10 Packets 100 times", 10, 10, &packetBufQueue{MaxLength: 32, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
 		{"Custom Queue 10 Packets 100 times", 10, 10, &customPacketQueue{MaxLength: 32, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
-	}
+		{"Channel Queue 10 Packets 100 times", 10, 10, &channelPacketQueue{MaxLength: 32, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}}}
 
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
