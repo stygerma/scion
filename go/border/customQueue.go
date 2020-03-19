@@ -25,6 +25,7 @@ type customPacketQueue struct {
 	tb     tokenBucket
 	head   int
 	tail   int
+	mask   int
 }
 
 func (pq *customPacketQueue) initQueue(mutQue *sync.Mutex, mutTb *sync.Mutex) {
@@ -39,18 +40,20 @@ func (pq *customPacketQueue) initQueue(mutQue *sync.Mutex, mutTb *sync.Mutex) {
 	pq.queue = make([]*qPkt, pq.MaxLength)
 	pq.head = 0
 	pq.tail = 0
+	pq.mask = pq.MaxLength - 1
 
 	// fmt.Println("Finish init")
 }
 
 func (pq *customPacketQueue) enqueue(rp *qPkt) {
 
+	// TODO: Making this lockfree makes it 10 times faster
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
 
 	// fmt.Println("Enqueue at", pq.tail, "Dequeue at", pq.head)
 	pq.queue[pq.tail] = rp
-	pq.tail = (pq.tail + 1) % pq.MaxLength
+	pq.tail = (pq.tail + 1) & pq.mask
 	pq.length = pq.length + 1
 
 }
@@ -88,7 +91,7 @@ func (pq *customPacketQueue) pop() *qPkt {
 	// fmt.Println("Enqueue at", pq.tail, "Dequeue at", pq.head)
 
 	pkt := pq.queue[pq.head]
-	pq.head = (pq.head + pq.MaxLength + 1) % pq.MaxLength
+	pq.head = (pq.head + pq.MaxLength + 1) & pq.mask
 	pq.length = pq.length - 1
 
 	return pkt
@@ -106,7 +109,7 @@ func (pq *customPacketQueue) popMultiple(number int) []*qPkt {
 
 	if pq.head+number < pq.MaxLength {
 		pkt = pq.queue[pq.head : pq.head+number]
-		pq.head = (pq.head + number) % pq.MaxLength
+		pq.head = (pq.head + number) & pq.mask
 
 	} else {
 		for pq.head+number > pq.MaxLength {
@@ -115,11 +118,11 @@ func (pq *customPacketQueue) popMultiple(number int) []*qPkt {
 			pq.head = 0
 
 			pkt = append(pkt, pq.queue[pq.head:pq.head+number]...)
-			pq.head = (pq.head + number) % pq.MaxLength
+			pq.head = (pq.head + number) & pq.mask
 		}
 
 		pkt = append(pkt, pq.queue[pq.head:pq.head+number]...)
-		pq.head = (pq.head + number) % pq.MaxLength
+		pq.head = (pq.head + number) & pq.mask
 
 	}
 
