@@ -33,13 +33,13 @@ Things to do:
 
 */
 
-func setupQueue() packetQueue {
+func setupQueue() packetSliceQueue {
 
 	bandwidth := 0
 	priority := 1
 
 	bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
-	que := packetQueue{MaxLength: 128, MinBandwidth: priority, MaxBandWidth: priority, mutex: &sync.Mutex{}, tb: bucket}
+	que := packetSliceQueue{MaxLength: 128, MinBandwidth: priority, MaxBandWidth: priority, mutex: &sync.Mutex{}, tb: bucket}
 
 	return que
 
@@ -83,6 +83,151 @@ func BenchmarkEnqueue(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		que.enqueue(&pkt)
+	}
+}
+
+func Benchmark600Enqueue(b *testing.B) {
+	que := setupQueue()
+	pkt := setupQueuePaket()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 600; j++ {
+			que.enqueue(&pkt)
+		}
+		pkts := que.popMultiple(100)
+		_ = pkts
+	}
+}
+
+func Benchmark600BufEnqueue(b *testing.B) {
+
+	bandwidth := 0
+	priority := 1
+
+	bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+	que := packetBufQueue{MaxLength: 600, MinBandwidth: priority, MaxBandWidth: priority, mutex: &sync.Mutex{}, tb: bucket}
+	que.initQueue(&sync.Mutex{}, &sync.Mutex{})
+
+	pkt := setupQueuePaket()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 600; j++ {
+			que.enqueue(&pkt)
+		}
+		pkts := que.popMultiple(100)
+		_ = pkts
+	}
+}
+
+func BenchmarkEnqDeque(b *testing.B) {
+
+	bucket := tokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+	pkt := setupQueuePaket()
+
+	benchmarks := []struct {
+		name       string
+		noPackets  int
+		dequeueDiv int
+		que        packetQueue
+	}{
+		{"Buf Queue 80 Packets", 80, 8, &packetBufQueue{MaxLength: 80, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 80 Packets", 80, 8, &packetSliceQueue{MaxLength: 80, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Buf Queue 600 Packets", 600, 6, &packetBufQueue{MaxLength: 600, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 600 Packets", 600, 6, &packetSliceQueue{MaxLength: 600, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Buf Queue 7000 Packets", 7000, 7, &packetBufQueue{MaxLength: 7000, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 7000 Packets", 7000, 7, &packetSliceQueue{MaxLength: 7000, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			bm.que.initQueue(&sync.Mutex{}, &sync.Mutex{})
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				for i := 0; i < bm.noPackets; i++ {
+					bm.que.enqueue(&pkt)
+				}
+				for i := 0; i < bm.dequeueDiv; i++ {
+					bm.que.popMultiple(bm.noPackets / bm.dequeueDiv)
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkEnqDequeMult(b *testing.B) {
+
+	bucket := tokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+	pkt := setupQueuePaket()
+
+	benchmarks := []struct {
+		name                  string
+		noPacketsPerIteration int
+		iterations            int
+		que                   packetQueue
+	}{
+		{"Buf Queue 80 Packets", 80, 8, &packetBufQueue{MaxLength: 80, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 80 Packets", 80, 8, &packetSliceQueue{MaxLength: 80, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Buf Queue 600 Packets", 600, 6, &packetBufQueue{MaxLength: 600, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 600 Packets", 600, 6, &packetSliceQueue{MaxLength: 600, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Buf Queue 7000 Packets", 7000, 7, &packetBufQueue{MaxLength: 7000, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 7000 Packets", 7000, 7, &packetSliceQueue{MaxLength: 7000, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			bm.que.initQueue(&sync.Mutex{}, &sync.Mutex{})
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				for i := 0; i < bm.iterations; i++ {
+					for i := 0; i < bm.noPacketsPerIteration; i++ {
+						bm.que.enqueue(&pkt)
+					}
+					pkts := bm.que.popMultiple(bm.noPacketsPerIteration)
+					_ = pkts
+				}
+
+			}
+		})
+	}
+}
+
+func BenchmarkEnqDequeSingleMult(b *testing.B) {
+
+	bucket := tokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+	pkt := setupQueuePaket()
+
+	benchmarks := []struct {
+		name                  string
+		noPacketsPerIteration int
+		iterations            int
+		que                   packetQueue
+	}{
+		{"Buf Queue 80 Packets", 80, 8, &packetBufQueue{MaxLength: 80, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 80 Packets", 80, 8, &packetSliceQueue{MaxLength: 80, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Buf Queue 600 Packets", 600, 6, &packetBufQueue{MaxLength: 600, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 600 Packets", 600, 6, &packetSliceQueue{MaxLength: 600, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Buf Queue 7000 Packets", 7000, 7, &packetBufQueue{MaxLength: 7000, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+		{"Slice Queue 7000 Packets", 7000, 7, &packetSliceQueue{MaxLength: 7000, MinBandwidth: 0, MaxBandWidth: 0, mutex: &sync.Mutex{}, tb: bucket}},
+	}
+
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			bm.que.initQueue(&sync.Mutex{}, &sync.Mutex{})
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				for i := 0; i < bm.iterations; i++ {
+					for i := 0; i < bm.noPacketsPerIteration; i++ {
+						bm.que.enqueue(&pkt)
+					}
+					for i := 0; i < bm.noPacketsPerIteration; i++ {
+						pkts := bm.que.pop()
+						_ = pkts
+					}
+
+				}
+
+			}
+		})
 	}
 }
 
@@ -143,7 +288,7 @@ func (r *Router) forwardPacketTest(rp *rpkt.RtrPkt) {
 
 }
 
-func TestHundredPacketQueue(t *testing.T) {
+func TestHundredpacketSliceQueue(t *testing.T) {
 
 	r, _ := setupTestRouter(t)
 
