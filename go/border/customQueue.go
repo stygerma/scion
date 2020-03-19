@@ -126,6 +126,8 @@ func (pq *customPacketQueue) popMultiple(number int) []*qPkt {
 
 	}
 
+	pq.length = pq.length - number
+
 	return pkt
 }
 
