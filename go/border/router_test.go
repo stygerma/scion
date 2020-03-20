@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"testing"
+
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 func TestLoadSampleConfig(t *testing.T) {
@@ -38,5 +40,26 @@ func TestLoadSampleConfigQueues(t *testing.T) {
 	}
 	if r.config.Queues[1].Name != "Speedy Queue" {
 		t.Errorf("Incorrect Queue Name is %v but should be %v", r.config.Queues[0].Name, "Speedy Queue")
+	}
+}
+
+func smallFunctionLargeLogs() {
+	x := 5 * 5
+	x = x * 8
+
+	log.Info("Hello Info")
+	log.Debug("Hello Debug")
+}
+
+// I would like to disable the logs during the benchmark only
+func BenchmarkHelloWorld(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		smallFunctionLargeLogs()
+	}
+}
+
+func BenchmarkHelloWorldNoLogs(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		smallFunctionLargeLogs()
 	}
 }
