@@ -7,14 +7,13 @@ ROOTDIR=$(dirname "$0")/..
 bazel build //:all
 
 DSTDIR=${1:-$ROOTDIR/licenses/data}
-PROJECT=${2:-scion}
 
 rm -rf $DSTDIR
 
-(cd $ROOTDIR/bazel-$PROJECT/external; find -L . -iregex '.*\(LICENSE\|COPYING\).*') | while IFS= read -r path ; do
+(cd $ROOTDIR/bazel-scion/external; find -L . -iregex '.*\(LICENSE\|COPYING\).*') | while IFS= read -r path ; do
     dst=$DSTDIR/$(dirname $path)
     mkdir -p $dst
-    cp $ROOTDIR/bazel-$PROJECT/external/$path $dst
+    cp $ROOTDIR/bazel-scion/external/$path $dst
 done
 
 # Bazel tools are used only for building.
