@@ -178,3 +178,7 @@ func (pq *ChannelPacketQueue) GetMinBandwidth() int {
 func (pq *ChannelPacketQueue) GetPriority() int {
 	return pq.pktQue.Priority
 }
+
+func (pq *ChannelPacketQueue) GetPacketQueue() PacketQueue {
+	return pq.pktQue
+}

@@ -18,7 +18,6 @@ package rpkt
 import (
 	"fmt"
 	"net"
-	"testing"
 	"time"
 
 	"github.com/scionproto/scion/go/border/brconf"
@@ -29,8 +28,7 @@ import (
 	"github.com/scionproto/scion/go/lib/topology"
 )
 
-//TODO: Make this be not dumb, I just want this export for tests. But for some reason it doesn't work.
-func JFPrepareRtrPacketSample(t *testing.T) *RtrPkt {
+func prepareRtrPacketDetailedSample(sourceIA addr.IA, destinationIA addr.IA, L4Type common.L4ProtocolType) *RtrPkt {
 	r := NewRtrPkt()
 	// r.Raw = xtest.MustReadFromFile(t, rawUdpPkt)
 	// Set some other data that are required for the parsing to succeed:
@@ -128,8 +126,7 @@ func JFPrepareRtrPacketWith(sourceIA addr.IA, destinationIA addr.IA, L4Type comm
 	return r
 }
 
-//TODO: Make this be not dumb, I just want this export for tests. But for some reason it doesn't work.
-func JFPrepareRtrPacketWithSrings(sourceIA string, destinationIA string, L4Type int) *RtrPkt {
+func PrepareRtrPacketWithStrings(sourceIA string, destinationIA string, L4Type int) *RtrPkt {
 
 	srcIA, err := addr.IAFromString(sourceIA)
 
@@ -143,7 +140,7 @@ func JFPrepareRtrPacketWithSrings(sourceIA string, destinationIA string, L4Type 
 		fmt.Println(err)
 	}
 
-	pkt := JFPrepareRtrPacketWith(
+	pkt := prepareRtrPacketDetailedSample(
 		srcIA,
 		dstIA,
 		common.L4ProtocolType(L4Type))
