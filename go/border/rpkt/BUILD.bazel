@@ -23,6 +23,9 @@ go_library(
         "route.go",
         "rpkt.go",
         "validate.go",
+        "classRule.go",
+        "loadConfig.go",
+        "scheduler.go",
     ],
     importpath = "github.com/scionproto/scion/go/border/rpkt",
     visibility = ["//visibility:public"],
@@ -32,6 +35,7 @@ go_library(
         "//go/border/internal/metrics:go_default_library",
         "//go/border/rcmn:go_default_library",
         "//go/border/rctx:go_default_library",
+        "//go/border/qosqueues:go_default_library",
         "//go/lib/addr:go_default_library",
         "//go/lib/assert:go_default_library",
         "//go/lib/common:go_default_library",
@@ -49,6 +53,7 @@ go_library(
         "//go/lib/spse/scmp_auth:go_default_library",
         "//go/lib/topology:go_default_library",
         "//go/lib/util:go_default_library",
+        "//go/lib/addr:go_default_library",
     ],
 )
 
