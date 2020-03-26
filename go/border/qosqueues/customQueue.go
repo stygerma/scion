@@ -1,4 +1,4 @@
-package main
+package qosqueues
 
 import (
 	"math/rand"
@@ -9,18 +9,11 @@ import (
 )
 
 type customPacketQueue struct {
-	Name         string          `yaml:"name"`
-	ID           int             `yaml:"id"`
-	MinBandwidth int             `yaml:"CIR"`
-	MaxBandWidth int             `yaml:"PIR"`
-	PoliceRate   int             `yaml:"policeRate"`
-	MaxLength    int             `yaml:"maxLength"`
-	priority     int             `yaml:"priority"`
-	Profile      []actionProfile `yaml:"profile"`
+	pktQue PacketQueue
 
 	mutex *sync.Mutex
 
-	queue  []*qPkt
+	queue  []*QPkt
 	length int
 	tb     tokenBucket
 	head   int
@@ -28,24 +21,27 @@ type customPacketQueue struct {
 	mask   int
 }
 
-func (pq *customPacketQueue) initQueue(mutQue *sync.Mutex, mutTb *sync.Mutex) {
+var _ PacketQueueInterface = (*customPacketQueue)(nil)
 
+func (pq *customPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
+
+	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
 	pq.tb = tokenBucket{
-		MaxBandWidth: pq.PoliceRate,
-		tokens:       pq.PoliceRate,
+		MaxBandWidth: pq.pktQue.PoliceRate,
+		tokens:       pq.pktQue.PoliceRate,
 		lastRefill:   time.Now(),
 		mutex:        mutTb}
-	pq.queue = make([]*qPkt, pq.MaxLength)
+	pq.queue = make([]*QPkt, pq.pktQue.MaxLength)
 	pq.head = 0
 	pq.tail = 0
-	pq.mask = pq.MaxLength - 1
+	pq.mask = pq.pktQue.MaxLength - 1
 
 	// fmt.Println("Finish init")
 }
 
-func (pq *customPacketQueue) enqueue(rp *qPkt) {
+func (pq *customPacketQueue) Enqueue(rp *QPkt) {
 
 	// TODO: Making this lockfree makes it 10 times faster
 	pq.mutex.Lock()
@@ -60,7 +56,7 @@ func (pq *customPacketQueue) enqueue(rp *qPkt) {
 
 func (pq *customPacketQueue) canEnqueue() bool {
 
-	return pq.length < pq.MaxLength
+	return pq.length < pq.pktQue.MaxLength
 }
 
 func (pq *customPacketQueue) canDequeue() bool {
@@ -68,22 +64,22 @@ func (pq *customPacketQueue) canDequeue() bool {
 	return pq.head < pq.tail
 }
 
-func (pq *customPacketQueue) getFillLevel() int {
+func (pq *customPacketQueue) GetFillLevel() int {
 
-	return pq.length / pq.MaxLength
+	return pq.length / pq.pktQue.MaxLength
 }
 
-func (pq *customPacketQueue) getLength() int {
+func (pq *customPacketQueue) GetLength() int {
 
 	return pq.length
 }
 
-func (pq *customPacketQueue) peek() *qPkt {
+func (pq *customPacketQueue) peek() *QPkt {
 
 	return pq.queue[0]
 }
 
-func (pq *customPacketQueue) pop() *qPkt {
+func (pq *customPacketQueue) Pop() *QPkt {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -91,13 +87,13 @@ func (pq *customPacketQueue) pop() *qPkt {
 	// fmt.Println("Enqueue at", pq.tail, "Dequeue at", pq.head)
 
 	pkt := pq.queue[pq.head]
-	pq.head = (pq.head + pq.MaxLength + 1) & pq.mask
+	pq.head = (pq.head + pq.pktQue.MaxLength + 1) & pq.mask
 	pq.length = pq.length - 1
 
 	return pkt
 }
 
-func (pq *customPacketQueue) popMultiple(number int) []*qPkt {
+func (pq *customPacketQueue) PopMultiple(number int) []*QPkt {
 
 	// TODO: Readd this as soon as popMultiple works as standalone
 	pq.mutex.Lock()
@@ -105,16 +101,16 @@ func (pq *customPacketQueue) popMultiple(number int) []*qPkt {
 
 	// fmt.Println("Pop 10")
 
-	var pkt []*qPkt
+	var pkt []*QPkt
 
-	if pq.head+number < pq.MaxLength {
+	if pq.head+number < pq.pktQue.MaxLength {
 		pkt = pq.queue[pq.head : pq.head+number]
 		pq.head = (pq.head + number) & pq.mask
 
 	} else {
-		for pq.head+number > pq.MaxLength {
-			pkt = pq.queue[pq.head:pq.MaxLength]
-			number = number - (pq.MaxLength - pq.head)
+		for pq.head+number > pq.pktQue.MaxLength {
+			pkt = pq.queue[pq.head:pq.pktQue.MaxLength]
+			number = number - (pq.pktQue.MaxLength - pq.head)
 			pq.head = 0
 
 			pkt = append(pkt, pq.queue[pq.head:pq.head+number]...)
@@ -131,19 +127,19 @@ func (pq *customPacketQueue) popMultiple(number int) []*qPkt {
 	return pkt
 }
 
-func (pq *customPacketQueue) checkAction() policeAction {
+func (pq *customPacketQueue) CheckAction() PoliceAction {
 
-	level := pq.getFillLevel()
+	level := pq.GetFillLevel()
 
 	log.Info("Current level is", "level", level)
-	log.Info("Profiles are", "profiles", pq.Profile)
+	log.Info("Profiles are", "profiles", pq.pktQue.Profile)
 
-	for j := len(pq.Profile) - 1; j >= 0; j-- {
-		if level >= pq.Profile[j].FillLevel {
+	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
+		if level >= pq.pktQue.Profile[j].FillLevel {
 			log.Info("Matched a rule!")
-			if rand.Intn(100) < (pq.Profile[j].Prob) {
+			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
 				log.Info("Take Action!")
-				return pq.Profile[j].Action
+				return pq.pktQue.Profile[j].Action
 			}
 			log.Info("Do not take Action")
 
@@ -153,11 +149,11 @@ func (pq *customPacketQueue) checkAction() policeAction {
 	return PASS
 }
 
-func (pq *customPacketQueue) police(qp *qPkt, shouldLog bool) policeAction {
+func (pq *customPacketQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	pq.tb.mutex.Lock()
 	defer pq.tb.mutex.Unlock()
 
-	packetSize := (qp.rp.Bytes().Len()) // In byte
+	packetSize := (qp.Rp.Bytes().Len()) // In byte
 
 	tokenForPacket := packetSize * 8 // In bit
 
@@ -172,30 +168,30 @@ func (pq *customPacketQueue) police(qp *qPkt, shouldLog bool) policeAction {
 	if shouldLog {
 		log.Debug("Available bandwidth after refill", "bandwidth", pq.tb.tokens)
 		log.Debug("Tokens necessary for packet", "tokens", tokenForPacket)
-		log.Debug("Tokens necessary for packet", "bytes", qp.rp.Bytes().Len())
+		log.Debug("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
 	}
 
 	if pq.tb.tokens-tokenForPacket > 0 {
 		pq.tb.tokens = pq.tb.tokens - tokenForPacket
 		pq.tb.tokenSpent += tokenForPacket
-		qp.act.action = PASS
-		qp.act.reason = None
+		qp.Act.action = PASS
+		qp.Act.reason = None
 	} else {
-		qp.act.action = DROP
-		qp.act.reason = BandWidthExceeded
+		qp.Act.action = DROP
+		qp.Act.reason = BandWidthExceeded
 	}
 
 	if shouldLog {
 		log.Debug("Available bandwidth after update", "bandwidth", pq.tb.tokens)
 	}
 
-	return qp.act.action
+	return qp.Act.action
 }
 
-func (pq *customPacketQueue) getMinBandwidth() int {
-	return pq.MinBandwidth
+func (pq *customPacketQueue) GetMinBandwidth() int {
+	return pq.pktQue.MinBandwidth
 }
 
-func (pq *customPacketQueue) getPriority() int {
-	return pq.priority
+func (pq *customPacketQueue) GetPriority() int {
+	return pq.pktQue.priority
 }
