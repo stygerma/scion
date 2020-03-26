@@ -25,24 +25,21 @@ type PoliceAction int
 
 const (
 	// PASS Pass the packet
-	PASS PoliceAction = 0
+	PASS PoliceAction = iota
 	// NOTIFY Notify the sending host of the packet
-	NOTIFY PoliceAction = 1
+	NOTIFY
 	// DROP Drop the packet
-	DROP PoliceAction = 2
+	DROP
 	// DROPNOTIFY Drop and then notify someone
-	DROPNOTIFY PoliceAction = 3
+	DROPNOTIFY
 )
 
 type Violation int
 
 const (
-	// None none
-	None = 0
-	// BandWidthExceeded ...
-	BandWidthExceeded = 1
-	// queueFull
-	queueFull = 2
+	None Violation = iota
+	BandWidthExceeded
+	queueFull
 )
 
 // Action is
