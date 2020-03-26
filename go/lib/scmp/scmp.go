@@ -92,6 +92,7 @@ const (
 	T_P_BadSegment
 	T_P_BadInfoField
 	T_P_BadHopField
+	T_P_CongWarn //MS
 )
 
 // C_Ext types
@@ -117,8 +118,13 @@ var typeNameMap = map[Class][]string{
 		"BAD_PKT_LEN", "BAD_IOF_OFFSET", "BAD_HOF_OFFSET"},
 	C_Path: {"PATH_REQUIRED", "BAD_MAC", "EXPIRED_HOPF", "BAD_IF", "REVOKED_IF",
 		"NON_ROUTING_HOPF", "DELIVERY_NON_LOCAL", "BAD_SEGMENT",
+<<<<<<< HEAD
 		"BAD_INFO_FIELD", "BAD_HOP_FIELD", "BASIC_CONG_WARN", "HBH_CONG_WARN",
 		"STOCHASTIC_CONG_WARN", "COMBI_CONG_WARN"},
+=======
+		"BAD_INFO_FIELD", "BAD_HOP_FIELD", "CONG_WARN",
+	},
+>>>>>>> e9ea163d9f4c7bbb1d1a067fd6cd04bb881e6b81
 	C_Ext:   {"TOO_MANY_HOPBYHOP", "BAD_EXT_ORDER", "BAD_HOPBYHOP", "BAD_END2END"},
 	C_Sibra: {"BAD_VERSION", "SETUP_NO_REQ"},
 }

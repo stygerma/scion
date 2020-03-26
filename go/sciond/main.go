@@ -87,7 +87,7 @@ func realMain() int {
 		log.Crit("Setup failed", "err", err)
 		return 1
 	}
-	pathDB, revCache, err := pathstorage.NewPathStorage(cfg.SD.PathDB, cfg.SD.RevCache)
+	pathDB, revCache, err := pathstorage.NewPathStorage(cfg.PathDB)
 	if err != nil {
 		log.Crit("Unable to initialize path storage", "err", err)
 		return 1
@@ -102,12 +102,7 @@ func realMain() int {
 	defer trCloser.Close()
 	opentracing.SetGlobalTracer(tracer)
 
-<<<<<<< HEAD
 	publicIP, err := net.ResolveUDPAddr("udp", cfg.SD.Address)
-=======
-	publicIP, err := net.ResolveUDPAddr("udp", cfg.SD.Public)
-	log.Info("This is the shits", "err", err, "addr", publicIP) //BC
->>>>>>> e74d7c4... added some ways to log, some comments and a getter for hooks
 	if err != nil {
 		log.Crit("Unable to resolve listening address", "err", err, "addr", publicIP)
 		return 1
@@ -224,7 +219,7 @@ func setup() error {
 	if err := cfg.Validate(); err != nil {
 		return common.NewBasicError("unable to validate config", err)
 	}
-	topo, err := topology.FromJSONFile(cfg.General.Topology)
+	topo, err := topology.FromJSONFile(cfg.General.Topology())
 	if err != nil {
 		return common.NewBasicError("unable to load topology", err)
 	}
@@ -232,7 +227,7 @@ func setup() error {
 	if err := itopo.Update(topo); err != nil {
 		return common.NewBasicError("unable to set initial static topology", err)
 	}
-	infraenv.InitInfraEnvironment(cfg.General.Topology)
+	infraenv.InitInfraEnvironment(cfg.General.Topology())
 	return nil
 }
 

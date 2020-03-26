@@ -97,6 +97,7 @@ local scmpTypes = {
         [7] = "BAD_SEGMENT",
         [8] = "BAD_INFO_FIELD",
         [9] = "BAD_HOP_FIELD",
+        [10] = "CONG_WARN", --MS
     },
     ["EXT"] = {
         [0] = "TOO_MANY_HOPBYHOP",

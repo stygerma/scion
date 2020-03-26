@@ -343,6 +343,8 @@ func (s *SCMPTaggedLayer) parseSCMPType(c string) {
 		s.Type = scmp.T_P_BadInfoField
 	case "BAD_HOP_FIELD":
 		s.Type = scmp.T_P_BadHopField
+	case "CONG_WARN":
+		s.Type = scmp.T_P_CongWarn //MS
 	case "TOO_MANY_HOPBYHOP":
 		s.Type = scmp.T_E_TooManyHopbyHop
 	case "BAD_EXT_ORDER":
