@@ -24,3 +24,20 @@ go_library(
         "//go/lib/scmp:go_default_library",
     ],
 )
+
+go_test(
+    name = "go_default_test",
+    srcs = [
+        "bufQueue_test.go",
+        "channelQueue_test.go",
+        "customQueue_test.go",
+        "queue_test.go",
+        "sliceQueue_test.go",
+        "policer_test.go"
+    ],
+    data = glob(["testdata/**"]),
+    embed = [":go_default_library"],
+    deps = [
+        "//go/border/qosqueues:go_default_library",
+    ],
+)
