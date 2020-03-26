@@ -36,7 +36,7 @@ import (
 	"github.com/scionproto/scion/go/lib/prom"
 	"github.com/scionproto/scion/go/lib/serrors"
 	"github.com/scionproto/scion/go/lib/sigdisp"
-	"github.com/scionproto/scion/go/sig/config"
+	"github.com/scionproto/scion/go/lib/sigjson"
 	"github.com/scionproto/scion/go/sig/egress"
 	"github.com/scionproto/scion/go/sig/internal/base"
 	"github.com/scionproto/scion/go/sig/internal/ingress"
@@ -150,16 +150,16 @@ func setupTun() (io.ReadWriteCloser, error) {
 		return nil, err
 	}
 	src := cfg.Sig.SrcIP4
-	if len(src) == 0 && cfg.Sig.IP.To4() != nil {
-		src = cfg.Sig.IP
+	if len(src) == 0 && sigcmn.CtrlAddr.To4() != nil {
+		src = sigcmn.CtrlAddr
 	}
 	if err = xnet.AddRoute(cfg.Sig.TunRTableId, tunLink, sigcmn.DefV4Net, src); err != nil {
 		return nil,
 			common.NewBasicError("Unable to add default IPv4 route to SIG routing table", err)
 	}
 	src = cfg.Sig.SrcIP6
-	if len(src) == 0 && cfg.Sig.IP.To16() != nil && cfg.Sig.IP.To4() == nil {
-		src = cfg.Sig.IP
+	if len(src) == 0 && sigcmn.CtrlAddr.To16() != nil && sigcmn.CtrlAddr.To4() == nil {
+		src = sigcmn.CtrlAddr
 	}
 	if err = xnet.AddRoute(cfg.Sig.TunRTableId, tunLink, sigcmn.DefV6Net, src); err != nil {
 		return nil,
@@ -195,7 +195,7 @@ func checkPerms() error {
 }
 
 func loadConfig(path string) bool {
-	cfg, err := config.LoadFromFile(path)
+	cfg, err := sigjson.LoadFromFile(path)
 	if err != nil {
 		log.Error("loadConfig: Failed", "err", err)
 		return false

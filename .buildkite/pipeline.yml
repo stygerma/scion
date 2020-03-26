@@ -1,7 +1,7 @@
 steps:
   - label: ":bazel: Build scion code"
     command:
-      - bazel build --announce_rc //:scion //:scion-ci
+      - bazel build --announce_rc //:all
     key: build
     retry:
       automatic:
@@ -22,6 +22,16 @@ steps:
   - label: ":python: Python tests"
     command: ./scion.sh test py
     key: py_tests
+    retry:
+      automatic:
+        - exit_status: -1  # Agent was lost
+        - exit_status: 255 # Forced agent shutdown
+  - label: "Check licenses"
+    command:
+      - mkdir -p /tmp/test-artifacts/licenses
+      - ./tools/licenses.sh /tmp/test-artifacts/licenses
+      - diff -rNu3 /tmp/test-artifacts/licenses ./licenses/data
+    key: licenses
     retry:
       automatic:
         - exit_status: -1  # Agent was lost
