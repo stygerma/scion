@@ -24,7 +24,7 @@ import (
 	"github.com/scionproto/scion/go/lib/ringbuf"
 )
 
-type packetBufQueue struct {
+type PacketBufQueue struct {
 	pktQue PacketQueue
 
 	mutex *sync.Mutex
@@ -37,9 +37,9 @@ type packetBufQueue struct {
 // type QPktList []QPkt
 // type QPktPointerList []*QPkt
 
-var _ PacketQueueInterface = (*packetBufQueue)(nil)
+var _ PacketQueueInterface = (*PacketBufQueue)(nil)
 
-func (pq *packetBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
+func (pq *PacketBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
 
 	pq.pktQue = que
 	pq.mutex = mutQue
@@ -55,28 +55,28 @@ func (pq *packetBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *
 
 }
 
-func (pq *packetBufQueue) Enqueue(rp *QPkt) {
+func (pq *PacketBufQueue) Enqueue(rp *QPkt) {
 
 	pq.bufQueue.Write(ringbuf.EntryList{rp}, false)
 
 }
 
-func (pq *packetBufQueue) canDequeue() bool {
+func (pq *PacketBufQueue) canDequeue() bool {
 
 	return pq.GetLength() > 0
 }
 
-func (pq *packetBufQueue) GetFillLevel() int {
+func (pq *PacketBufQueue) GetFillLevel() int {
 
 	return pq.GetLength() / pq.pktQue.MaxLength
 }
 
-func (pq *packetBufQueue) GetLength() int {
+func (pq *PacketBufQueue) GetLength() int {
 
 	return pq.bufQueue.Length()
 }
 
-func (pq *packetBufQueue) Pop() *QPkt {
+func (pq *PacketBufQueue) Pop() *QPkt {
 
 	pkts := make(ringbuf.EntryList, 1)
 
@@ -85,7 +85,7 @@ func (pq *packetBufQueue) Pop() *QPkt {
 	return pkts[0].(*QPkt)
 }
 
-func (pq *packetBufQueue) PopMultiple(number int) []*QPkt {
+func (pq *PacketBufQueue) PopMultiple(number int) []*QPkt {
 
 	pkts := make(ringbuf.EntryList, number)
 
@@ -104,7 +104,7 @@ func (pq *packetBufQueue) PopMultiple(number int) []*QPkt {
 	return retArr
 }
 
-func (pq *packetBufQueue) CheckAction() PoliceAction {
+func (pq *PacketBufQueue) CheckAction() PoliceAction {
 
 	level := pq.GetFillLevel()
 
@@ -126,7 +126,7 @@ func (pq *packetBufQueue) CheckAction() PoliceAction {
 	return PASS
 }
 
-func (pq *packetBufQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
+func (pq *PacketBufQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	pq.tb.mutex.Lock()
 	defer pq.tb.mutex.Unlock()
 
@@ -165,10 +165,14 @@ func (pq *packetBufQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	return qp.Act.action
 }
 
-func (pq *packetBufQueue) GetMinBandwidth() int {
+func (pq *PacketBufQueue) GetMinBandwidth() int {
 	return pq.pktQue.MinBandwidth
 }
 
-func (pq *packetBufQueue) GetPriority() int {
+func (pq *PacketBufQueue) GetPriority() int {
 	return pq.pktQue.Priority
+}
+
+func (pq *PacketBufQueue) GetPacketQueue() PacketQueue {
+	return pq.pktQue
 }
