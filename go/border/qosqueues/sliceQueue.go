@@ -8,7 +8,7 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
-type packetSliceQueue struct {
+type PacketSliceQueue struct {
 	pktQue PacketQueue
 
 	mutex *sync.Mutex
@@ -18,9 +18,9 @@ type packetSliceQueue struct {
 	tb     tokenBucket
 }
 
-var _ PacketQueueInterface = (*packetSliceQueue)(nil)
+var _ PacketQueueInterface = (*PacketSliceQueue)(nil)
 
-func (pq *packetSliceQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
+func (pq *PacketSliceQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
 
 	pq.pktQue = que
 	pq.mutex = mutQue
@@ -33,7 +33,7 @@ func (pq *packetSliceQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb
 
 }
 
-func (pq *packetSliceQueue) Enqueue(rp *QPkt) {
+func (pq *PacketSliceQueue) Enqueue(rp *QPkt) {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -43,27 +43,27 @@ func (pq *packetSliceQueue) Enqueue(rp *QPkt) {
 
 }
 
-func (pq *packetSliceQueue) canDequeue() bool {
+func (pq *PacketSliceQueue) canDequeue() bool {
 
 	return pq.length > 0
 }
 
-func (pq *packetSliceQueue) GetFillLevel() int {
+func (pq *PacketSliceQueue) GetFillLevel() int {
 
 	return pq.length / pq.pktQue.MaxLength
 }
 
-func (pq *packetSliceQueue) GetLength() int {
+func (pq *PacketSliceQueue) GetLength() int {
 
 	return pq.length
 }
 
-func (pq *packetSliceQueue) peek() *QPkt {
+func (pq *PacketSliceQueue) peek() *QPkt {
 
 	return pq.queue[0]
 }
 
-func (pq *packetSliceQueue) Pop() *QPkt {
+func (pq *PacketSliceQueue) Pop() *QPkt {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -75,7 +75,7 @@ func (pq *packetSliceQueue) Pop() *QPkt {
 	return pkt
 }
 
-func (pq *packetSliceQueue) PopMultiple(number int) []*QPkt {
+func (pq *PacketSliceQueue) PopMultiple(number int) []*QPkt {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -87,7 +87,7 @@ func (pq *packetSliceQueue) PopMultiple(number int) []*QPkt {
 	return pkt
 }
 
-func (pq *packetSliceQueue) CheckAction() PoliceAction {
+func (pq *PacketSliceQueue) CheckAction() PoliceAction {
 
 	level := pq.GetFillLevel()
 
@@ -109,7 +109,7 @@ func (pq *packetSliceQueue) CheckAction() PoliceAction {
 	return PASS
 }
 
-func (pq *packetSliceQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
+func (pq *PacketSliceQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	pq.tb.mutex.Lock()
 	defer pq.tb.mutex.Unlock()
 
@@ -148,10 +148,14 @@ func (pq *packetSliceQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	return qp.Act.action
 }
 
-func (pq *packetSliceQueue) GetMinBandwidth() int {
+func (pq *PacketSliceQueue) GetMinBandwidth() int {
 	return pq.pktQue.MinBandwidth
 }
 
-func (pq *packetSliceQueue) GetPriority() int {
+func (pq *PacketSliceQueue) GetPriority() int {
 	return pq.pktQue.Priority
+}
+
+func (pq *PacketSliceQueue) GetPacketQueue() PacketQueue {
+	return pq.pktQue
 }
