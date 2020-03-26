@@ -1,4 +1,4 @@
-package main
+package qosqueues
 
 import (
 	"sync"
@@ -21,9 +21,9 @@ func setupCustomPacketQueue(length int) customPacketQueue {
 func TestBasicCustomEnqueue(t *testing.T) {
 	que := setupCustomPacketQueue(128)
 	pkt := setupQueuePaket()
-	que.initQueue(&sync.Mutex{}, &sync.Mutex{})
-	que.enqueue(&pkt)
-	length := que.getLength()
+	que.InitQueue(&sync.Mutex{}, &sync.Mutex{})
+	que.Enqueue(&pkt)
+	length := que.GetLength()
 	if length != 1 {
 		t.Errorf("Enqueue one packet should give length 1 gave length %d", length)
 	}
@@ -32,13 +32,13 @@ func TestBasicCustomEnqueue(t *testing.T) {
 func TestBasicCustomEnqueueDequeue(t *testing.T) {
 	que := setupCustomPacketQueue(128)
 	pkt := setupQueuePaket()
-	que.initQueue(&sync.Mutex{}, &sync.Mutex{})
-	que.enqueue(&pkt)
-	length := que.getLength()
+	que.InitQueue(&sync.Mutex{}, &sync.Mutex{})
+	que.Enqueue(&pkt)
+	length := que.GetLength()
 	if length != 1 {
 		t.Errorf("Enqueue one packet should give length 1 gave length %d", length)
 	}
-	pk := que.pop()
+	pk := que.Pop()
 	if pk == nil {
 		t.Errorf("Returned packet is nil")
 	}
@@ -50,10 +50,10 @@ func TestBasicCustomEnqueueDequeue(t *testing.T) {
 func TestBasicCustomEnqueueRollover(t *testing.T) {
 	que := setupCustomPacketQueue(32)
 	pkt := setupQueuePaket()
-	que.initQueue(&sync.Mutex{}, &sync.Mutex{})
+	que.InitQueue(&sync.Mutex{}, &sync.Mutex{})
 
 	for i := 0; i < 64; i++ {
-		que.enqueue(&pkt)
+		que.Enqueue(&pkt)
 		if i >= 32-1 {
 			if que.canEnqueue() {
 				t.Errorf("Should not be able to enqueue %d", i)
@@ -70,10 +70,10 @@ func TestBasicCustomEnqueueRollover(t *testing.T) {
 
 func TestBasicCustomDequeueRollover(t *testing.T) {
 	que := setupCustomPacketQueue(32)
-	que.initQueue(&sync.Mutex{}, &sync.Mutex{})
+	que.InitQueue(&sync.Mutex{}, &sync.Mutex{})
 
 	for i := 0; i < 63; i++ {
-		_ = que.pop()
+		_ = que.Pop()
 		if que.canDequeue() {
 			t.Errorf("Should not be able to dequeue %d", i)
 		}
