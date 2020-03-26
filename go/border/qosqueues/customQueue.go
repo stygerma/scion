@@ -23,7 +23,7 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
-type customPacketQueue struct {
+type CustomPacketQueue struct {
 	pktQue PacketQueue
 
 	mutex *sync.Mutex
@@ -36,9 +36,9 @@ type customPacketQueue struct {
 	mask   int
 }
 
-var _ PacketQueueInterface = (*customPacketQueue)(nil)
+var _ PacketQueueInterface = (*CustomPacketQueue)(nil)
 
-func (pq *customPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
+func (pq *CustomPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
 
 	pq.pktQue = que
 	pq.mutex = mutQue
@@ -56,7 +56,7 @@ func (pq *customPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutT
 	// fmt.Println("Finish init")
 }
 
-func (pq *customPacketQueue) Enqueue(rp *QPkt) {
+func (pq *CustomPacketQueue) Enqueue(rp *QPkt) {
 
 	// TODO: Making this lockfree makes it 10 times faster
 	pq.mutex.Lock()
@@ -69,32 +69,32 @@ func (pq *customPacketQueue) Enqueue(rp *QPkt) {
 
 }
 
-func (pq *customPacketQueue) canEnqueue() bool {
+func (pq *CustomPacketQueue) canEnqueue() bool {
 
 	return pq.length < pq.pktQue.MaxLength
 }
 
-func (pq *customPacketQueue) canDequeue() bool {
+func (pq *CustomPacketQueue) canDequeue() bool {
 
 	return pq.head < pq.tail
 }
 
-func (pq *customPacketQueue) GetFillLevel() int {
+func (pq *CustomPacketQueue) GetFillLevel() int {
 
 	return pq.length / pq.pktQue.MaxLength
 }
 
-func (pq *customPacketQueue) GetLength() int {
+func (pq *CustomPacketQueue) GetLength() int {
 
 	return pq.length
 }
 
-func (pq *customPacketQueue) peek() *QPkt {
+func (pq *CustomPacketQueue) peek() *QPkt {
 
 	return pq.queue[0]
 }
 
-func (pq *customPacketQueue) Pop() *QPkt {
+func (pq *CustomPacketQueue) Pop() *QPkt {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -108,7 +108,7 @@ func (pq *customPacketQueue) Pop() *QPkt {
 	return pkt
 }
 
-func (pq *customPacketQueue) PopMultiple(number int) []*QPkt {
+func (pq *CustomPacketQueue) PopMultiple(number int) []*QPkt {
 
 	// TODO: Readd this as soon as popMultiple works as standalone
 	pq.mutex.Lock()
@@ -142,7 +142,7 @@ func (pq *customPacketQueue) PopMultiple(number int) []*QPkt {
 	return pkt
 }
 
-func (pq *customPacketQueue) CheckAction() PoliceAction {
+func (pq *CustomPacketQueue) CheckAction() PoliceAction {
 
 	level := pq.GetFillLevel()
 
@@ -164,7 +164,7 @@ func (pq *customPacketQueue) CheckAction() PoliceAction {
 	return PASS
 }
 
-func (pq *customPacketQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
+func (pq *CustomPacketQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	pq.tb.mutex.Lock()
 	defer pq.tb.mutex.Unlock()
 
@@ -203,10 +203,14 @@ func (pq *customPacketQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	return qp.Act.action
 }
 
-func (pq *customPacketQueue) GetMinBandwidth() int {
+func (pq *CustomPacketQueue) GetMinBandwidth() int {
 	return pq.pktQue.MinBandwidth
 }
 
-func (pq *customPacketQueue) GetPriority() int {
+func (pq *CustomPacketQueue) GetPriority() int {
 	return pq.pktQue.Priority
+}
+
+func (pq *CustomPacketQueue) GetPacketQueue() PacketQueue {
+	return pq.pktQue
 }

@@ -82,6 +82,7 @@ type PacketQueueInterface interface {
 	Police(qp *QPkt, shouldLog bool) PoliceAction
 	GetPriority() int
 	GetMinBandwidth() int
+	GetPacketQueue() PacketQueue
 }
 
 func ReturnAction(polAction PoliceAction, profAction PoliceAction) PoliceAction {

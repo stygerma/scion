@@ -45,33 +45,33 @@ func TestLoadSampleConfigQueues(t *testing.T) {
 	fmt.Println("We have this number of queues: ", len(r.config.Queues))
 	t.Errorf("Output: %v", r.config)
 
-	if r.config.Queues[0].ID != 0 {
+	if r.config.Queues[0].GetPacketQueue().ID != 0 {
 		t.Errorf("Incorrect Queue ID")
 	}
-	if r.config.Queues[1].ID != 1 {
+	if r.config.Queues[1].GetPacketQueue().ID != 1 {
 		t.Errorf("Incorrect Queue ID")
 	}
 
-	if r.config.Queues[0].Name != "General Queue" {
-		t.Errorf("Incorrect Queue Name is %v but should be %v", r.config.Queues[0].Name, "General Queue")
+	if r.config.Queues[0].GetPacketQueue().Name != "General Queue" {
+		t.Errorf("Incorrect Queue Name is %v but should be %v", r.config.Queues[0].GetPacketQueue().Name, "General Queue")
 	}
-	if r.config.Queues[1].Name != "Speedy Queue" {
-		t.Errorf("Incorrect Queue Name is %v but should be %v", r.config.Queues[0].Name, "Speedy Queue")
+	if r.config.Queues[1].GetPacketQueue().Name != "Speedy Queue" {
+		t.Errorf("Incorrect Queue Name is %v but should be %v", r.config.Queues[0].GetPacketQueue().Name, "Speedy Queue")
 	}
 }
 
 func TestMaps(t *testing.T) {
-	m := make(map[addr.IA]*internalClassRule)
+	m := make(map[addr.IA]*classRule)
 
 	IA1, _ := addr.IAFromString("1-ff00:0:110")
 	IA2, _ := addr.IAFromString("2-ff00:0:110")
 	IA3, _ := addr.IAFromString("3-ff00:0:110")
 	IA4, _ := addr.IAFromString("4-ff00:0:110")
 
-	rul1 := internalClassRule{Name: "Hello Test", SourceAs: matchRule{IA: IA1}}
-	rul2 := internalClassRule{Name: "Hello World", SourceAs: matchRule{IA: IA2}}
-	rul3 := internalClassRule{Name: "Hello SCION", SourceAs: matchRule{IA: IA3}}
-	rul4 := internalClassRule{Name: "Hello Internet", SourceAs: matchRule{IA: IA4}}
+	rul1 := classRule{Name: "Hello Test", SourceAs: matchRule{IA: IA1}}
+	rul2 := classRule{Name: "Hello World", SourceAs: matchRule{IA: IA2}}
+	rul3 := classRule{Name: "Hello SCION", SourceAs: matchRule{IA: IA3}}
+	rul4 := classRule{Name: "Hello Internet", SourceAs: matchRule{IA: IA4}}
 
 	m[IA1] = &rul1
 	m[IA2] = &rul2
