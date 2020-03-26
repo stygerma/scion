@@ -1,4 +1,4 @@
-package main
+package qosqueues
 
 import (
 	"sync"
@@ -45,11 +45,4 @@ func (tb *tokenBucket) refill(shouldLog bool) {
 		}
 	}
 
-}
-
-func (qp *qPkt) sendNotification() {
-	select {
-	case r.notifications <- qp:
-	default:
-	}
 }

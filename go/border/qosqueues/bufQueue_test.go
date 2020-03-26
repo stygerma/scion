@@ -1,4 +1,4 @@
-package main
+package qosqueues
 
 import (
 	"sync"
@@ -14,7 +14,7 @@ func setupBufQueue() packetBufQueue {
 	bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 	que := packetBufQueue{MaxLength: 128, MinBandwidth: priority, MaxBandWidth: priority, mutex: &sync.Mutex{}, tb: bucket}
 
-	que.initQueue(&sync.Mutex{}, &sync.Mutex{})
+	que.InitQueue(&sync.Mutex{}, &sync.Mutex{})
 
 	return que
 
@@ -23,12 +23,12 @@ func setupBufQueue() packetBufQueue {
 func TestBasicEnqueueBuf(t *testing.T) {
 	que := setupBufQueue()
 	pkt := setupQueuePaket()
-	que.enqueue(&pkt)
-	length := que.getLength()
+	que.Enqueue(&pkt)
+	length := que.GetLength()
 	if length != 1 {
 		t.Errorf("Enqueue one packet should give length 1 gave length %d", length)
 	}
-	pktb := que.pop()
+	pktb := que.Pop()
 
 	if &pkt != pktb {
 		t.Errorf("Returned wrong packet")
@@ -38,12 +38,12 @@ func TestBasicEnqueueBuf(t *testing.T) {
 func TestBasicEnqueueBufMultidequeue(t *testing.T) {
 	que := setupBufQueue()
 	pkt := setupQueuePaket()
-	que.enqueue(&pkt)
-	length := que.getLength()
+	que.Enqueue(&pkt)
+	length := que.GetLength()
 	if length != 1 {
 		t.Errorf("Enqueue one packet should give length 1 gave length %d", length)
 	}
-	pktb := que.popMultiple(1)[0]
+	pktb := que.PopMultiple(1)[0]
 
 	if &pkt != pktb {
 		t.Errorf("Returned wrong packet")
