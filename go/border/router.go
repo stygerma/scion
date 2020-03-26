@@ -18,7 +18,11 @@
 package main
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/scionproto/scion/go/border/brconf"
 	"github.com/scionproto/scion/go/border/internal/metrics"
@@ -31,10 +35,18 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
 	_ "github.com/scionproto/scion/go/lib/scrypto" // Make sure math/rand is seeded
+	"gopkg.in/yaml.v2"
 )
 
 const processBufCnt = 128
 
+const maxNotificationCount = 512
+
+const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
+
+var droppedPackets = 0
+
+// Router struct
 type Router struct {
 	// Id is the SCION element ID, e.g. "br4-ff00:0:2f".
 	Id string
@@ -49,14 +61,90 @@ type Router struct {
 	// setCtxMtx serializes modifications to the router context. Topology updates
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
+
+	config              RouterConfig
+	notifications       chan *qPkt
+	flag                chan int
+	schedulerSurplus    surplus
+	schedulerSurplusMtx sync.Mutex
+	forwarder           func(rp *rpkt.RtrPkt)
 }
 
+type surplus struct {
+	surplus  int
+	payments []int
+}
+
+// RouterConfig is what I am loading from the config file
+type RouterConfig struct {
+	Queues []packetQueue `yaml:"Queues"`
+	Rules  []classRule   `yaml:"Rules"`
+}
+
+// NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
 	r := &Router{Id: id, confDir: confDir}
 	if err := r.setup(); err != nil {
 		return nil, err
 	}
+
+	r.initQueueing()
+
 	return r, nil
+}
+
+func (r *Router) loadConfigFile(path string) error {
+
+	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+
+	log.Info("Current Path is", "path", dir)
+
+	yamlFile, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Info("yamlFile.Get ", "error", err)
+		return err
+	}
+	err = yaml.Unmarshal(yamlFile, &r.config)
+	if err != nil {
+		log.Error("Unmarshal: ", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+func (r *Router) initQueueing() {
+
+	//TODO: Figure out the actual path where the other config files are loaded
+	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
+	err := r.loadConfigFile(configFileLocation)
+
+	if err != nil {
+		log.Error("Loading config file failed", "error", err)
+		panic("Loading config file failed")
+	}
+
+	// Initialise other data structures
+
+	for i := 0; i < len(r.config.Queues); i++ {
+		r.config.Queues[i].mutex = &sync.Mutex{}
+		r.config.Queues[i].length = 0
+		r.config.Queues[i].tb = tokenBucket{
+			MaxBandWidth: r.config.Queues[i].PoliceRate,
+			tokens:       r.config.Queues[i].PoliceRate,
+			lastRefill:   time.Now(),
+			mutex:        &sync.Mutex{}}
+	}
+
+	log.Info("We have queues: ", "numberOfQueues", len(r.config.Queues))
+
+	r.flag = make(chan int, len(r.config.Queues))
+	r.notifications = make(chan *qPkt, maxNotificationCount)
+	r.forwarder = r.forwardPacket
+
+	go func() {
+		r.drrDequer()
+	}()
 }
 
 // Start sets up networking, and starts go routines for handling the main packet
@@ -83,6 +171,9 @@ func (r *Router) ReloadConfig() error {
 	if err := r.setupCtxFromConfig(config); err != nil {
 		return common.NewBasicError("Unable to set up new context", err)
 	}
+	if err = r.loadConfigFile(configFileLocation); err != nil {
+		return common.NewBasicError("Unable to load QoS config", err)
+	}
 	return nil
 }
 
@@ -100,8 +191,15 @@ func (r *Router) handleSock(s *rctx.Sock, stop, stopped chan struct{}) {
 		}
 		for i := 0; i < n; i++ {
 			rp := pkts[i].(*rpkt.RtrPkt)
+<<<<<<< HEAD
 			r.processPacket(rp) //IMP: reference of processPacket method
 			rp.Release()
+=======
+			r.processPacket(rp)
+			// the packet might still be queued so we can't release it here.
+			// it is released in forwardPacket
+			// rp.Release()
+>>>>>>> 6f8f34f7fae02821c460ed7a2d7407fb0a04b539
 			pkts[i] = nil
 		}
 	}
@@ -176,10 +274,82 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	}
 	log.Debug("processed packet if necessary", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
+	// if err := rp.Route(); err != nil {
+	// 	r.handlePktError(rp, err, "Error routing packet")
+	// 	l.Result = metrics.ErrRoute
+	// 	metrics.Process.Pkts(l).Inc()
+	// }
+
+	r.queuePacket(rp)
+	// r.forwardPacket(rp);
+}
+
+func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
+	defer rp.Release()
+	droppedPackets = droppedPackets + 1
+	log.Debug("Dropped Packet", "dropped", droppedPackets)
+
+}
+
+func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
+
+	defer rp.Release()
+
+	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
 		r.handlePktError(rp, err, "Error routing packet")
+		l := metrics.ProcessLabels{
+			IntfIn:  metrics.IntfToLabel(rp.Ingress.IfID),
+			IntfOut: metrics.Drop,
+		}
 		l.Result = metrics.ErrRoute
 		metrics.Process.Pkts(l).Inc()
 	}
 	log.Debug("packet forwarded", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
+}
+
+func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
+
+	log.Debug("preRouteStep")
+
+	// Put packets destined for 1-ff00:0:110 on the slow queue
+	// Put all other packets from br2 on a faster queue but still delayed
+	// At the moment no queue is slow
+
+	queueNo := getQueueNumberFor(rp, &r.config.Rules)
+	qp := qPkt{rp: rp, queueNo: queueNo}
+
+	log.Info("Queuenumber is ", "queuenumber", queueNo)
+	log.Info("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
+
+	polAct := r.config.Queues[queueNo].police(&qp, queueNo == 1)
+	profAct := r.config.Queues[queueNo].checkAction()
+
+	act := returnAction(polAct, profAct)
+
+	// if queueNo == 1 {
+	// 	panic("We have received a packet on queue 1 🥳")
+	// }
+
+	if act == PASS {
+		r.config.Queues[queueNo].enqueue(&qp)
+	} else if act == NOTIFY {
+		r.config.Queues[queueNo].enqueue(&qp)
+		qp.sendNotification()
+	} else if act == DROPNOTIFY {
+		r.dropPacket(qp.rp)
+		qp.sendNotification()
+	} else if act == DROP {
+		r.dropPacket(qp.rp)
+	} else {
+		// This should never happen
+		r.config.Queues[queueNo].enqueue(&qp)
+	}
+
+	// According to gobyexample all sends are blocking and this is the standard way to do non-blocking sends (https://gobyexample.com/non-blocking-channel-operations)
+	select {
+	case r.flag <- queueNo:
+	default:
+	}
+
 }
