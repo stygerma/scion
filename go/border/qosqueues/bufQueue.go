@@ -170,5 +170,5 @@ func (pq *packetBufQueue) GetMinBandwidth() int {
 }
 
 func (pq *packetBufQueue) GetPriority() int {
-	return pq.pktQue.priority
+	return pq.pktQue.Priority
 }
