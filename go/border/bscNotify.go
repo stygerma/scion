@@ -54,7 +54,7 @@ func (r *Router) createNotificationSCMP(qp *qPkt) (*rpkt.RtrPkt, error) {
 }
 
 func createPld() *scmp.Payload {
-
+	
 }
 
 
@@ -64,7 +64,7 @@ func (r *Router) createCongWarn(qp *qPkt) *scmp.BscCongWarn {
 	ifCongState.QueueLength = r.config.Queues[qp.queueNo].length
 	ifCongState.QueueFullness = r.config.Queues[qp.queueNo].queue.len()
 	ifCongState.violation = qp.act.reason
-	//TODO find way to include something that identifies the BR or its interface
+	//TODO find way to include something that identifies the BR or its interface 
 	return &scmp.BscCongWarn{scmp.IfCongState: ifCongState}
 }
 
