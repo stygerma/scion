@@ -26,17 +26,47 @@ import (
 )
 
 // RouterConfig is what I am loading from the config file
-type RouterConfig struct {
-	Queues []qosqueues.PacketQueue `yaml:"Queues"`
-	Rules  []classRule             `yaml:"Rules"`
+type configFileRouterConfig struct {
+	Queues []configFilePacketQueue `yaml:"Queues"`
+	Rules  []configFileClassRule   `yaml:"Rules"`
+}
+
+type configFileActionProfile struct {
+	FillLevel int                    `yaml:"fill-level"`
+	Prob      int                    `yaml:"prob"`
+	Action    qosqueues.PoliceAction `yaml:"action"`
+}
+
+type configFilePacketQueue struct {
+	Name         string                    `yaml:"name"`
+	ID           int                       `yaml:"id"`
+	MinBandwidth int                       `yaml:"CIR"`
+	MaxBandWidth int                       `yaml:"PIR"`
+	PoliceRate   int                       `yaml:"policeRate"`
+	MaxLength    int                       `yaml:"maxLength"`
+	Priority     int                       `yaml:"priority"`
+	Profile      []configFileActionProfile `yaml:"profile"`
+}
+
+type configFileClassRule struct {
+	// This is currently means the ID of the sending border router
+	Name                 string `yaml:"name"`
+	SourceAs             string `yaml:"sourceAs"`
+	SourceMatchMode      int    `yaml:"sourceMatchMode"`
+	NextHopAs            string `yaml:"nextHopAs"`
+	NextHopMatchMode     int    `yaml:"nextHopMatchMode"`
+	DestinationAs        string `yaml:"destinationAs"`
+	DestinationMatchMode int    `yaml:"destinationMatchMode"`
+	L4Type               []int  `yaml:"L4Type"`
+	QueueNumber          int    `yaml:"queueNumber"`
 }
 
 func (r *Router) loadConfigFile(path string) error {
 
-	var internalRules []internalClassRule
+	var internalRules []classRule
 	var internalQueues []qosqueues.PacketQueueInterface
 
-	var rc RouterConfig
+	var rc configFileRouterConfig
 
 	// dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	// log.Debug("Current Path is", "path", dir)
@@ -61,12 +91,38 @@ func (r *Router) loadConfigFile(path string) error {
 	for _, que := range rc.Queues {
 		muta := &sync.Mutex{}
 		mutb := &sync.Mutex{}
-		queueToUse.InitQueue(que, muta, mutb)
+		queueToUse.InitQueue(convertConfigFileQueueToQueue(que), muta, mutb)
 		internalQueues = append(internalQueues, queueToUse)
 	}
 
-	r.legacyConfig = rc
-	r.config = InternalRouterConfig{Queues: internalQueues, Rules: internalRules}
+	r.config = routerConfig{Queues: internalQueues, Rules: internalRules}
 
 	return nil
+}
+
+func convertConfigFileQueueToQueue(cfQueue configFilePacketQueue) qosqueues.PacketQueue {
+
+	var ap []qosqueues.ActionProfile
+
+	for _, prof := range cfQueue.Profile {
+		intProf := qosqueues.ActionProfile{
+			FillLevel: prof.FillLevel,
+			Prob:      prof.Prob,
+			Action:    prof.Action,
+		}
+		ap = append(ap, intProf)
+	}
+
+	que := qosqueues.PacketQueue{
+		Name:         cfQueue.Name,
+		ID:           cfQueue.ID,
+		MinBandwidth: cfQueue.MinBandwidth,
+		MaxBandWidth: cfQueue.MaxBandWidth,
+		PoliceRate:   cfQueue.PoliceRate,
+		MaxLength:    cfQueue.MaxLength,
+		Priority:     cfQueue.Priority,
+		Profile:      ap,
+	}
+
+	return que
 }
