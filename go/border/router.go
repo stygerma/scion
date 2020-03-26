@@ -18,8 +18,6 @@
 package main
 
 import (
-	"io/ioutil"
-	"strings"
 	"sync"
 
 	"github.com/scionproto/scion/go/border/brconf"
@@ -36,7 +34,6 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
 	_ "github.com/scionproto/scion/go/lib/scrypto" // Make sure math/rand is seeded
-	"gopkg.in/yaml.v2"
 )
 
 const processBufCnt = 128
@@ -44,6 +41,8 @@ const processBufCnt = 128
 const maxNotificationCount = 512
 
 var droppedPackets = 0
+
+var queueToUse = &qosqueues.ChannelPacketQueue{}
 
 // Router struct
 type Router struct {
@@ -65,15 +64,9 @@ type Router struct {
 	qosConfig qos.QosConfiguration
 }
 
-// RouterConfig is what I am loading from the config file
-type RouterConfig struct {
-	Queues []customPacketQueue `yaml:"Queues"`
-	Rules  []classRule         `yaml:"Rules"`
-}
-
 // InternalRouterConfig is what I am loading from the config file
 type InternalRouterConfig struct {
-	Queues           []customPacketQueue
+	Queues           []qosqueues.PacketQueueInterface
 	Rules            []internalClassRule
 	SourceRules      map[addr.IA][]*internalClassRule
 	DestinationRules map[addr.IA][]*internalClassRule
@@ -91,49 +84,17 @@ func NewRouter(id, confDir string) (*Router, error) {
 	return r, nil
 }
 
-func (r *Router) loadConfigFile(path string) {
-
-	var internalRules []internalClassRule
-
-	var rc RouterConfig
-
-	// dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	// log.Debug("Current Path is", "path", dir)
-
-	yamlFile, err := ioutil.ReadFile(path)
-	if err != nil {
-		log.Info("yamlFile.Get ", "error", err)
-	}
-	err = yaml.Unmarshal(yamlFile, &rc)
-	if err != nil {
-		log.Error("Unmarshal: ", "error", err)
-	}
-
-}
-
 func (r *Router) initQueueing(location string) {
 
 	//TODO: Figure out the actual path where the other config files are loaded
 	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
 	r.loadConfigFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
 
-	// Initialise other data structures
-
-	log.Info("We have policeRate in token bucket: ", "MaxBandWidth", r.config.Queues[0].tb.MaxBandWidth)
-
-	for i := 0; i < len(r.config.Queues); i++ {
-		muta := &sync.Mutex{}
-		mutb := &sync.Mutex{}
-		r.config.Queues[i].initQueue(muta, mutb)
-	}
-
 	log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
 	log.Debug("We have rules: ", "numberOfRules", len(r.config.Rules))
 
 	r.flag = make(chan int, len(r.config.Queues))
-
-	r.notifications = make(chan *qPkt, maxNotificationCount)
-
+	r.notifications = make(chan *qosqueues.QPkt, maxNotificationCount)
 	r.forwarder = r.forwardPacket
 
 	go func() {
@@ -295,15 +256,16 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	// Put all other packets from br2 on a faster queue but still delayed
 	// At the moment no queue is slow
 
-	if strings.Contains(r.Id, "br2-ff00_0_212") {
-		log.Debug("It's me br2-ff00_0_212")
+	queueNo := getQueueNumberWithHashFor(r, rp)
+	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
-		dstAddr, _ := rp.DstIA()
-		if strings.Contains(dstAddr.String(), "1-ff00:0:110") {
-			log.Debug("It's destined for 1-ff00:0:110")
-			r.queues[0].enqueue(rp)
+	log.Debug("Queuenumber is ", "queuenumber", queueNo)
+	log.Debug("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
 
-		} else {
+	polAct := r.config.Queues[queueNo].Police(&qp, queueNo == 1)
+	profAct := r.config.Queues[queueNo].CheckAction()
+
+	act := qosqueues.ReturnAction(polAct, profAct)
 
 			// r.queues[1].mutex.Lock()
 			// r.queues[1].queue = append(r.queues[1].queue, rp)
@@ -311,10 +273,32 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 			r.queues[1].enqueue(rp)
 		}
 
+	if act == qosqueues.PASS {
+		r.config.Queues[queueNo].Enqueue(&qp)
+	} else if act == qosqueues.NOTIFY {
+		r.config.Queues[queueNo].Enqueue(&qp)
+		r.sendNotification(&qp)
+	} else if act == qosqueues.DROPNOTIFY {
+		r.dropPacket(qp.Rp)
+		r.sendNotification(&qp)
+	} else if act == qosqueues.DROP {
+		r.dropPacket(qp.Rp)
 	} else {
-		log.Debug("In fact I am")
-		log.Debug("", r.Id, nil)
-		r.queues[1].enqueue(rp)
+		// This should never happen
+		r.config.Queues[queueNo].Enqueue(&qp)
 	}
 
+	// According to gobyexample all sends are blocking and this is the standard way to do non-blocking sends (https://gobyexample.com/non-blocking-channel-operations)
+	select {
+	case r.flag <- queueNo:
+	default:
+	}
+
+}
+
+func (r *Router) sendNotification(qp *qosqueues.QPkt) {
+	select {
+	case r.notifications <- qp:
+	default:
+	}
 }
