@@ -398,7 +398,7 @@ Things to do:
 // func BenchmarkPop5(b *testing.B) { benchmarkPop(10, b) }
 
 // func TestCallPacketGen(t *testing.T) {
-// 	_ = rpkt.JFPrepareRtrPacketSample(t)
+// 	_ = rpkt.prepareRtrPacketSample(t)
 // }
 
 // func TestBasicRoute(t *testing.T) {
@@ -408,7 +408,7 @@ Things to do:
 
 // 	r.forwarder = r.forwardPacketTest
 
-// 	rp := rpkt.JFPrepareRtrPacketSample(t)
+// 	rp := rpkt.prepareRtrPacketSample(t)
 
 // 	r.queuePacket(rp)
 
@@ -445,7 +445,7 @@ Things to do:
 // 	ps := make([]*rpkt.RtrPkt, 100)
 
 // 	for i := 0; i < 100; i++ {
-// 		rp := rpkt.JFPrepareRtrPacketSample(t)
+// 		rp := rpkt.prepareRtrPacketSample(t)
 // 		r.queuePacket(rp)
 // 		ps[i] = rp
 // 	}
