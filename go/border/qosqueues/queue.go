@@ -54,21 +54,21 @@ type QPkt struct {
 	Rp      *rpkt.RtrPkt
 }
 
-type actionProfile struct {
-	FillLevel int          `yaml:"fill-level"`
-	Prob      int          `yaml:"prob"`
-	Action    PoliceAction `yaml:"action"`
+type ActionProfile struct {
+	FillLevel int
+	Prob      int
+	Action    PoliceAction
 }
 
 type PacketQueue struct {
-	Name         string          `yaml:"name"`
-	ID           int             `yaml:"id"`
-	MinBandwidth int             `yaml:"CIR"`
-	MaxBandWidth int             `yaml:"PIR"`
-	PoliceRate   int             `yaml:"policeRate"`
-	MaxLength    int             `yaml:"maxLength"`
-	priority     int             `yaml:"priority"`
-	Profile      []actionProfile `yaml:"profile"`
+	Name         string
+	ID           int
+	MinBandwidth int
+	MaxBandWidth int
+	PoliceRate   int
+	MaxLength    int
+	Priority     int
+	Profile      []ActionProfile
 }
 
 type PacketQueueInterface interface {
