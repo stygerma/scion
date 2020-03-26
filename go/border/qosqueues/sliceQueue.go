@@ -153,5 +153,5 @@ func (pq *packetSliceQueue) GetMinBandwidth() int {
 }
 
 func (pq *packetSliceQueue) GetPriority() int {
-	return pq.pktQue.priority
+	return pq.pktQue.Priority
 }

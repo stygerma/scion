@@ -64,12 +64,12 @@ type Router struct {
 	qosConfig qos.QosConfiguration
 }
 
-// InternalRouterConfig is what I am loading from the config file
-type InternalRouterConfig struct {
+// routerConfig is what I am loading from the config file
+type routerConfig struct {
 	Queues           []qosqueues.PacketQueueInterface
-	Rules            []internalClassRule
-	SourceRules      map[addr.IA][]*internalClassRule
-	DestinationRules map[addr.IA][]*internalClassRule
+	Rules            []classRule
+	SourceRules      map[addr.IA][]*classRule
+	DestinationRules map[addr.IA][]*classRule
 }
 
 // NewRouter returns a new router
