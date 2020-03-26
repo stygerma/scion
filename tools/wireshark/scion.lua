@@ -62,6 +62,10 @@ local scmpTypes = {
         [4] = "TRACE_ROUTE_REPLY",
         [5] = "RECORD_PATH_REQUEST",
         [6] = "RECORD_PATH_REPLY",
+        [7] = "BASIC_CONG_WARN", --IMPL
+        [8] = "HBH_CONG_WARN",
+        [9] = "STOCHASTIC_CONG_WARN",
+        [10] = "COMBI_CONG_WARN",
     },
     ["ROUTING"] = {
         [0] = "UNREACH_NET",
@@ -93,7 +97,6 @@ local scmpTypes = {
         [7] = "BAD_SEGMENT",
         [8] = "BAD_INFO_FIELD",
         [9] = "BAD_HOP_FIELD",
-        [10] = "CONG_WARN", --MS
     },
     ["EXT"] = {
         [0] = "TOO_MANY_HOPBYHOP",

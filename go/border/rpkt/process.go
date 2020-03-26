@@ -59,7 +59,7 @@ func (rp *RtrPkt) Process() error {
 }
 
 // processSCMP is a processing hook used to handle SCMP payloads.
-func (rp *RtrPkt) processSCMP() (HookResult, error) {
+func (rp *RtrPkt) processSCMP() (HookResult, error) { //IMP: implement the behavior of intermediate BRs
 	// FIXME(shitz): rate-limit revocations
 	hdr := rp.l4.(*scmp.Hdr)
 	switch {
@@ -77,6 +77,22 @@ func (rp *RtrPkt) processSCMP() (HookResult, error) {
 			if err := rp.processSCMPRevocation(); err != nil {
 				return HookError, err
 			}
+		}
+	case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_BasicCongWarn: //IMPL:
+		if err := rp.processSCMPBasicCongWarn(); err != nil {
+			return HookError, err
+		}
+	case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_HBHCongWarn: //IMPL:
+		if err := rp.processSCMPHBHCongWarn(); err != nil {
+			return HookError, err
+		}
+	case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_StochasticCongWarn: //IMPL:
+		if err := rp.processSCMPStochasticCongWarn(); err != nil {
+			return HookError, err
+		}
+	case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_CombiCongWarn: //IMPL:
+		if err := rp.processSCMPCombiCongWarn(); err != nil {
+			return HookError, err
 		}
 	default:
 		return HookError, common.NewBasicError("Unsupported destination SCMP payload", nil,
@@ -155,6 +171,24 @@ func (rp *RtrPkt) processSCMPRecordPath() error {
 		return common.NewBasicError("Failed to update L4 header", nil, "err", err)
 	}
 	return nil
+}
+
+func (rp *RtrPkt) processSCMPBasicCongWarn() error { //IMPL: processing of Basic congestion warning at intermediate BR
+	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host : further disseminate
+}
+
+func (rp *RtrPkt) processSCMPHBHCongWarn() error { //IMPL: processing of HBH congestion warning at intermediate BR
+	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host(s) : remove block for this AS
+	//and further disseminate message if necessary
+}
+
+func (rp *RtrPkt) processSCMPStochasticCongWarn() error { //IMPL: processing of Stochastic congestion warning at intermediate BR
+	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host : further disseminate
+}
+
+func (rp *RtrPkt) processSCMPCombiCongWarn() error { //IMPL: processing of Combi congestion warning at intermediate BR
+	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host(s) : remove block for this AS
+	//and further disseminate message if necessary
 }
 
 // processSCMPRevocation handles SCMP revocations.

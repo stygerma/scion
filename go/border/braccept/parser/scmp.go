@@ -285,6 +285,14 @@ func (s *SCMPTaggedLayer) parseSCMPType(c string) {
 		s.Type = scmp.T_G_RecordPathRequest
 	case "RECORD_PATH_REPLY":
 		s.Type = scmp.T_G_RecordPathReply
+	case "BASIC_CONG_WARN":
+		s.Type = scmp.T_G_BasicCongWarn //IMPL:
+	case "HBH_CONG_WARN":
+		s.Type = scmp.T_G_HBHCongWarn
+	case "STOCHASTIC_CONG_WARN":
+		s.Type = scmp.T_G_StochasticCongWarn
+	case "COMBI_CONG_WARN":
+		s.Type = scmp.T_G_CombiCongWarn
 	case "UNREACH_NET":
 		s.Type = scmp.T_R_UnreachNet
 	case "UNREACH_HOST":
@@ -335,8 +343,6 @@ func (s *SCMPTaggedLayer) parseSCMPType(c string) {
 		s.Type = scmp.T_P_BadInfoField
 	case "BAD_HOP_FIELD":
 		s.Type = scmp.T_P_BadHopField
-	case "CONG_WARN":
-		s.Type = scmp.T_P_CongWarn //MS
 	case "TOO_MANY_HOPBYHOP":
 		s.Type = scmp.T_E_TooManyHopbyHop
 	case "BAD_EXT_ORDER":

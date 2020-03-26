@@ -12,6 +12,4 @@ type hbhSelection struct {
 	pkts      []qPkt        //packets of sources that need to be notified
 }
 
-func (hbhS *hbhSelection) createNotificationSCMP() error {
 
-}

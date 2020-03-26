@@ -75,7 +75,7 @@ func (p *Path) Copy() *Path {
 	return &Path{append(common.RawBytes(nil), p.Raw...), p.InfOff, p.HopOff}
 }
 
-func (p *Path) Reverse() error {
+func (p *Path) Reverse() error { //IMP: reverse path
 	if len(p.Raw) == 0 {
 		// Empty path doesn't need reversal.
 		return nil

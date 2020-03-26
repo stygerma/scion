@@ -139,7 +139,7 @@ func ValidateFlags() {
 	}
 }
 
-func NewSCMPPkt(t scmp.Type, info scmp.Info, ext common.Extension) *spkt.ScnPkt {
+func NewSCMPPkt(t scmp.Type, info scmp.Info, ext common.Extension) *spkt.ScnPkt { //IMP: how to create SCMPs from the general class
 	var exts []common.Extension
 	scmpMeta := scmp.Meta{InfoLen: uint8(info.Len() / common.LineLen)}
 	pld := make(common.RawBytes, scmp.MetaLen+info.Len())

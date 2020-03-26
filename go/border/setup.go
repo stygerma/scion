@@ -69,10 +69,6 @@ func (r *Router) setup() error {
 	if conf, err = r.loadNewConfig(); err != nil {
 		return err
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e9ea163... building basic skeleton
 	// Initialize itopo.
 	itopo.Init(
 		&itopo.Config{
@@ -81,16 +77,7 @@ func (r *Router) setup() error {
 		},
 	)
 	if err := itopo.Update(conf.Topo); err != nil {
-<<<<<<< HEAD
-=======
-	// Initialize itopo. //Q: what even is an itopo?
-	itopo.Init(r.Id, proto.ServiceType_br, itopo.Callbacks{CleanDynamic: r.setupCtxOnClean})
-	if _, _, err := itopo.SetStatic(conf.Topo, true); err != nil {
->>>>>>> e74d7c4... added some ways to log, some comments and a getter for hooks
-=======
->>>>>>> e9ea163... building basic skeleton
-		return err
-	}
+		
 	conf.Topo = itopo.Get()
 	// Setup new context.
 	if err = r.setupCtxFromConfig(conf); err != nil {
