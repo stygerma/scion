@@ -3,9 +3,15 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = [
+        "congWarn.go",
         "error.go",
         "hdr.go",
+        "info_bscCongWarn.go",
+        "info_combiCongWarn.go",
+        "info_congWarn.go",
+        "info_hbhCongWarn.go",
         "info.go",
+        "info_stochCongWarn.go",
         "info_recordpath.go",
         "info_traceroute.go",
         "meta.go",

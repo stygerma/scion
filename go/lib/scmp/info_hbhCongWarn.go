@@ -5,14 +5,15 @@ package scmp
 import (
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
+	"github.com/scionproto/scion/go/lib/spath"
 )
 
 //defines the layout of the hop-by-hop congestion warning payload
 
 type HbhCongWarn struct {
-	rp        layers.ScnPath
+	rp        spath.Path
 	timestamp uint32      //TBA: maybe 64 bit needed
-	ifInfo    ifCongState //MS: need to implement something such that the interface state is defined while the ISP can restrict what is shared
+	ifInfo    IfCongState //MS: need to implement something such that the interface state is defined while the ISP can restrict what is shared
 	asBlocks  []asBlock   //MS: define the AS blocks
 }
 

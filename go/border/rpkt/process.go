@@ -173,7 +173,7 @@ func (rp *RtrPkt) processSCMPRecordPath() error {
 	return nil
 }
 
-func (rp *RtrPkt) processSCMPBasicCongWarn() error { //IMPL: processing of Basic congestion warning at intermediate BR
+/*func (rp *RtrPkt) processSCMPBasicCongWarn() error { //IMPL: processing of Basic congestion warning at intermediate BR
 	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host : further disseminate
 }
 
@@ -189,7 +189,7 @@ func (rp *RtrPkt) processSCMPStochasticCongWarn() error { //IMPL: processing of 
 func (rp *RtrPkt) processSCMPCombiCongWarn() error { //IMPL: processing of Combi congestion warning at intermediate BR
 	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host(s) : remove block for this AS
 	//and further disseminate message if necessary
-}
+}*/
 
 // processSCMPRevocation handles SCMP revocations.
 // There are 3 cases where the router does more than just forward an SCMP revocation message.

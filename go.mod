@@ -3,6 +3,7 @@ module github.com/scionproto/scion
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/antlr/antlr4 v0.0.0-20181218183524-be58ebffde8e
+	github.com/bazelbuild/bazel-gazelle v0.20.0
 	github.com/buildkite/go-buildkite v2.2.1-0.20190413010238-568b6651b687+incompatible
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/cheekybits/genny v0.0.0-20170328200008-9127e812e1e9 // indirect
@@ -13,6 +14,7 @@ require (
 	github.com/google/go-cmp v0.3.0
 	github.com/google/go-querystring v1.0.1-0.20190318165438-c8c88dbee036 // indirect
 	github.com/google/gopacket v1.1.16-0.20190123011826-102d5ca2098c
+	github.com/henrydcase/nobs v0.0.0-20200305111951-7d891c7eb892 // indirect
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/inconshreveable/log15 v0.0.0-20161013181240-944cbfb97b44
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
@@ -22,6 +24,7 @@ require (
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.8
 	github.com/mattn/go-sqlite3 v1.9.1-0.20180719091609-b3511bfdd742
+	github.com/oncilla/gochecks v0.0.0-20200209152508-954a3ef2d564
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/opentracing/opentracing-go v1.1.0
