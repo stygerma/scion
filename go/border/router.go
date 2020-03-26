@@ -61,8 +61,7 @@ type Router struct {
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
 
-	config              InternalRouterConfig
-	legacyConfig        RouterConfig
+	config              routerConfig
 	notifications       chan *qosqueues.QPkt
 	flag                chan int
 	schedulerSurplus    surplus
@@ -74,12 +73,12 @@ type surplus struct {
 	payments []int
 }
 
-// InternalRouterConfig is what I am loading from the config file
-type InternalRouterConfig struct {
+// routerConfig is what I am loading from the config file
+type routerConfig struct {
 	Queues           []qosqueues.PacketQueueInterface
-	Rules            []internalClassRule
-	SourceRules      map[addr.IA][]*internalClassRule
-	DestinationRules map[addr.IA][]*internalClassRule
+	Rules            []classRule
+	SourceRules      map[addr.IA][]*classRule
+	DestinationRules map[addr.IA][]*classRule
 }
 
 // NewRouter returns a new router
