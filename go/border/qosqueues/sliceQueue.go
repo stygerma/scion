@@ -1,4 +1,4 @@
-package main
+package qosqueues
 
 import (
 	"math/rand"
@@ -9,35 +9,31 @@ import (
 )
 
 type packetSliceQueue struct {
-	Name         string          `yaml:"name"`
-	ID           int             `yaml:"id"`
-	MinBandwidth int             `yaml:"CIR"`
-	MaxBandWidth int             `yaml:"PIR"`
-	PoliceRate   int             `yaml:"policeRate"`
-	MaxLength    int             `yaml:"maxLength"`
-	priority     int             `yaml:"priority"`
-	Profile      []actionProfile `yaml:"profile"`
+	pktQue PacketQueue
 
 	mutex *sync.Mutex
 
-	queue  []*qPkt
+	queue  []*QPkt
 	length int
 	tb     tokenBucket
 }
 
-func (pq *packetSliceQueue) initQueue(mutQue *sync.Mutex, mutTb *sync.Mutex) {
+var _ PacketQueueInterface = (*packetSliceQueue)(nil)
 
+func (pq *packetSliceQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
+
+	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
 	pq.tb = tokenBucket{
-		MaxBandWidth: pq.PoliceRate,
-		tokens:       pq.PoliceRate,
+		MaxBandWidth: pq.pktQue.PoliceRate,
+		tokens:       pq.pktQue.PoliceRate,
 		lastRefill:   time.Now(),
 		mutex:        mutTb}
 
 }
 
-func (pq *packetSliceQueue) enqueue(rp *qPkt) {
+func (pq *packetSliceQueue) Enqueue(rp *QPkt) {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -52,22 +48,22 @@ func (pq *packetSliceQueue) canDequeue() bool {
 	return pq.length > 0
 }
 
-func (pq *packetSliceQueue) getFillLevel() int {
+func (pq *packetSliceQueue) GetFillLevel() int {
 
-	return pq.length / pq.MaxLength
+	return pq.length / pq.pktQue.MaxLength
 }
 
-func (pq *packetSliceQueue) getLength() int {
+func (pq *packetSliceQueue) GetLength() int {
 
 	return pq.length
 }
 
-func (pq *packetSliceQueue) peek() *qPkt {
+func (pq *packetSliceQueue) peek() *QPkt {
 
 	return pq.queue[0]
 }
 
-func (pq *packetSliceQueue) pop() *qPkt {
+func (pq *packetSliceQueue) Pop() *QPkt {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -79,7 +75,7 @@ func (pq *packetSliceQueue) pop() *qPkt {
 	return pkt
 }
 
-func (pq *packetSliceQueue) popMultiple(number int) []*qPkt {
+func (pq *packetSliceQueue) PopMultiple(number int) []*QPkt {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -91,19 +87,19 @@ func (pq *packetSliceQueue) popMultiple(number int) []*qPkt {
 	return pkt
 }
 
-func (pq *packetSliceQueue) checkAction() policeAction {
+func (pq *packetSliceQueue) CheckAction() PoliceAction {
 
-	level := pq.getFillLevel()
+	level := pq.GetFillLevel()
 
 	log.Info("Current level is", "level", level)
-	log.Info("Profiles are", "profiles", pq.Profile)
+	log.Info("Profiles are", "profiles", pq.pktQue.Profile)
 
-	for j := len(pq.Profile) - 1; j >= 0; j-- {
-		if level >= pq.Profile[j].FillLevel {
+	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
+		if level >= pq.pktQue.Profile[j].FillLevel {
 			log.Info("Matched a rule!")
-			if rand.Intn(100) < (pq.Profile[j].Prob) {
+			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
 				log.Info("Take Action!")
-				return pq.Profile[j].Action
+				return pq.pktQue.Profile[j].Action
 			}
 			log.Info("Do not take Action")
 
@@ -113,11 +109,11 @@ func (pq *packetSliceQueue) checkAction() policeAction {
 	return PASS
 }
 
-func (pq *packetSliceQueue) police(qp *qPkt, shouldLog bool) policeAction {
+func (pq *packetSliceQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	pq.tb.mutex.Lock()
 	defer pq.tb.mutex.Unlock()
 
-	packetSize := (qp.rp.Bytes().Len()) // In byte
+	packetSize := (qp.Rp.Bytes().Len()) // In byte
 
 	tokenForPacket := packetSize * 8 // In bit
 
@@ -132,30 +128,30 @@ func (pq *packetSliceQueue) police(qp *qPkt, shouldLog bool) policeAction {
 	if shouldLog {
 		log.Debug("Available bandwidth after refill", "bandwidth", pq.tb.tokens)
 		log.Debug("Tokens necessary for packet", "tokens", tokenForPacket)
-		log.Debug("Tokens necessary for packet", "bytes", qp.rp.Bytes().Len())
+		log.Debug("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
 	}
 
 	if pq.tb.tokens-tokenForPacket > 0 {
 		pq.tb.tokens = pq.tb.tokens - tokenForPacket
 		pq.tb.tokenSpent += tokenForPacket
-		qp.act.action = PASS
-		qp.act.reason = None
+		qp.Act.action = PASS
+		qp.Act.reason = None
 	} else {
-		qp.act.action = DROP
-		qp.act.reason = BandWidthExceeded
+		qp.Act.action = DROP
+		qp.Act.reason = BandWidthExceeded
 	}
 
 	if shouldLog {
 		log.Debug("Available bandwidth after update", "bandwidth", pq.tb.tokens)
 	}
 
-	return qp.act.action
+	return qp.Act.action
 }
 
-func (pq *packetSliceQueue) getMinBandwidth() int {
-	return pq.MinBandwidth
+func (pq *packetSliceQueue) GetMinBandwidth() int {
+	return pq.pktQue.MinBandwidth
 }
 
-func (pq *packetSliceQueue) getPriority() int {
-	return pq.priority
+func (pq *packetSliceQueue) GetPriority() int {
+	return pq.pktQue.priority
 }
