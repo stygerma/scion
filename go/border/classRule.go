@@ -16,6 +16,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/scionproto/scion/go/border/rpkt"
@@ -177,13 +178,13 @@ func getQueueNumberWithHashFor(r *Router, rp *rpkt.RtrPkt) int {
 	queues1 := r.config.SourceRules[srcAddr]
 	queues2 := r.config.DestinationRules[dstAddr]
 
-	matches := make([]*internalClassRule, 0)
-	returnRule := &internalClassRule{QueueNumber: 0}
+	matches := make([]internalClassRule, 0)
+	returnRule := internalClassRule{QueueNumber: 0}
 
 	for _, rul1 := range queues1 {
 		for _, rul2 := range queues2 {
 			if rul1 == rul2 {
-				matches = append(matches, rul1)
+				matches = append(matches, *rul1)
 			}
 		}
 	}
@@ -202,23 +203,45 @@ func getQueueNumberWithHashFor(r *Router, rp *rpkt.RtrPkt) int {
 func getQueueNumberIterativeForInternal(r *Router, rp *rpkt.RtrPkt) int {
 
 	queueNo := 0
+	matches := make([]internalClassRule, 0)
 
 	for _, cr := range r.config.Rules {
+
 		if cr.matchInternalRule(rp) {
-			queueNo = cr.QueueNumber
+			matches = append(matches, cr)
 		}
 	}
+
+	max := -1
+	for _, rul1 := range matches {
+		if rul1.Priority > max {
+			queueNo = rul1.QueueNumber
+			max = rul1.Priority
+		}
+	}
+
 	return queueNo
 }
 
 func getQueueNumberIterativeFor(r *Router, rp *rpkt.RtrPkt) int {
 	queueNo := 0
 
+	matches := make([]classRule, 0)
+
 	for _, cr := range r.legacyConfig.Rules {
 		if cr.matchRule(rp) {
-			queueNo = cr.QueueNumber
+			matches = append(matches, cr)
 		}
 	}
+
+	max := -1
+	for _, rul1 := range matches {
+		if rul1.Priority > max {
+			queueNo = rul1.QueueNumber
+			max = rul1.Priority
+		}
+	}
+
 	return queueNo
 }
 
@@ -260,6 +283,8 @@ func (cr *classRule) matchRule(rp *rpkt.RtrPkt) bool {
 	srcAddr, _ := rp.SrcIA()
 	// log.Debug("Source Address is " + srcAddr.String())
 	// log.Debug("Comparing " + srcAddr.String() + " and " + cr.SourceAs)
+	fmt.Println("Source Address is " + srcAddr.String())
+	fmt.Println("Comparing " + srcAddr.String() + " and " + cr.SourceAs)
 	if !strings.Contains(srcAddr.String(), cr.SourceAs) {
 		match = false
 	}
