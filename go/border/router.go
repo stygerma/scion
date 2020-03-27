@@ -28,7 +28,6 @@ import (
 	"github.com/scionproto/scion/go/border/rctrl"
 	"github.com/scionproto/scion/go/border/rctx"
 	"github.com/scionproto/scion/go/border/rpkt"
-	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/assert"
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/fatal"
@@ -65,6 +64,7 @@ type Router struct {
 	// setCtxMtx serializes modifications to the router context. Topology updates
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
+<<<<<<< 9fe6884a06075d4213175d5498fd46b140b5d03e
 	// qosConfig holds all data structures and state required for the quality of service
 	// subsystem in the router
 	qosConfig qos.QosConfiguration
@@ -76,6 +76,16 @@ type routerConfig struct {
 	Rules            []classRule
 	SourceRules      map[addr.IA][]*classRule
 	DestinationRules map[addr.IA][]*classRule
+=======
+
+	config              qosqueues.InternalRouterConfig
+	legacyConfig        qosqueues.RouterConfig
+	notifications       chan *qosqueues.QPkt
+	schedulerSurplus    qosqueues.Surplus
+	schedulerSurplusMtx sync.Mutex
+	workerChannels      [](chan *qosqueues.QPkt)
+	forwarder           func(rp *rpkt.RtrPkt)
+>>>>>>> Move ClassRule to qosqueues
 }
 
 // NewRouter returns a new router
@@ -125,9 +135,6 @@ func (r *Router) Start() {
 	go func() {
 		defer log.HandlePanic()
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
-	}()
-	go func() {
-		r.dequeuer()
 	}()
 	if err := r.startDiscovery(); err != nil {
 		fatal.Fatal(common.NewBasicError("Unable to start discovery", err))
@@ -263,7 +270,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	log.Debug("preRouteStep")
 	log.Debug("We have rules: ", "len(Rules)", len(r.config.Rules))
 
-	queueNo := getQueueNumberWithHashFor(r, rp)
+	queueNo := qosqueues.GetQueueNumberWithHashFor(&r.config, rp)
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
 	r.workerChannels[(queueNo % noWorker)] <- &qp
