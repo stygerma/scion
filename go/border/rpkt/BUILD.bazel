@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "addr.go",
         "create.go",
+        "export.go",
         "extn_onehoppath.go",
         "extn_packet_security.go",
         "extn_scmp.go",
@@ -26,6 +27,7 @@ go_library(
     importpath = "github.com/scionproto/scion/go/border/rpkt",
     visibility = ["//visibility:public"],
     deps = [
+        "//go/border/brconf:go_default_library",
         "//go/border/ifstate:go_default_library",
         "//go/border/internal/metrics:go_default_library",
         "//go/border/rcmn:go_default_library",
@@ -55,7 +57,6 @@ go_test(
     srcs = [
         "rpkt_hook_test.go",
         "rpkt_test.go",
-        "export_test.go"
     ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
