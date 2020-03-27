@@ -147,9 +147,9 @@ func (r *Router) getFromSurplus(queueNo int, request int) int {
 	}
 	upperLimit := min(64*(r.config.Queues[queueNo].GetMinBandwidth()/qsum), 1)
 
-	credit := min(r.schedulerSurplus.surplus, upperLimit)
+	credit := min(r.schedulerSurplus.Surplus, upperLimit)
 
-	r.schedulerSurplus.surplus = r.schedulerSurplus.surplus - credit
+	r.schedulerSurplus.Surplus = r.schedulerSurplus.Surplus - credit
 
 	return credit
 
@@ -160,8 +160,8 @@ func (r *Router) payIntoSurplus(queueNo int, payment int) {
 	r.schedulerSurplusMtx.Lock()
 	defer r.schedulerSurplusMtx.Unlock()
 
-	r.schedulerSurplus.surplus = min(r.schedulerSurplus.surplus+(payment-r.schedulerSurplus.payments[queueNo]), 0)
-	r.schedulerSurplus.payments[queueNo] = payment
+	r.schedulerSurplus.Surplus = min(r.schedulerSurplus.Surplus+(payment-r.schedulerSurplus.Payments[queueNo]), 0)
+	r.schedulerSurplus.Payments[queueNo] = payment
 
 }
 
@@ -170,7 +170,7 @@ func (r *Router) surplusAvailable() bool {
 	r.schedulerSurplusMtx.Lock()
 	defer r.schedulerSurplusMtx.Unlock()
 
-	return r.schedulerSurplus.surplus > 0
+	return r.schedulerSurplus.Surplus > 0
 }
 
 func max(a, b int) int {
