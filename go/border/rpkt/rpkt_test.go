@@ -34,7 +34,7 @@ import (
 var rawUdpPkt = "udp-scion.bin"
 
 // Prepare the packet from raw
-func prepareRtrPacketSample(t *testing.T) *RtrPkt {
+func PrepareRtrPacketSample(t *testing.T) *RtrPkt {
 	r := NewRtrPkt()
 	r.Raw = xtest.MustReadFromFile(t, rawUdpPkt)
 	// Set some other data that are required for the parsing to succeed:
@@ -50,7 +50,7 @@ func prepareRtrPacketSample(t *testing.T) *RtrPkt {
 }
 
 func TestParseBasic(t *testing.T) {
-	r := prepareRtrPacketSample(t)
+	r := PrepareRtrPacketSample(t)
 
 	r.parseBasic()
 	srcIA, _ := r.SrcIA()
@@ -76,7 +76,7 @@ func TestParseBasic(t *testing.T) {
 }
 
 func TestParse(t *testing.T) {
-	r := prepareRtrPacketSample(t)
+	r := PrepareRtrPacketSample(t)
 
 	// Verify additional fields that appear after complete parse only
 	r.Parse()
