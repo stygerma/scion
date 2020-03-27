@@ -55,10 +55,15 @@ type QPkt struct {
 	Rp      *rpkt.RtrPkt
 }
 
-type ActionProfile struct {
-	FillLevel int
-	Prob      int
-	Action    PoliceAction
+type NPkt struct {
+	Rule *InternalClassRule
+	Qpkt *QPkt
+}
+
+type actionProfile struct {
+	FillLevel int          `yaml:"fill-level"`
+	Prob      int          `yaml:"prob"`
+	Action    PoliceAction `yaml:"action"`
 }
 
 type congestionWarningApproach int
