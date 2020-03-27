@@ -4,17 +4,17 @@ load("//:scion.bzl", "scion_go_binary")
 go_library(
     name = "go_default_library",
     srcs = [
+        "classRule.go",
         "doc.go",
         "error.go",
         "io.go",
         "main.go",
+        "policer.go",
+        "queue.go",
         "revinfo.go",
         "router.go",
-        "setup.go",
-        "queue.go",
-        "classRule.go",
-        "policer.go",
         "scheduler.go",
+        "setup.go",
         "setup-posix.go",
     ],
     importpath = "github.com/scionproto/scion/go/border",
@@ -24,7 +24,6 @@ go_library(
         "//go/border/ifstate:go_default_library",
         "//go/border/internal/metrics:go_default_library",
         "//go/border/rcmn:go_default_library",
-        "//go/lib/addr:go_default_library",
         "//go/border/rctrl:go_default_library",
         "//go/border/rctx:go_default_library",
         "//go/border/rpkt:go_default_library",
@@ -45,8 +44,8 @@ go_library(
         "//go/proto:go_default_library",
         "@com_github_burntsushi_toml//:go_default_library",
         "@com_github_syndtr_gocapability//capability:go_default_library",
-        "@org_golang_x_net//ipv4:go_default_library",
         "@in_gopkg_yaml_v2//:go_default_library",
+        "@org_golang_x_net//ipv4:go_default_library",
     ],
 )
 
@@ -60,8 +59,10 @@ go_test(
     name = "go_default_test",
     srcs = [
         "io_test.go",
+        "policer_test.go",
+        "queue_test.go",
+        "router_test.go",
         "setup_test.go",
-        "policer_test.go"
     ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
