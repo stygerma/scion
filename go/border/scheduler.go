@@ -1,3 +1,18 @@
+// Copyright 2020 ETH Zurich
+// Copyright 2020 ETH Zurich, Anapaya Systems
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import "github.com/scionproto/scion/go/lib/log"
@@ -6,24 +21,23 @@ import "github.com/scionproto/scion/go/lib/log"
 
 func (r *Router) dequeue(i int) {
 
-	length := r.config.Queues[i].getLength()
+	length := r.config.Queues[i].GetLength()
 	log.Debug("The queue has length", "length", length)
 
 	if length > 0 {
-		qps := r.config.Queues[i].popMultiple(length)
+		qps := r.config.Queues[i].PopMultiple(length)
 		for _, qp := range qps {
-			r.forwarder(qp.rp)
+			r.forwarder(qp.Rp)
 		}
 	}
 }
 
 func (r *Router) dequeuer() {
 	for {
-		j := <-r.flag
 		i := 0
 
 		for i < len(r.config.Queues) {
-			r.dequeue((j + i) % (len(r.config.Queues)))
+			r.dequeue(i)
 			i = i + 1
 		}
 	}
@@ -36,16 +50,15 @@ func (r *Router) drrDequer() {
 	i := 0
 	qsum := 0
 	for i < len(r.config.Queues) {
-		qsum = qsum + r.config.Queues[i].priority
+		qsum = qsum + r.config.Queues[i].GetPriority()
 		i++
 	}
 
 	for {
-		j := <-r.flag
-		i := 0
+		i = 0
 
 		for i < len(r.config.Queues) {
-			r.drrDequeue((j+i)%(len(r.config.Queues)), 1)
+			r.drrDequeue(i, 1)
 			i++
 		}
 	}
@@ -53,16 +66,16 @@ func (r *Router) drrDequer() {
 
 func (r *Router) drrDequeue(queueNo int, qsum int) {
 
-	length := r.config.Queues[queueNo].getLength()
-	pktToDequeue := min(64*(r.config.Queues[queueNo].priority/qsum), 1)
+	length := r.config.Queues[queueNo].GetLength()
+	pktToDequeue := min(64*(r.config.Queues[queueNo].GetPriority()/qsum), 1)
 
 	log.Debug("The queue has length", "length", length)
 	log.Debug("Dequeueing packets", "quantum", pktToDequeue)
 
 	if length > 0 {
-		qps := r.config.Queues[queueNo].popMultiple(max(length, pktToDequeue))
+		qps := r.config.Queues[queueNo].PopMultiple(max(length, pktToDequeue))
 		for _, qp := range qps {
-			r.forwarder(qp.rp)
+			r.forwarder(qp.Rp)
 		}
 	}
 }
@@ -74,16 +87,15 @@ func (r *Router) drrMinMaxDequer() {
 	i := 0
 	qsum := 0
 	for i < len(r.config.Queues) {
-		qsum = qsum + r.config.Queues[i].priority
+		qsum = qsum + r.config.Queues[i].GetPriority()
 		i++
 	}
 
 	for {
-		j := <-r.flag
-		i := 0
+		i = 0
 
 		for i < len(r.config.Queues) {
-			r.drrMinMaxDequeue((j+i)%(len(r.config.Queues)), 1)
+			r.drrMinMaxDequeue(i, 1)
 			i++
 		}
 	}
@@ -91,8 +103,8 @@ func (r *Router) drrMinMaxDequer() {
 
 func (r *Router) drrMinMaxDequeue(queueNo int, qsum int) {
 
-	length := r.config.Queues[queueNo].getLength()
-	pktToDequeue := min(64*(r.config.Queues[queueNo].MinBandwidth/qsum), 1)
+	length := r.config.Queues[queueNo].GetLength()
+	pktToDequeue := min(64*(r.config.Queues[queueNo].GetMinBandwidth()/qsum), 1)
 
 	log.Debug("The queue has length", "length", length)
 	log.Debug("Dequeueing packets", "quantum", pktToDequeue)
@@ -112,9 +124,9 @@ func (r *Router) drrMinMaxDequeue(queueNo int, qsum int) {
 			}
 		}
 
-		qps := r.config.Queues[queueNo].popMultiple(max(length, pktToDequeue))
+		qps := r.config.Queues[queueNo].PopMultiple(max(length, pktToDequeue))
 		for _, qp := range qps {
-			r.forwarder(qp.rp)
+			r.forwarder(qp.Rp)
 		}
 	}
 }
@@ -130,14 +142,14 @@ func (r *Router) getFromSurplus(queueNo int, request int) int {
 	i := 0
 	qsum := 0
 	for i < len(r.config.Queues) {
-		qsum = qsum + r.config.Queues[i].MinBandwidth
+		qsum = qsum + r.config.Queues[i].GetMinBandwidth()
 		i++
 	}
-	upperLimit := min(64*(r.config.Queues[queueNo].MaxBandWidth/qsum), 1)
+	upperLimit := min(64*(r.config.Queues[queueNo].GetMinBandwidth()/qsum), 1)
 
-	credit := min(r.schedulerSurplus.surplus, upperLimit)
+	credit := min(r.schedulerSurplus.Surplus, upperLimit)
 
-	r.schedulerSurplus.surplus = r.schedulerSurplus.surplus - credit
+	r.schedulerSurplus.Surplus = r.schedulerSurplus.Surplus - credit
 
 	return credit
 
@@ -148,8 +160,8 @@ func (r *Router) payIntoSurplus(queueNo int, payment int) {
 	r.schedulerSurplusMtx.Lock()
 	defer r.schedulerSurplusMtx.Unlock()
 
-	r.schedulerSurplus.surplus = min(r.schedulerSurplus.surplus+(payment-r.schedulerSurplus.payments[queueNo]), 0)
-	r.schedulerSurplus.payments[queueNo] = payment
+	r.schedulerSurplus.Surplus = min(r.schedulerSurplus.Surplus+(payment-r.schedulerSurplus.Payments[queueNo]), 0)
+	r.schedulerSurplus.Payments[queueNo] = payment
 
 }
 
@@ -158,7 +170,7 @@ func (r *Router) surplusAvailable() bool {
 	r.schedulerSurplusMtx.Lock()
 	defer r.schedulerSurplusMtx.Unlock()
 
-	return r.schedulerSurplus.surplus > 0
+	return r.schedulerSurplus.Surplus > 0
 }
 
 func max(a, b int) int {

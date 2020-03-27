@@ -15,16 +15,15 @@ go_library(
         "revinfo.go",
         "router.go",
         "setup.go",
-        "queue.go",
-        "classRule.go",
-        "policer.go",
         "scheduler.go",
+        "loadConfig.go",
         "setup-posix.go",
         "stochasticNotify.go"
     ],
     importpath = "github.com/scionproto/scion/go/border",
     visibility = ["//visibility:private"],
     deps = [
+        "//go/border/qosqueues:go_default_library",
         "//go/border/brconf:go_default_library",
         "//go/border/ifstate:go_default_library",
         "//go/border/internal/metrics:go_default_library",
@@ -66,11 +65,11 @@ go_test(
     srcs = [
         "io_test.go",
         "setup_test.go",
-        "policer_test.go"
     ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
     deps = [
+        "//go/border/qosqueues:go_default_library",
         "//go/border/brconf:go_default_library",
         "//go/border/rctx:go_default_library",
         "//go/border/rpkt:go_default_library",
