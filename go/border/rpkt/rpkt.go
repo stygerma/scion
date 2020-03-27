@@ -163,10 +163,6 @@ type addrIFPair struct {
 	IfLabel string
 }
 
-//TODO: Remove this as soon as you have found a way around the unexported structs
-// currently waiting for a reply from J.
-type AddrIFPair = addrIFPair
-
 // EgressPair contains the output function to send a packet with, along with an
 // overlay destination address.
 type EgressPair struct {

@@ -1,3 +1,18 @@
+// Copyright 2020 ETH Zurich
+// Copyright 2018 ETH Zurich, Anapaya Systems
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package rpkt
 
 import (
@@ -25,7 +40,7 @@ func JFPrepareRtrPacketSample(t *testing.T) *RtrPkt {
 			IFs: map[common.IFIDType]*topology.IFInfo{5: nil},
 		},
 	}
-	r.Ingress = AddrIFPair{IfID: 5}
+	r.Ingress = addrIFPair{IfID: 5}
 	// return r
 
 	// r.parseBasic()
@@ -36,7 +51,7 @@ func JFPrepareRtrPacketSample(t *testing.T) *RtrPkt {
 	r.Raw = nil // We don't need contents for this anyways
 	r.TimeIn = time.Now()
 	r.DirFrom = -1 // I don't know what this is
-	r.Ingress = AddrIFPair{Dst: sampleUDPAddr,
+	r.Ingress = addrIFPair{Dst: sampleUDPAddr,
 		Src:  sampleUDPAddr,
 		IfID: 0, IfLabel: "TODO set all of this stuff correctly"}
 	r.Egress = []EgressPair{EgressPair{S: nil, Dst: sampleUDPAddr}}
@@ -76,7 +91,7 @@ func JFPrepareRtrPacketWith(sourceIA addr.IA, destinationIA addr.IA, L4Type comm
 			IFs: map[common.IFIDType]*topology.IFInfo{5: nil},
 		},
 	}
-	r.Ingress = AddrIFPair{IfID: 5}
+	r.Ingress = addrIFPair{IfID: 5}
 
 	sampleUDPAddr := &net.UDPAddr{IP: net.IPv4(127, 1, 1, 111), Port: -1, Zone: "IPv6 scoped addressing zone"}
 
@@ -84,7 +99,7 @@ func JFPrepareRtrPacketWith(sourceIA addr.IA, destinationIA addr.IA, L4Type comm
 	r.Raw = nil // We don't need contents for this anyways
 	r.TimeIn = time.Now()
 	r.DirFrom = -1 // I don't know what this is
-	r.Ingress = AddrIFPair{Dst: sampleUDPAddr,
+	r.Ingress = addrIFPair{Dst: sampleUDPAddr,
 		Src:  sampleUDPAddr,
 		IfID: 0, IfLabel: "TODO set all of this stuff correctly"}
 	r.Egress = []EgressPair{EgressPair{S: nil, Dst: sampleUDPAddr}}
