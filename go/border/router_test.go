@@ -31,19 +31,20 @@ func TestLoadSampleConfig(t *testing.T) {
 
 	fmt.Println("The Queue is: ", r.config.Queues[0])
 	fmt.Println("The Rule is: ", r.config.Rules[0])
-	t.Errorf("Output: %v", r.config)
+	// t.Errorf("Output: %v", r.config)
 
 }
 
-func TestLoadSampleConfigQueues(t *testing.T) {
-	r, _ := setupTestRouter(t)
+// TODO: Readd this test with the new qosqueues
+// func TestLoadSampleConfigQueues(t *testing.T) {
+// 	r, _ := setupTestRouter(t)
 
-	r.loadConfigFile("sample-config.yaml")
+// 	r.loadConfigFile("sample-config.yaml")
 
-	fmt.Println("The Queue is: ", r.config.Queues[0])
-	fmt.Println("The Rule is: ", r.config.Rules[0])
-	fmt.Println("We have this number of queues: ", len(r.config.Queues))
-	t.Errorf("Output: %v", r.config)
+// 	fmt.Println("The Queue is: ", r.config.Queues[0])
+// 	fmt.Println("The Rule is: ", r.config.Rules[0])
+// 	fmt.Println("We have this number of queues: ", len(r.config.Queues))
+// 	t.Errorf("Output: %v", r.config)
 
 	if r.config.Queues[0].GetPacketQueue().ID != 0 {
 		t.Errorf("Incorrect Queue ID")
