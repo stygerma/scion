@@ -21,7 +21,7 @@ const (
 	DROPNOTIFY policeAction = 3
 )
 
-type violation int
+type Violation int
 
 const (
 	// None none
@@ -33,11 +33,11 @@ const (
 )
 
 type action struct {
-	reason violation
+	reason Violation
 	action policeAction
 }
 
-type qPkt struct {
+type QPkt struct {
 	queueNo int
 	act     action
 	rp      *rpkt.RtrPkt
@@ -55,7 +55,7 @@ type packetQueue struct {
 
 	mutex *sync.Mutex
 
-	queue  []*qPkt
+	queue  []*QPkt
 	length int
 	tb     tokenBucket
 }
@@ -66,7 +66,7 @@ type actionProfile struct {
 	Action    policeAction `yaml:"action"`
 }
 
-func (pq *packetQueue) enqueue(rp *qPkt) {
+func (pq *packetQueue) enqueue(rp *QPkt) {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -91,12 +91,12 @@ func (pq *packetQueue) getLength() int {
 	return pq.length
 }
 
-func (pq *packetQueue) peek() *qPkt {
+func (pq *packetQueue) peek() *QPkt {
 
 	return pq.queue[0]
 }
 
-func (pq *packetQueue) pop() *qPkt {
+func (pq *packetQueue) pop() *QPkt {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
@@ -108,7 +108,7 @@ func (pq *packetQueue) pop() *qPkt {
 	return pkt
 }
 
-func (pq *packetQueue) popMultiple(number int) []*qPkt {
+func (pq *packetQueue) popMultiple(number int) []*QPkt {
 
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()

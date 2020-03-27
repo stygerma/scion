@@ -43,10 +43,12 @@ require (
 	github.com/uber/jaeger-lib v2.0.0+incompatible // indirect
 	github.com/vishvananda/netlink v0.0.0-20170924180554-177f1ceba557
 	github.com/vishvananda/netns v0.0.0-20170219233438-54f0e4339ce7 // indirect
+	github.com/yuin/goldmark v1.1.26 // indirect
 	go.uber.org/atomic v1.5.1 // indirect
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
-	golang.org/x/net v0.0.0-20191105084925-a882066a44e0
-	golang.org/x/tools v0.0.0-20191029041327-9cc4af7d6b2c
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
+	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
+	golang.org/x/tools v0.0.0-20200326210457-5d86d385bf88
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0-20170531160350-a96e63847dc3
 	gopkg.in/restruct.v1 v1.0.0-20151213023948-80ede2e57cc2
 	gopkg.in/yaml.v2 v2.2.4

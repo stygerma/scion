@@ -77,7 +77,9 @@ func (r *Router) setup() error {
 		},
 	)
 	if err := itopo.Update(conf.Topo); err != nil {
-		
+		return err
+	}
+
 	conf.Topo = itopo.Get()
 	// Setup new context.
 	if err = r.setupCtxFromConfig(conf); err != nil {

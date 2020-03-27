@@ -57,7 +57,7 @@ func (r *Router) PacketError() {
 	for args := range r.pktErrorQ { //MS: pktErrorQ is a channel, i.e. range only assign to args if the pktErrorQ received error
 		r.doPktError(args.rp, args.perr)
 		args.rp.Release()
-		log.Debug("============ MS ============ handled this pkterr", args, "============ MS ============")
+		//log.Debug("============ MS ============ handled this pkterr", args, "============ MS ============")
 	}
 	log.Debug("============ MS ============ PacketError() end (should not appear ============ MS ============")
 }

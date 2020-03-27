@@ -4,5 +4,5 @@ package main
 
 type stochastic struct {
 	SwitchingPoint float64
-	Controller     PID
+	//Controller     PID
 }

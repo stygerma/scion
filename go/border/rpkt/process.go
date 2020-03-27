@@ -78,7 +78,7 @@ func (rp *RtrPkt) processSCMP() (HookResult, error) { //IMP: implement the behav
 				return HookError, err
 			}
 		}
-	case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_BasicCongWarn: //IMPL:
+	/*case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_BasicCongWarn: //IMPL:
 		if err := rp.processSCMPBasicCongWarn(); err != nil {
 			return HookError, err
 		}
@@ -93,7 +93,7 @@ func (rp *RtrPkt) processSCMP() (HookResult, error) { //IMP: implement the behav
 	case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_CombiCongWarn: //IMPL:
 		if err := rp.processSCMPCombiCongWarn(); err != nil {
 			return HookError, err
-		}
+		}*/
 	default:
 		return HookError, common.NewBasicError("Unsupported destination SCMP payload", nil,
 			"class", hdr.Class, "type", hdr.Type.Name(hdr.Class))

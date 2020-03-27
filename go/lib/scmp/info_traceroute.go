@@ -50,8 +50,8 @@ const (
 
 type InfoTraceRoute struct {
 	Id     uint64
-	IA     addr.IA
-	IfID   common.IFIDType
+	IA     addr.IA         //MS: uint64
+	IfID   common.IFIDType //MS: uint64
 	HopOff uint8
 	In     bool
 }

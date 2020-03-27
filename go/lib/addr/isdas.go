@@ -184,8 +184,8 @@ var _ flag.Value = (*IA)(nil)
 
 // IA represents the ISD (ISolation Domain) and AS (Autonomous System) Id of a given SCION AS.
 type IA struct {
-	I ISD
-	A AS
+	I ISD //MS: uint16
+	A AS //MS: uint64
 }
 
 func IAFromRaw(b common.RawBytes) IA {

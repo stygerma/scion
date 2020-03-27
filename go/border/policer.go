@@ -14,6 +14,7 @@ type tokenBucket struct {
 	timerGranularity int
 	lastRefill       time.Time
 	mutex            *sync.Mutex
+	CurrBW           uint64 // In bps
 }
 
 func (tb *tokenBucket) refill(shouldLog bool) {
@@ -36,6 +37,8 @@ func (tb *tokenBucket) refill(shouldLog bool) {
 			log.Debug("On Update: Spent token in last period", "#tokens", tb.tokenSpent)
 		}
 
+		tb.CurrBW = uint64(tb.tokenSpent/int(timeSinceLastUpdate)) * 1000
+
 		tb.tokenSpent = 0
 
 		if tb.tokens+newTokens > tb.MaxBandWidth {
@@ -47,7 +50,7 @@ func (tb *tokenBucket) refill(shouldLog bool) {
 
 }
 
-func (pq *packetQueue) police(qp *qPkt, shouldLog bool) policeAction {
+func (pq *packetQueue) police(qp *QPkt, shouldLog bool) policeAction {
 	pq.tb.mutex.Lock()
 	defer pq.tb.mutex.Unlock()
 
@@ -86,7 +89,7 @@ func (pq *packetQueue) police(qp *qPkt, shouldLog bool) policeAction {
 	return qp.act.action
 }
 
-func (qp *qPkt) sendNotification() {
+func (qp *QPkt) sendNotification() {
 	select {
 	case r.notifications <- qp:
 	default:

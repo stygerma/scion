@@ -31,9 +31,9 @@ func setupQueue() packetQueue {
 
 }
 
-func setupQueuePaket() qPkt {
+func setupQueuePaket() QPkt {
 
-	return qPkt{queueNo: 0, rp: nil}
+	return QPkt{queueNo: 0, rp: nil}
 }
 
 func TestBasicEnqueue(t *testing.T) {

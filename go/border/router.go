@@ -63,7 +63,7 @@ type Router struct {
 	setCtxMtx sync.Mutex
 
 	config              RouterConfig
-	notifications       chan *qPkt
+	notifications       chan *QPkt
 	flag                chan int
 	schedulerSurplus    surplus
 	schedulerSurplusMtx sync.Mutex
@@ -139,7 +139,7 @@ func (r *Router) initQueueing() {
 	log.Info("We have queues: ", "numberOfQueues", len(r.config.Queues))
 
 	r.flag = make(chan int, len(r.config.Queues))
-	r.notifications = make(chan *qPkt, maxNotificationCount)
+	r.notifications = make(chan *QPkt, maxNotificationCount)
 	r.forwarder = r.forwardPacket
 
 	go func() {
@@ -191,15 +191,10 @@ func (r *Router) handleSock(s *rctx.Sock, stop, stopped chan struct{}) {
 		}
 		for i := 0; i < n; i++ {
 			rp := pkts[i].(*rpkt.RtrPkt)
-<<<<<<< HEAD
-			r.processPacket(rp) //IMP: reference of processPacket method
-			rp.Release()
-=======
 			r.processPacket(rp)
 			// the packet might still be queued so we can't release it here.
 			// it is released in forwardPacket
 			// rp.Release()
->>>>>>> 6f8f34f7fae02821c460ed7a2d7407fb0a04b539
 			pkts[i] = nil
 		}
 	}
@@ -317,7 +312,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	// At the moment no queue is slow
 
 	queueNo := getQueueNumberFor(rp, &r.config.Rules)
-	qp := qPkt{rp: rp, queueNo: queueNo}
+	qp := QPkt{rp: rp, queueNo: queueNo}
 
 	log.Info("Queuenumber is ", "queuenumber", queueNo)
 	log.Info("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
