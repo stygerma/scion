@@ -25,48 +25,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// RouterConfig is what I am loading from the config file
-type configFileRouterConfig struct {
-	Queues []configFilePacketQueue `yaml:"Queues"`
-	Rules  []configFileClassRule   `yaml:"Rules"`
-}
-
-type configFileActionProfile struct {
-	FillLevel int                    `yaml:"fill-level"`
-	Prob      int                    `yaml:"prob"`
-	Action    qosqueues.PoliceAction `yaml:"action"`
-}
-
-type configFilePacketQueue struct {
-	Name         string                    `yaml:"name"`
-	ID           int                       `yaml:"id"`
-	MinBandwidth int                       `yaml:"CIR"`
-	MaxBandWidth int                       `yaml:"PIR"`
-	PoliceRate   int                       `yaml:"policeRate"`
-	MaxLength    int                       `yaml:"maxLength"`
-	Priority     int                       `yaml:"priority"`
-	Profile      []configFileActionProfile `yaml:"profile"`
-}
-
-type configFileClassRule struct {
-	// This is currently means the ID of the sending border router
-	Name                 string `yaml:"name"`
-	SourceAs             string `yaml:"sourceAs"`
-	SourceMatchMode      int    `yaml:"sourceMatchMode"`
-	NextHopAs            string `yaml:"nextHopAs"`
-	NextHopMatchMode     int    `yaml:"nextHopMatchMode"`
-	DestinationAs        string `yaml:"destinationAs"`
-	DestinationMatchMode int    `yaml:"destinationMatchMode"`
-	L4Type               []int  `yaml:"L4Type"`
-	QueueNumber          int    `yaml:"queueNumber"`
-}
-
 func (r *Router) loadConfigFile(path string) error {
 
-	var internalRules []classRule
+	var internalRules []qosqueues.InternalClassRule
 	var internalQueues []qosqueues.PacketQueueInterface
 
-	var rc configFileRouterConfig
+	var rc qosqueues.RouterConfig
 
 	// dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	// log.Debug("Current Path is", "path", dir)
@@ -81,7 +45,7 @@ func (r *Router) loadConfigFile(path string) error {
 	}
 
 	for _, rule := range rc.Rules {
-		intRule, err := convClassRuleToInternal(rule)
+		intRule, err := qosqueues.ConvClassRuleToInternal(rule)
 		if err != nil {
 			log.Error("Error reading config file", "error", err)
 		}
@@ -95,7 +59,8 @@ func (r *Router) loadConfigFile(path string) error {
 		internalQueues = append(internalQueues, queueToUse)
 	}
 
-	r.config = routerConfig{Queues: internalQueues, Rules: internalRules}
+	r.legacyConfig = rc
+	r.config = qosqueues.InternalRouterConfig{Queues: internalQueues, Rules: internalRules}
 
 	return nil
 }
