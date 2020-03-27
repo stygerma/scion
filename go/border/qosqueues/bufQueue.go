@@ -34,9 +34,6 @@ type PacketBufQueue struct {
 	tb       tokenBucket
 }
 
-// type QPktList []QPkt
-// type QPktPointerList []*QPkt
-
 var _ PacketQueueInterface = (*PacketBufQueue)(nil)
 
 func (pq *PacketBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
@@ -108,17 +105,17 @@ func (pq *PacketBufQueue) CheckAction() PoliceAction {
 
 	level := pq.GetFillLevel()
 
-	log.Info("Current level is", "level", level)
-	log.Info("Profiles are", "profiles", pq.pktQue.Profile)
+	log.Trace("Current level is", "level", level)
+	log.Trace("Profiles are", "profiles", pq.pktQue.Profile)
 
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
-			log.Info("Matched a rule!")
+			log.Trace("Matched a rule!")
 			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
-				log.Info("Take Action!")
+				log.Trace("Take Action!")
 				return pq.pktQue.Profile[j].Action
 			}
-			log.Info("Do not take Action")
+			log.Trace("Do not take Action")
 
 		}
 	}
