@@ -16,6 +16,7 @@
 package qosqueues
 
 import (
+	"math"
 	"sync"
 	"testing"
 	"time"
@@ -387,3 +388,47 @@ func BenchmarkPop5(b *testing.B) { benchmarkPop(10, b) }
 // 		}
 // 	}
 // }
+
+func BenchmarkReturnAction(b *testing.B) {
+
+	benchmarks := []struct {
+		name string
+		fu   func(polAction PoliceAction, profAction PoliceAction) PoliceAction
+		pa1  PoliceAction
+		pa2  PoliceAction
+	}{
+		{"Old", ReturnActionOld, DROPNOTIFY, DROP},
+		{"Old", ReturnActionOld, DROP, DROPNOTIFY},
+		{"Old", ReturnActionOld, PASS, PASS},
+		{"New", ReturnAction, DROPNOTIFY, DROP},
+		{"New", ReturnAction, DROP, DROPNOTIFY},
+		{"New", ReturnAction, PASS, PASS},
+	}
+
+	benchmarksPrime := []struct {
+		name string
+		fu   func(polAction PrimePoliceAction, profAction PrimePoliceAction) PrimePoliceAction
+		pa1  PrimePoliceAction
+		pa2  PrimePoliceAction
+	}{
+		{"Prime", ReturnActionPrime, PrimeDROPNOTIFY, PrimeDROP},
+		{"Prime", ReturnActionPrime, PrimeDROP, PrimeDROPNOTIFY},
+		{"Prime", ReturnActionPrime, PrimePASS, PrimePASS},
+	}
+
+	max := int(math.Pow(10, 8))
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < max; i++ {
+				bm.fu(bm.pa1, bm.pa2)
+			}
+		})
+	}
+	for _, bm := range benchmarksPrime {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < max; i++ {
+				bm.fu(bm.pa1, bm.pa2)
+			}
+		})
+	}
+}

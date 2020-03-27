@@ -21,7 +21,7 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
-type PoliceAction int
+type PoliceAction uint8
 
 const (
 	// PASS Pass the packet
@@ -32,6 +32,18 @@ const (
 	DROP
 	// DROPNOTIFY Drop and then notify someone
 	DROPNOTIFY
+)
+
+type PrimePoliceAction uint8
+
+const (
+	PrimePASS PrimePoliceAction = 3
+	// NOTIFY Notify the sending host of the packet
+	PrimeNOTIFY PrimePoliceAction = 5
+	// DROP Drop the packet
+	PrimeDROP PrimePoliceAction = 11
+	// DROPNOTIFY Drop and then notify someone
+	PrimeDROPNOTIFY PrimePoliceAction = 13
 )
 
 type Violation int
@@ -100,7 +112,7 @@ type PacketQueueInterface interface {
 	GetPacketQueue() PacketQueue
 }
 
-func ReturnAction(polAction PoliceAction, profAction PoliceAction) PoliceAction {
+func ReturnActionOld(polAction PoliceAction, profAction PoliceAction) PoliceAction {
 
 	if polAction == DROPNOTIFY || profAction == DROPNOTIFY {
 		return DROPNOTIFY
@@ -115,4 +127,37 @@ func ReturnAction(polAction PoliceAction, profAction PoliceAction) PoliceAction 
 	}
 
 	return PASS
+}
+
+func ReturnAction(polAction PoliceAction, profAction PoliceAction) PoliceAction {
+
+	pol, prof := 3-polAction, 3-profAction
+	if pol*prof == 0 {
+		return DROPNOTIFY
+	}
+	pol--
+	prof--
+	if pol*prof == 0 {
+		return DROP
+	}
+	pol--
+	prof--
+	if pol*prof == 0 {
+		return NOTIFY
+	}
+	return PASS
+}
+
+func ReturnActionPrime(polAction PrimePoliceAction, profAction PrimePoliceAction) PrimePoliceAction {
+
+	if polAction*profAction%PrimeDROPNOTIFY == 0 {
+		return PrimeDROPNOTIFY
+	}
+	if polAction*profAction%PrimeDROP == 0 {
+		return PrimeDROPNOTIFY
+	}
+	if polAction*profAction%PrimeDROPNOTIFY == 0 {
+		return PrimePASS
+	}
+	return PrimePASS
 }
