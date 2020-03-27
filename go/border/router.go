@@ -66,7 +66,7 @@ type Router struct {
 
 	config              qosqueues.InternalRouterConfig
 	legacyConfig        qosqueues.RouterConfig
-	notifications       chan *qosqueues.QPkt
+	notifications       chan *qosqueues.NPkt
 	schedulerSurplus    qosqueues.Surplus
 	schedulerSurplusMtx sync.Mutex
 	workerChannels      [](chan *qosqueues.QPkt)
@@ -94,7 +94,7 @@ func (r *Router) initQueueing(location string) {
 	log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
 	log.Debug("We have rules: ", "numberOfRules", len(r.config.Rules))
 
-	r.notifications = make(chan *qosqueues.QPkt, maxNotificationCount)
+	r.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	r.forwarder = r.forwardPacket
 
 	go r.drrDequer()
@@ -309,8 +309,11 @@ func putOnQueue(queueNo int, qp *qosqueues.QPkt) {
 }
 
 func (r *Router) sendNotification(qp *qosqueues.QPkt) {
+
+	np := qosqueues.NPkt{Rule: qosqueues.GetRuleWithHashFor(&r.config, qp.Rp), Qpkt: qp}
+
 	select {
-	case r.notifications <- qp:
+	case r.notifications <- &np:
 	default:
 	}
 }
