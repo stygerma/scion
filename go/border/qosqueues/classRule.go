@@ -85,13 +85,20 @@ func ConvClassRuleToInternal(cr classRule) (InternalClassRule, error) {
 		return InternalClassRule{}, err
 	}
 
+	l4t := make([]common.L4ProtocolType, 0)
+
+	for _, l4pt := range cr.L4Type {
+		l4t = append(l4t, common.L4ProtocolType(l4pt))
+
+	}
+
 	rule := InternalClassRule{
 		Name:          cr.Name,
 		Priority:      cr.Priority,
 		SourceAs:      sourceMatch,
 		NextHopAs:     matchRule{},
 		DestinationAs: destinationMatch,
-		L4Type:        common.L4Type(cr.L4Type),
+		L4Type:        l4t,
 		QueueNumber:   cr.QueueNumber}
 
 	return rule, nil
