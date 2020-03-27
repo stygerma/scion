@@ -48,7 +48,7 @@ type InternalClassRule struct {
 	SourceAs      matchRule
 	NextHopAs     matchRule
 	DestinationAs matchRule
-	L4Type        []int
+	L4Type        []common.L4Type
 	QueueNumber   int
 }
 
@@ -91,7 +91,7 @@ func ConvClassRuleToInternal(cr classRule) (InternalClassRule, error) {
 		SourceAs:      sourceMatch,
 		NextHopAs:     matchRule{},
 		DestinationAs: destinationMatch,
-		L4Type:        cr.L4Type,
+		L4Type:        common.L4Type(cr.L4Type),
 		QueueNumber:   cr.QueueNumber}
 
 	return rule, nil
