@@ -59,6 +59,7 @@ Queues :
 Rules :
     - 
         name: "Test rule"
+        priority: 0
         sourceAs: "2-ff00:0:212"
         sourceMatchMode: 0
         nextHopAs: ""
@@ -74,6 +75,7 @@ Rules :
         queueNumber: 1
     - 
         name: "Drop Test Rule"
+        priority: 1
         sourceAs: "1-ff00:0:110"
         sourceMatchMode: 0
         nextHopAs: ""
