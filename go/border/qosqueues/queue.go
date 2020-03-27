@@ -55,6 +55,11 @@ type QPkt struct {
 	Rp      *rpkt.RtrPkt
 }
 
+type NPkt struct {
+	Rule *InternalClassRule
+	Qpkt *QPkt
+}
+
 type actionProfile struct {
 	FillLevel int          `yaml:"fill-level"`
 	Prob      int          `yaml:"prob"`
