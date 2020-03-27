@@ -12,6 +12,8 @@ import (
 	"github.com/scionproto/scion/go/lib/addr"
 )
 
+// TODO: Add tests for MatchModes as soon as you have decided which thing
+
 func TestGetEqualQueueNumbers(t *testing.T) {
 
 	r, _ := setupTestRouter(t)
@@ -30,7 +32,7 @@ func TestGetEqualQueueNumbers(t *testing.T) {
 
 }
 
-func TestMultipleRuleMatches(t *testing.T) {
+func TestMultipleRuleMatchesHigh(t *testing.T) {
 
 	r, _ := setupTestRouter(t)
 
@@ -41,7 +43,22 @@ func TestMultipleRuleMatches(t *testing.T) {
 	queueNo1 := getQueueNumberIterativeForInternal(r, pkt)
 
 	if queueNo1 != 15 {
-		t.Log("Wrong queuenumber should be", 15, "but is", queueNo1)
+		t.Errorf("Wrong queuenumber should be %d but is %d ", 15, queueNo1)
+	}
+}
+
+func TestMultipleRuleMatchesLow(t *testing.T) {
+
+	r, _ := setupTestRouter(t)
+
+	r.initQueueing("testdata/testConfig2.yaml")
+
+	pkt := rpkt.JFPrepareRtrPacketWithSrings("1-ff00:0:110", "1-ff00:0:111", 1)
+
+	queueNo1 := getQueueNumberIterativeForInternal(r, pkt)
+
+	if queueNo1 != 2 {
+		t.Errorf("Wrong queuenumber should be %d but is %d ", 2, queueNo1)
 	}
 }
 
