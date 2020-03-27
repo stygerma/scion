@@ -29,6 +29,7 @@ import (
 type classRule struct {
 	// This is currently means the ID of the sending border router
 	Name                 string `yaml:"name"`
+	Priority             int    `yaml:"priority"`
 	SourceAs             string `yaml:"sourceAs"`
 	SourceMatchMode      int    `yaml:"sourceMatchMode"`
 	NextHopAs            string `yaml:"nextHopAs"`
@@ -42,6 +43,7 @@ type classRule struct {
 type internalClassRule struct {
 	// This is currently means the ID of the sending border router
 	Name          string
+	Priority      int
 	SourceAs      matchRule
 	NextHopAs     matchRule
 	DestinationAs matchRule
@@ -84,6 +86,7 @@ func convClassRuleToInternal(cr classRule) (internalClassRule, error) {
 
 	rule := internalClassRule{
 		Name:          cr.Name,
+		Priority:      cr.Priority,
 		SourceAs:      sourceMatch,
 		NextHopAs:     matchRule{},
 		DestinationAs: destinationMatch,
@@ -174,37 +177,70 @@ func getQueueNumberWithHashFor(r *Router, rp *rpkt.RtrPkt) int {
 	queues1 := r.config.SourceRules[srcAddr]
 	queues2 := r.config.DestinationRules[dstAddr]
 
+	matches := make([]internalClassRule, 0)
+	returnRule := internalClassRule{QueueNumber: 0}
+
 	for _, rul1 := range queues1 {
 		for _, rul2 := range queues2 {
 			if rul1 == rul2 {
-				return rul1.QueueNumber
+				matches = append(matches, *rul1)
 			}
 		}
 	}
 
-	return 0
+	max := -1
+	for _, rul1 := range matches {
+		if rul1.Priority > max {
+			returnRule = rul1
+			max = rul1.Priority
+		}
+	}
+
+	return returnRule.QueueNumber
 }
 
 func getQueueNumberIterativeForInternal(r *Router, rp *rpkt.RtrPkt) int {
 
 	queueNo := 0
+	matches := make([]internalClassRule, 0)
 
 	for _, cr := range r.config.Rules {
+
 		if cr.matchInternalRule(rp) {
-			queueNo = cr.QueueNumber
+			matches = append(matches, cr)
 		}
 	}
+
+	max := -1
+	for _, rul1 := range matches {
+		if rul1.Priority > max {
+			queueNo = rul1.QueueNumber
+			max = rul1.Priority
+		}
+	}
+
 	return queueNo
 }
 
 func getQueueNumberIterativeFor(r *Router, rp *rpkt.RtrPkt) int {
 	queueNo := 0
 
+	matches := make([]classRule, 0)
+
 	for _, cr := range r.legacyConfig.Rules {
 		if cr.matchRule(rp) {
-			queueNo = cr.QueueNumber
+			matches = append(matches, cr)
 		}
 	}
+
+	max := -1
+	for _, rul1 := range matches {
+		if rul1.Priority > max {
+			queueNo = rul1.QueueNumber
+			max = rul1.Priority
+		}
+	}
+
 	return queueNo
 }
 
