@@ -40,7 +40,7 @@ type classRule struct {
 	QueueNumber          int    `yaml:"queueNumber"`
 }
 
-type internalClassRule struct {
+type InternalClassRule struct {
 	// This is currently means the ID of the sending border router
 	Name          string
 	Priority      int
@@ -169,7 +169,7 @@ func getMatchFromRule(cr classRule, matchModeField int, matchRuleField string) (
 	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil, "matchMode", matchModeField)
 }
 
-func getQueueNumberWithHashFor(r *Router, rp *rpkt.RtrPkt) int {
+func getRuleWithHashFor(r *Router, rp *rpkt.RtrPkt) *internalClassRule {
 
 	srcAddr, _ := rp.SrcIA()
 	dstAddr, _ := rp.DstIA()
@@ -196,7 +196,12 @@ func getQueueNumberWithHashFor(r *Router, rp *rpkt.RtrPkt) int {
 		}
 	}
 
-	return returnRule.QueueNumber
+	return &returnRule
+}
+
+func getQueueNumberWithHashFor(r *Router, rp *rpkt.RtrPkt) int {
+
+	return getRuleWithHashFor(r, rp).QueueNumber
 }
 
 func getQueueNumberIterativeForInternal(r *Router, rp *rpkt.RtrPkt) int {
