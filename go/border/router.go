@@ -38,6 +38,7 @@ const processBufCnt = 128
 
 const maxNotificationCount = 512
 
+// TODO: this path should be configure in br.toml
 const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
 
 const noWorker = 1
@@ -86,7 +87,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 func (r *Router) initQueueing(location string) {
 
-	//TODO: Figure out the actual path where the other config files are loaded
+	//TODO: Figure out the actual path where the other config files are loaded --> this path should be configure in br.toml
 	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
 	err := r.loadConfigFile(location)
 
