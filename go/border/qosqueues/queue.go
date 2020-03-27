@@ -44,6 +44,7 @@ const (
 
 // Action is
 type Action struct {
+	rule   *InternalClassRule
 	reason Violation
 	action PoliceAction
 }

@@ -1,4 +1,4 @@
-package main
+package qosqueues
 
 import (
 	"fmt"
@@ -110,13 +110,13 @@ func BenchmarkBig(b *testing.B) {
 	}{
 		{"Naive implementation with string comparison 600 packets", getQueueNumberIterativeFor, "sample-config.yaml"},
 		{"Naive implementation with int comparison 600 packets", getQueueNumberIterativeForInternal, "sample-config.yaml"},
-		{"Map based implementation 600 packets", getQueueNumberWithHashFor, "sample-config.yaml"},
+		{"Map based implementation 600 packets", GetQueueNumberWithHashFor, "sample-config.yaml"},
 		{"Naive implementation with string comparison 600 packets", getQueueNumberIterativeFor, "bench-config-medium.yaml"},
 		{"Naive implementation with int comparison 600 packets", getQueueNumberIterativeForInternal, "bench-config-medium.yaml"},
-		{"Map based implementation 600 packets", getQueueNumberWithHashFor, "bench-config-medium.yaml"},
+		{"Map based implementation 600 packets", GetQueueNumberWithHashFor, "bench-config-medium.yaml"},
 		{"Naive implementation with string comparison 600 packets", getQueueNumberIterativeFor, "bench-config-large.yaml"},
 		{"Naive implementation with int comparison 600 packets", getQueueNumberIterativeForInternal, "bench-config-large.yaml"},
-		{"Map based implementation 600 packets", getQueueNumberWithHashFor, "bench-config-large.yaml"},
+		{"Map based implementation 600 packets", GetQueueNumberWithHashFor, "bench-config-large.yaml"},
 	}
 
 	for _, bm := range benchmarks {

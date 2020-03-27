@@ -27,7 +27,6 @@ import (
 	"github.com/scionproto/scion/go/border/rctrl"
 	"github.com/scionproto/scion/go/border/rctx"
 	"github.com/scionproto/scion/go/border/rpkt"
-	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/assert"
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/log"
@@ -64,25 +63,13 @@ type Router struct {
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
 
-	config              routerConfig
+	config              qosqueues.InternalRouterConfig
+	legacyConfig        qosqueues.RouterConfig
 	notifications       chan *qosqueues.QPkt
-	schedulerSurplus    surplus
+	schedulerSurplus    qosqueues.Surplus
 	schedulerSurplusMtx sync.Mutex
 	workerChannels      [](chan *qosqueues.QPkt)
 	forwarder           func(rp *rpkt.RtrPkt)
-}
-
-type surplus struct {
-	surplus  int
-	payments []int
-}
-
-// routerConfig is what I am loading from the config file
-type routerConfig struct {
-	Queues           []qosqueues.PacketQueueInterface
-	Rules            []classRule
-	SourceRules      map[addr.IA][]*classRule
-	DestinationRules map[addr.IA][]*classRule
 }
 
 // NewRouter returns a new router
@@ -137,9 +124,6 @@ func (r *Router) Start() {
 	go func() {
 		defer log.HandlePanic()
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
-	}()
-	go func() {
-		r.dequeuer()
 	}()
 	if err := r.startDiscovery(); err != nil {
 		fatal.Fatal(common.NewBasicError("Unable to start discovery", err))
@@ -287,7 +271,7 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	log.Debug("preRouteStep")
 	log.Debug("We have rules: ", "len(Rules)", len(r.config.Rules))
 
-	queueNo := getQueueNumberWithHashFor(r, rp)
+	queueNo := qosqueues.GetQueueNumberWithHashFor(&r.config, rp)
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
 	r.workerChannels[(queueNo % noWorker)] <- &qp
