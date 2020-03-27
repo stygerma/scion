@@ -57,7 +57,6 @@ go_test(
     srcs = [
         "rpkt_hook_test.go",
         "rpkt_test.go",
-        "export_test.go"
     ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
