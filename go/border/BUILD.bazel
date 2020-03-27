@@ -15,7 +15,6 @@ go_library(
         "router.go",
         "scheduler.go",
         "setup.go",
-        "classRule.go",
         "scheduler.go",
         "loadConfig.go",
         "setup-posix.go",
