@@ -81,7 +81,7 @@ type PacketQueue struct {
 	MaxBandWidth int               `yaml:"PIR"`
 	PoliceRate   int               `yaml:"policeRate"`
 	MaxLength    int               `yaml:"maxLength"`
-	priority     int               `yaml:"priority"`
+	Priority     int               `yaml:"priority"`
 	congWarning  CongestionWarning `yaml:"congestionWarning"`
 	Profile      []actionProfile   `yaml:"profile"`
 }
