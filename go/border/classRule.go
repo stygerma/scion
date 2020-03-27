@@ -16,7 +16,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/scionproto/scion/go/border/rpkt"
@@ -283,8 +282,6 @@ func (cr *classRule) matchRule(rp *rpkt.RtrPkt) bool {
 	srcAddr, _ := rp.SrcIA()
 	// log.Debug("Source Address is " + srcAddr.String())
 	// log.Debug("Comparing " + srcAddr.String() + " and " + cr.SourceAs)
-	fmt.Println("Source Address is " + srcAddr.String())
-	fmt.Println("Comparing " + srcAddr.String() + " and " + cr.SourceAs)
 	if !strings.Contains(srcAddr.String(), cr.SourceAs) {
 		match = false
 	}
