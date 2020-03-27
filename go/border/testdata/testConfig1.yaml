@@ -74,7 +74,7 @@ Rules :
             - 222
         queueNumber: 1
     - 
-        name: "Drop Test Rule"
+        name: "Lower Priority Rule"
         priority: 1
         sourceAs: "1-ff00:0:110"
         sourceMatchMode: 0
@@ -89,3 +89,19 @@ Rules :
             # - 17
             # - 222
         queueNumber: 2
+    - 
+        name: "Higher Priority Rule"
+        priority: 2
+        sourceAs: "1-ff00:0:110"
+        sourceMatchMode: 0
+        nextHopAs: ""
+        nextHopMatchMode : 0 
+        destinationAs: "1-ff00:0:111"
+        destinationMatchMode: 0
+        L4Type:
+            # - 0
+            - 1
+            # - 6
+            # - 17
+            # - 222
+        queueNumber: 15
