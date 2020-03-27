@@ -8,8 +8,9 @@ Queues :
         policeRate: 50000000 #50Mbit/s
         maxLength: 1024
         priority: 5
-        congestionWarningApproach: 1
-        informationContent: 2
+        congestionWarning:
+            - approach: 3
+            - informationContent: 1
         profile:
             - 
                 fill-level: 20
@@ -31,8 +32,9 @@ Queues :
         policeRate: 5000000 #5Mbit/s
         maxLength: 1024
         priority: 1
-        congestionWarningApproach: 3
-        informationContent: 1
+        congestionWarning:
+            - approach: 3
+            - informationContent: 1
         profile:
             - 
                 fill-level: 20
