@@ -94,7 +94,7 @@ type PacketQueueInterface interface {
 	GetFillLevel() int
 	GetLength() int
 	CheckAction() PoliceAction
-	Police(qp *QPkt, shouldLog bool) PoliceAction
+	Police(qp *QPkt) PoliceAction
 	GetPriority() int
 	GetMinBandwidth() int
 	GetPacketQueue() PacketQueue

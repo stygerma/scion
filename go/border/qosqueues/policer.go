@@ -23,34 +23,29 @@ import (
 )
 
 type tokenBucket struct {
-	MaxBandWidth     int // In bps
-	tokens           int // One token is 1 b
-	tokenSpent       int
-	timerGranularity int
-	lastRefill       time.Time
-	mutex            *sync.Mutex
-	CurrBW           uint64
+	MaxBandWidth int // In bps
+	tokens       int // One token is 1 b
+	tokenSpent   int
+	lastRefill   time.Time
+	mutex        *sync.Mutex
+	CurrBW       uint64
 }
 
-func (tb *tokenBucket) refill(shouldLog bool) {
+func (tb *tokenBucket) refill() {
 
 	now := time.Now()
 
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
-	if shouldLog {
-		log.Debug("Last update was", "ms ago", timeSinceLastUpdate)
-	}
+	log.Trace("Last update was", "ms ago", timeSinceLastUpdate)
 
 	if timeSinceLastUpdate > 100 {
 
 		newTokens := ((tb.MaxBandWidth) * int(timeSinceLastUpdate)) / (1000)
 		tb.lastRefill = now
 
-		if shouldLog {
-			log.Debug("Add new tokens", "#tokens", newTokens)
-			log.Debug("On Update: Spent token in last period", "#tokens", tb.tokenSpent)
-		}
+		log.Trace("Add new tokens", "#tokens", newTokens)
+		log.Trace("On Update: Spent token in last period", "#tokens", tb.tokenSpent)
 
 		tb.CurrBW = uint64(tb.tokenSpent/int(timeSinceLastUpdate)) * 1000
 

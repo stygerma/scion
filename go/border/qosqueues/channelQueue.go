@@ -132,7 +132,7 @@ func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
 	return PASS
 }
 
-func (pq *ChannelPacketQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
+func (pq *ChannelPacketQueue) Police(qp *QPkt) PoliceAction {
 	pq.tb.mutex.Lock()
 	defer pq.tb.mutex.Unlock()
 
@@ -140,19 +140,15 @@ func (pq *ChannelPacketQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 
 	tokenForPacket := packetSize * 8 // In bit
 
-	if shouldLog {
-		log.Debug("Overall available bandwidth per second", "MaxBandWidth", pq.tb.MaxBandWidth)
-		log.Debug("Spent token in last period", "#tokens", pq.tb.tokenSpent)
-		log.Debug("Available bandwidth before refill", "bandwidth", pq.tb.tokens)
-	}
+	log.Trace("Overall available bandwidth per second", "MaxBandWidth", pq.tb.MaxBandWidth)
+	log.Trace("Spent token in last period", "#tokens", pq.tb.tokenSpent)
+	log.Trace("Available bandwidth before refill", "bandwidth", pq.tb.tokens)
 
-	pq.tb.refill(shouldLog)
+	pq.tb.refill()
 
-	if shouldLog {
-		log.Debug("Available bandwidth after refill", "bandwidth", pq.tb.tokens)
-		log.Debug("Tokens necessary for packet", "tokens", tokenForPacket)
-		log.Debug("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
-	}
+	log.Trace("Available bandwidth after refill", "bandwidth", pq.tb.tokens)
+	log.Trace("Tokens necessary for packet", "tokens", tokenForPacket)
+	log.Trace("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
 
 	if pq.tb.tokens-tokenForPacket > 0 {
 		pq.tb.tokens = pq.tb.tokens - tokenForPacket
@@ -164,9 +160,7 @@ func (pq *ChannelPacketQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 		qp.Act.reason = BandWidthExceeded
 	}
 
-	if shouldLog {
-		log.Debug("Available bandwidth after update", "bandwidth", pq.tb.tokens)
-	}
+	log.Trace("Available bandwidth after update", "bandwidth", pq.tb.tokens)
 
 	return qp.Act.action
 }
