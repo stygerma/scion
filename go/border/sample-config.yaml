@@ -8,6 +8,8 @@ Queues :
         policeRate: 50000000 #50Mbit/s
         maxLength: 1024
         priority: 5
+        congestionWarningApproach: 1
+        informationContent: 2
         profile:
             - 
                 fill-level: 20
@@ -29,6 +31,8 @@ Queues :
         policeRate: 5000000 #5Mbit/s
         maxLength: 1024
         priority: 1
+        congestionWarningApproach: 3
+        informationContent: 1
         profile:
             - 
                 fill-level: 20
@@ -61,11 +65,8 @@ Rules :
         name: "Test rule"
         priority: 0
         sourceAs: "2-ff00:0:212"
-        sourceMatchMode: 0
         nextHopAs: ""
-        nextHopMatchMode : 0 
         destinationAs: "1-ff00:0:110"
-        destinationMatchMode: 0
         L4Type:
             - 0
             - 1
@@ -77,11 +78,8 @@ Rules :
         name: "Drop Test Rule"
         priority: 1
         sourceAs: "1-ff00:0:110"
-        sourceMatchMode: 0
         nextHopAs: ""
-        nextHopMatchMode : 0 
         destinationAs: "1-ff00:0:111"
-        destinationMatchMode: 0
         L4Type:
             # - 0
             - 1
