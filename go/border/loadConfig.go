@@ -25,18 +25,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// RouterConfig is what I am loading from the config file
-type RouterConfig struct {
-	Queues []qosqueues.PacketQueue `yaml:"Queues"`
-	Rules  []classRule             `yaml:"Rules"`
-}
-
 func (r *Router) loadConfigFile(path string) error {
 
-	var internalRules []internalClassRule
+	var internalRules []qosqueues.InternalClassRule
 	var internalQueues []qosqueues.PacketQueueInterface
 
-	var rc RouterConfig
+	var rc qosqueues.RouterConfig
 
 	// dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	// log.Debug("Current Path is", "path", dir)
@@ -51,7 +45,7 @@ func (r *Router) loadConfigFile(path string) error {
 	}
 
 	for _, rule := range rc.Rules {
-		intRule, err := convClassRuleToInternal(rule)
+		intRule, err := qosqueues.ConvClassRuleToInternal(rule)
 		if err != nil {
 			log.Error("Error reading config file", "error", err)
 		}
@@ -66,7 +60,7 @@ func (r *Router) loadConfigFile(path string) error {
 	}
 
 	r.legacyConfig = rc
-	r.config = InternalRouterConfig{Queues: internalQueues, Rules: internalRules}
+	r.config = qosqueues.InternalRouterConfig{Queues: internalQueues, Rules: internalRules}
 
 	return nil
 }

@@ -11,7 +11,6 @@ go_library(
         "revinfo.go",
         "router.go",
         "setup.go",
-        "classRule.go",
         "scheduler.go",
         "loadConfig.go",
         "setup-posix.go",
@@ -61,7 +60,6 @@ go_test(
     srcs = [
         "io_test.go",
         "setup_test.go",
-        "policer_test.go"
     ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
