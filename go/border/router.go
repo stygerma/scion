@@ -23,6 +23,7 @@ import (
 	"github.com/scionproto/scion/go/border/brconf"
 	"github.com/scionproto/scion/go/border/internal/metrics"
 	"github.com/scionproto/scion/go/border/qos"
+	"github.com/scionproto/scion/go/border/qosqueues"
 	"github.com/scionproto/scion/go/border/rcmn"
 	"github.com/scionproto/scion/go/border/rctrl"
 	"github.com/scionproto/scion/go/border/rctx"
@@ -39,6 +40,11 @@ import (
 const processBufCnt = 128
 
 const maxNotificationCount = 512
+
+const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
+
+const noWorker = 1
+const workLength = 32
 
 var droppedPackets = 0
 
@@ -93,13 +99,18 @@ func (r *Router) initQueueing(location string) {
 	log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
 	log.Debug("We have rules: ", "numberOfRules", len(r.config.Rules))
 
-	r.flag = make(chan int, len(r.config.Queues))
 	r.notifications = make(chan *qosqueues.QPkt, maxNotificationCount)
 	r.forwarder = r.forwardPacket
 
-	go func() {
-		r.drrDequer()
-	}()
+	go r.drrDequer()
+
+	r.workerChannels = make([]chan *qosqueues.QPkt, min(noWorker, len(r.config.Queues)))
+
+	for i := range r.workerChannels {
+		r.workerChannels[i] = make(chan *qosqueues.QPkt, workLength)
+
+		go worker(&r.workerChannels[i])
+	}
 
 	log.Debug("Finish init queueing")
 }
@@ -252,48 +263,47 @@ func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 	log.Debug("preRouteStep")
 	log.Debug("We have rules: ", "len(Rules)", len(r.config.Rules))
 
-	// Put packets destined for 1-ff00:0:110 on the slow queue
-	// Put all other packets from br2 on a faster queue but still delayed
-	// At the moment no queue is slow
-
 	queueNo := getQueueNumberWithHashFor(r, rp)
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
-	log.Debug("Queuenumber is ", "queuenumber", queueNo)
-	log.Debug("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
+	r.workerChannels[(queueNo % noWorker)] <- &qp
 
-	polAct := r.config.Queues[queueNo].Police(&qp, queueNo == 1)
+}
+
+func worker(workChannel *chan *qosqueues.QPkt) {
+
+	for {
+		qp := <-*workChannel
+		queueNo := qp.QueueNo
+
+		log.Debug("Queuenumber is ", "queuenumber", queueNo)
+		log.Debug("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
+
+		putOnQueue(queueNo, qp)
+	}
+
+}
+
+func putOnQueue(queueNo int, qp *qosqueues.QPkt) {
+	polAct := r.config.Queues[queueNo].Police(qp, queueNo == 1)
 	profAct := r.config.Queues[queueNo].CheckAction()
 
 	act := qosqueues.ReturnAction(polAct, profAct)
 
-			// r.queues[1].mutex.Lock()
-			// r.queues[1].queue = append(r.queues[1].queue, rp)
-			// r.queues[1].mutex.Unlock()
-			r.queues[1].enqueue(rp)
-		}
-
 	if act == qosqueues.PASS {
-		r.config.Queues[queueNo].Enqueue(&qp)
+		r.config.Queues[queueNo].Enqueue(qp)
 	} else if act == qosqueues.NOTIFY {
-		r.config.Queues[queueNo].Enqueue(&qp)
-		r.sendNotification(&qp)
+		r.config.Queues[queueNo].Enqueue(qp)
+		r.sendNotification(qp)
 	} else if act == qosqueues.DROPNOTIFY {
 		r.dropPacket(qp.Rp)
-		r.sendNotification(&qp)
+		r.sendNotification(qp)
 	} else if act == qosqueues.DROP {
 		r.dropPacket(qp.Rp)
 	} else {
 		// This should never happen
-		r.config.Queues[queueNo].Enqueue(&qp)
+		r.config.Queues[queueNo].Enqueue(qp)
 	}
-
-	// According to gobyexample all sends are blocking and this is the standard way to do non-blocking sends (https://gobyexample.com/non-blocking-channel-operations)
-	select {
-	case r.flag <- queueNo:
-	default:
-	}
-
 }
 
 func (r *Router) sendNotification(qp *qosqueues.QPkt) {
