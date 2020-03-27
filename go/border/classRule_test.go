@@ -30,6 +30,21 @@ func TestGetEqualQueueNumbers(t *testing.T) {
 
 }
 
+func TestMultipleRuleMatches(t *testing.T) {
+
+	r, _ := setupTestRouter(t)
+
+	r.initQueueing("testdata/testConfig1.yaml")
+
+	pkt := rpkt.JFPrepareRtrPacketWithSrings("1-ff00:0:110", "1-ff00:0:111", 1)
+
+	queueNo1 := getQueueNumberIterativeForInternal(r, pkt)
+
+	if queueNo1 != 15 {
+		t.Log("Wrong queuenumber should be", 15, "but is", queueNo1)
+	}
+}
+
 func BenchmarkIterativeBasic(b *testing.B) {
 
 	r = &Router{Id: "TestRouter"}
