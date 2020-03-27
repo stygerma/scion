@@ -293,23 +293,23 @@ func worker(workChannel *chan *qosqueues.QPkt) {
 }
 
 func putOnQueue(queueNo int, qp *qosqueues.QPkt) {
-	polAct := r.config.Queues[queueNo].Police(qp, queueNo == 1)
+	polAct := r.config.Queues[queueNo].Police(qp)
 	profAct := r.config.Queues[queueNo].CheckAction()
 
 	act := qosqueues.ReturnAction(polAct, profAct)
 
-	if act == qosqueues.PASS {
+	switch act {
+	case qosqueues.PASS:
 		r.config.Queues[queueNo].Enqueue(qp)
-	} else if act == qosqueues.NOTIFY {
+	case qosqueues.NOTIFY:
 		r.config.Queues[queueNo].Enqueue(qp)
 		r.sendNotification(qp)
-	} else if act == qosqueues.DROPNOTIFY {
+	case qosqueues.DROPNOTIFY:
 		r.dropPacket(qp.Rp)
 		r.sendNotification(qp)
-	} else if act == qosqueues.DROP {
+	case qosqueues.DROP:
 		r.dropPacket(qp.Rp)
-	} else {
-		// This should never happen
+	default:
 		r.config.Queues[queueNo].Enqueue(qp)
 	}
 }
