@@ -23,6 +23,7 @@ import (
 	"github.com/scionproto/scion/go/border/brconf"
 	"github.com/scionproto/scion/go/border/internal/metrics"
 	"github.com/scionproto/scion/go/border/qosqueues"
+	"github.com/scionproto/scion/go/border/qosscheduler"
 	"github.com/scionproto/scion/go/border/rcmn"
 	"github.com/scionproto/scion/go/border/rctrl"
 	"github.com/scionproto/scion/go/border/rctx"
@@ -64,13 +65,13 @@ type Router struct {
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
 
-	config              qosqueues.InternalRouterConfig
-	legacyConfig        qosqueues.RouterConfig
-	notifications       chan *qosqueues.NPkt
-	schedulerSurplus    qosqueues.Surplus
-	schedulerSurplusMtx sync.Mutex
-	workerChannels      [](chan *qosqueues.QPkt)
-	forwarder           func(rp *rpkt.RtrPkt)
+	// TODO: Put this configuration somewhere else
+	config         qosqueues.InternalRouterConfig
+	schedul        qosscheduler.SchedulerInterface
+	legacyConfig   qosqueues.RouterConfig
+	notifications  chan *qosqueues.NPkt
+	workerChannels [](chan *qosqueues.QPkt)
+	forwarder      func(rp *rpkt.RtrPkt)
 }
 
 // NewRouter returns a new router
@@ -102,7 +103,9 @@ func (r *Router) initQueueing(location string) {
 	r.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	r.forwarder = r.forwardPacket
 
-	go r.drrDequer()
+	r.schedul = &qosscheduler.RoundRobinScheduler{}
+
+	go r.schedul.Dequeuer(r.config, r.forwarder)
 
 	r.workerChannels = make([]chan *qosqueues.QPkt, min(noWorker, len(r.config.Queues)))
 
