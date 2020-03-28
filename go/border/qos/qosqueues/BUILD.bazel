@@ -12,7 +12,7 @@ go_library(
         "queue.go",
         "sliceQueue.go"
     ],
-    importpath = "github.com/scionproto/scion/go/border/qosqueues",
+    importpath = "github.com/scionproto/scion/go/border/qos/qosqueues",
     visibility = ["//visibility:public"],
     deps = [
         "//go/border/brconf:go_default_library",
@@ -42,6 +42,6 @@ go_test(
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
     deps = [
-        "//go/border/qosqueues:go_default_library",
+        "//go/border/qos/qosqueues:go_default_library",
     ],
 )

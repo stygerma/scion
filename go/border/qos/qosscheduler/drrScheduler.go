@@ -1,7 +1,7 @@
 package qosscheduler
 
 import (
-	"github.com/scionproto/scion/go/border/qosqueues"
+	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/log"
 )
