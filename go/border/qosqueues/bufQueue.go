@@ -18,7 +18,6 @@ package qosqueues
 import (
 	"math/rand"
 	"sync"
-	"time"
 
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
@@ -41,11 +40,8 @@ func (pq *PacketBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
-	pq.tb = tokenBucket{
-		MaxBandWidth: pq.pktQue.PoliceRate,
-		tokens:       pq.pktQue.PoliceRate,
-		lastRefill:   time.Now(),
-		mutex:        mutTb}
+	pq.tb = tokenBucket{}
+	pq.tb.Init(pq.pktQue.PoliceRate)
 	pq.bufQueue = ringbuf.New(pq.pktQue.MaxLength, func() interface{} {
 		return &QPkt{}
 	}, pq.pktQue.Name)
@@ -88,10 +84,6 @@ func (pq *PacketBufQueue) PopMultiple(number int) []*QPkt {
 
 	_, _ = pq.bufQueue.Read(pkts, false)
 
-	// dubdub := (*[]*QPkt)(unsafe.Pointer(&pkts))
-
-	// retArr := *dubdub
-
 	retArr := make([]*QPkt, number)
 
 	for k, pkt := range pkts {
@@ -124,36 +116,7 @@ func (pq *PacketBufQueue) CheckAction() PoliceAction {
 }
 
 func (pq *PacketBufQueue) Police(qp *QPkt) PoliceAction {
-	pq.tb.mutex.Lock()
-	defer pq.tb.mutex.Unlock()
-
-	packetSize := (qp.Rp.Bytes().Len()) // In byte
-
-	tokenForPacket := packetSize * 8 // In bit
-
-	log.Trace("Overall available bandwidth per second", "MaxBandWidth", pq.tb.MaxBandWidth)
-	log.Trace("Spent token in last period", "#tokens", pq.tb.tokenSpent)
-	log.Trace("Available bandwidth before refill", "bandwidth", pq.tb.tokens)
-
-	pq.tb.refill()
-
-	log.Trace("Available bandwidth after refill", "bandwidth", pq.tb.tokens)
-	log.Trace("Tokens necessary for packet", "tokens", tokenForPacket)
-	log.Trace("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
-
-	if pq.tb.tokens-tokenForPacket > 0 {
-		pq.tb.tokens -= tokenForPacket
-		pq.tb.tokenSpent += tokenForPacket
-		qp.Act.action = PASS
-		qp.Act.reason = None
-	} else {
-		qp.Act.action = DROP
-		qp.Act.reason = BandWidthExceeded
-	}
-
-	log.Trace("Available bandwidth after update", "bandwidth", pq.tb.tokens)
-
-	return qp.Act.action
+	return pq.tb.PoliceBucket(qp)
 }
 
 func (pq *PacketBufQueue) GetMinBandwidth() int {

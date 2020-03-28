@@ -19,7 +19,6 @@ import (
 	"math/rand"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"github.com/scionproto/scion/go/lib/log"
 )
@@ -44,11 +43,8 @@ func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mut
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
-	pq.tb = tokenBucket{
-		MaxBandWidth: pq.pktQue.PoliceRate,
-		tokens:       pq.pktQue.PoliceRate,
-		lastRefill:   time.Now(),
-		mutex:        mutTb}
+	pq.tb = tokenBucket{}
+	pq.tb.Init(pq.pktQue.PoliceRate)
 	pq.queue = make(chan *QPkt, pq.pktQue.MaxLength)
 	pq.head = 0
 	pq.tail = 0
@@ -133,36 +129,7 @@ func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
 }
 
 func (pq *ChannelPacketQueue) Police(qp *QPkt) PoliceAction {
-	pq.tb.mutex.Lock()
-	defer pq.tb.mutex.Unlock()
-
-	packetSize := (qp.Rp.Bytes().Len()) // In byte
-
-	tokenForPacket := packetSize * 8 // In bit
-
-	log.Trace("Overall available bandwidth per second", "MaxBandWidth", pq.tb.MaxBandWidth)
-	log.Trace("Spent token in last period", "#tokens", pq.tb.tokenSpent)
-	log.Trace("Available bandwidth before refill", "bandwidth", pq.tb.tokens)
-
-	pq.tb.refill()
-
-	log.Trace("Available bandwidth after refill", "bandwidth", pq.tb.tokens)
-	log.Trace("Tokens necessary for packet", "tokens", tokenForPacket)
-	log.Trace("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
-
-	if pq.tb.tokens-tokenForPacket > 0 {
-		pq.tb.tokens = pq.tb.tokens - tokenForPacket
-		pq.tb.tokenSpent += tokenForPacket
-		qp.Act.action = PASS
-		qp.Act.reason = None
-	} else {
-		qp.Act.action = DROP
-		qp.Act.reason = BandWidthExceeded
-	}
-
-	log.Trace("Available bandwidth after update", "bandwidth", pq.tb.tokens)
-
-	return qp.Act.action
+	return pq.tb.PoliceBucket(qp)
 }
 
 func (pq *ChannelPacketQueue) GetMinBandwidth() int {
