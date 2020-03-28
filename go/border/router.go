@@ -39,11 +39,6 @@ const processBufCnt = 128
 // TODO: this path should be configure in br.toml
 const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
 
-const noWorker = 1
-const workLength = 32
-
-var droppedPackets = 0
-
 // Router struct
 type Router struct {
 	// Id is the SCION element ID, e.g. "br4-ff00:0:2f".
@@ -59,14 +54,6 @@ type Router struct {
 	// setCtxMtx serializes modifications to the router context. Topology updates
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
-
-	// TODO: Put this configuration somewhere else
-	// config         qosqueues.InternalRouterConfig
-	// schedul        qosscheduler.SchedulerInterface
-	// legacyConfig   qosqueues.RouterConfig
-	// notifications  chan *qosqueues.NPkt
-	// workerChannels [](chan *qosqueues.QPkt)
-	// forwarder      func(rp *rpkt.RtrPkt)
 
 	qosConfig qos.QosConfiguration
 }
