@@ -14,6 +14,6 @@ type InternalRouterConfig struct {
 
 // RouterConfig is what I am loading from the config file
 type RouterConfig struct {
-	Queues []PacketQueue `yaml:"Queues"`
-	Rules  []classRule   `yaml:"Rules"`
+	Queues []ExternalPacketQueue `yaml:"Queues"`
+	Rules  []classRule           `yaml:"Rules"`
 }
