@@ -86,16 +86,28 @@ type CongestionWarning struct {
 	infoContent congestionWarningInformationContent `yaml:"informationContent"`
 }
 
-type PacketQueue struct {
+type ExternalPacketQueue struct {
 	Name         string            `yaml:"name"`
 	ID           int               `yaml:"id"`
 	MinBandwidth int               `yaml:"CIR"`
 	MaxBandWidth int               `yaml:"PIR"`
-	PoliceRate   int               `yaml:"policeRate"`
+	PoliceRate   string            `yaml:"policeRate"`
 	MaxLength    int               `yaml:"maxLength"`
 	Priority     int               `yaml:"priority"`
-	congWarning  CongestionWarning `yaml:"congestionWarning"`
+	CongWarning  CongestionWarning `yaml:"congestionWarning"`
 	Profile      []actionProfile   `yaml:"profile"`
+}
+
+type PacketQueue struct {
+	Name         string
+	ID           int
+	MinBandwidth int
+	MaxBandWidth int
+	PoliceRate   int
+	MaxLength    int
+	Priority     int
+	CongWarning  CongestionWarning
+	Profile      []actionProfile
 }
 
 type PacketQueueInterface interface {
