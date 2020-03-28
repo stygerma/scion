@@ -17,6 +17,9 @@ package main
 
 import (
 	"io/ioutil"
+	"math"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/scionproto/scion/go/border/qosqueues"
@@ -52,10 +55,10 @@ func (r *Router) loadConfigFile(path string) error {
 		internalRules = append(internalRules, intRule)
 	}
 
-	for _, que := range rc.Queues {
+	for _, extQue := range rc.Queues {
 		muta := &sync.Mutex{}
 		mutb := &sync.Mutex{}
-		queueToUse.InitQueue(convertConfigFileQueueToQueue(que), muta, mutb)
+		queueToUse.InitQueue(que, muta, mutb)
 		internalQueues = append(internalQueues, queueToUse)
 	}
 
@@ -65,29 +68,51 @@ func (r *Router) loadConfigFile(path string) error {
 	return nil
 }
 
-func convertConfigFileQueueToQueue(cfQueue configFilePacketQueue) qosqueues.PacketQueue {
+func convertExternalToInteralQueue(extQueue qosqueues.ExternalPacketQueue) qosqueues.PacketQueue {
 
-	var ap []qosqueues.ActionProfile
+	pq := qosqueues.PacketQueue{
+		Name:         extQueue.Name,
+		ID:           extQueue.ID,
+		MinBandwidth: extQueue.MinBandwidth,
+		MaxBandWidth: extQueue.MaxBandWidth,
+		PoliceRate:   convStringToNumber(extQueue.PoliceRate),
+		Priority:     extQueue.Priority,
+		CongWarning:  extQueue.CongWarning,
+		Profile:      extQueue.Profile,
+	}
 
-	for _, prof := range cfQueue.Profile {
-		intProf := qosqueues.ActionProfile{
-			FillLevel: prof.FillLevel,
-			Prob:      prof.Prob,
-			Action:    prof.Action,
+	return pq
+}
+
+func convStringToNumber(bandwidthstring string) int {
+	prefixes := map[string]int{
+		"h": 2,
+		"k": 3,
+		"M": 6,
+		"G": 9,
+		"T": 12,
+		"P": 15,
+		"E": 18,
+		"Z": 21,
+		"Y": 24,
+	}
+
+	var num, powpow int
+
+	for ind, str := range bandwidthstring {
+		if val, contains := prefixes[string(str)]; contains {
+			powpow = val
+			num, _ = strToInt(bandwidthstring[:ind])
+			return int(float64(num) * math.Pow(10, float64(powpow)))
 		}
-		ap = append(ap, intProf)
 	}
 
-	que := qosqueues.PacketQueue{
-		Name:         cfQueue.Name,
-		ID:           cfQueue.ID,
-		MinBandwidth: cfQueue.MinBandwidth,
-		MaxBandWidth: cfQueue.MaxBandWidth,
-		PoliceRate:   cfQueue.PoliceRate,
-		MaxLength:    cfQueue.MaxLength,
-		Priority:     cfQueue.Priority,
-		Profile:      ap,
-	}
+	val, _ := strToInt(bandwidthstring)
 
-	return que
+	return val
+}
+
+func strToInt(str string) (int, error) {
+	nonFractionalPart := strings.Split(str, ".")
+	return strconv.Atoi(nonFractionalPart[0])
 }
