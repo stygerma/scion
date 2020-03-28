@@ -8,7 +8,7 @@ go_library(
         "rrScheduler.go",
         "scheduler.go",
     ],
-    importpath = "github.com/scionproto/scion/go/border/qosqueues",
+    importpath = "github.com/scionproto/scion/go/border/qosscheduler",
     visibility = ["//visibility:public"],
     deps = [
         "//go/lib/log:go_default_library",
