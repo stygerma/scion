@@ -1,0 +1,33 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "drrScheduler.go",
+        "mmDrrScheduler.go",
+        "rrScheduler.go",
+        "scheduler.go",
+    ],
+    importpath = "github.com/scionproto/scion/go/border/qosqueues",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/lib/log:go_default_library",
+        "//go/border/rpkt:go_default_library",
+        "//go/border/qosqueues:go_default_library",
+    ],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = [
+        "drrScheduler_test.go",
+        "mmDrrScheduler_test.go",
+        "rrScheduler_test.go",
+        "scheduler_test.go",
+    ],
+    data = glob(["testdata/**"]),
+    embed = [":go_default_library"],
+    deps = [
+        "//go/border/qosqueues:go_default_library",
+    ],
+)
