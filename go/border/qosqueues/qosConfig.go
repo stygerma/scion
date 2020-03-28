@@ -4,11 +4,6 @@ import (
 	"github.com/scionproto/scion/go/lib/addr"
 )
 
-type Surplus struct {
-	Surplus  int
-	Payments []int
-}
-
 // InternalRouterConfig is what I am loading from the config file
 type InternalRouterConfig struct {
 	Queues           []PacketQueueInterface
