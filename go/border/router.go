@@ -23,8 +23,6 @@ import (
 	"github.com/scionproto/scion/go/border/brconf"
 	"github.com/scionproto/scion/go/border/internal/metrics"
 	"github.com/scionproto/scion/go/border/qos"
-	"github.com/scionproto/scion/go/border/qosqueues"
-	"github.com/scionproto/scion/go/border/qosscheduler"
 	"github.com/scionproto/scion/go/border/rcmn"
 	"github.com/scionproto/scion/go/border/rctrl"
 	"github.com/scionproto/scion/go/border/rctx"
@@ -39,8 +37,6 @@ import (
 
 const processBufCnt = 128
 
-const maxNotificationCount = 512
-
 // TODO: this path should be configure in br.toml
 const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
 
@@ -48,8 +44,6 @@ const noWorker = 1
 const workLength = 32
 
 var droppedPackets = 0
-
-var queueToUse = &qosqueues.ChannelPacketQueue{}
 
 // Router struct
 type Router struct {
@@ -91,6 +85,7 @@ type routerConfig struct {
 >>>>>>> Move ClassRule to qosqueues
 =======
 	// TODO: Put this configuration somewhere else
+<<<<<<< f03ea997fce1af649af243cb79390d70594c2605
 	config         qosqueues.InternalRouterConfig
 	schedul        qosscheduler.SchedulerInterface
 	legacyConfig   qosqueues.RouterConfig
@@ -98,6 +93,16 @@ type routerConfig struct {
 	workerChannels [](chan *qosqueues.QPkt)
 	forwarder      func(rp *rpkt.RtrPkt)
 >>>>>>> Put scheduler into its own package, but now there is an import cycle.
+=======
+	// config         qosqueues.InternalRouterConfig
+	// schedul        qosscheduler.SchedulerInterface
+	// legacyConfig   qosqueues.RouterConfig
+	// notifications  chan *qosqueues.NPkt
+	// workerChannels [](chan *qosqueues.QPkt)
+	// forwarder      func(rp *rpkt.RtrPkt)
+
+	qosConfig qos.QosConfiguration
+>>>>>>> Suggestion for new file structure
 }
 
 // NewRouter returns a new router
@@ -107,15 +112,9 @@ func NewRouter(id, confDir string) (*Router, error) {
 		return nil, err
 	}
 
-	r.initQueueing(configFileLocation)
-
-	return r, nil
-}
-
-func (r *Router) initQueueing(location string) {
-
 	//TODO: Figure out the actual path where the other config files are loaded --> this path should be configure in br.toml
 	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
+<<<<<<< f03ea997fce1af649af243cb79390d70594c2605
 	r.loadConfigFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
 
 	log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
@@ -123,20 +122,11 @@ func (r *Router) initQueueing(location string) {
 
 	r.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	r.forwarder = r.forwardPacket
+=======
+	r.qosConfig, _ = qos.InitQueueing(configFileLocation, r.forwardPacket)
+>>>>>>> Suggestion for new file structure
 
-	r.schedul = &qosscheduler.RoundRobinScheduler{}
-
-	go r.schedul.Dequeuer(r.config, r.forwarder)
-
-	r.workerChannels = make([]chan *qosqueues.QPkt, min(noWorker, len(r.config.Queues)))
-
-	for i := range r.workerChannels {
-		r.workerChannels[i] = make(chan *qosqueues.QPkt, workLength)
-
-		go worker(&r.workerChannels[i])
-	}
-
-	log.Debug("Finish init queueing")
+	return r, nil
 }
 
 // Start sets up networking, and starts go routines for handling the main packet
@@ -166,6 +156,12 @@ func (r *Router) ReloadConfig() error {
 	if err := r.setupCtxFromConfig(config); err != nil {
 		return common.NewBasicError("Unable to set up new context", err)
 	}
+<<<<<<< f03ea997fce1af649af243cb79390d70594c2605
+=======
+	if r.qosConfig, err = qos.InitQueueing(configFileLocation, r.forwardPacket); err != nil {
+		return common.NewBasicError("Unable to load QoS config", err)
+	}
+>>>>>>> Suggestion for new file structure
 	return nil
 }
 
@@ -251,6 +247,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
+<<<<<<< f03ea997fce1af649af243cb79390d70594c2605
 
 	r.qosConfig.QueuePacket(rp)
 }
@@ -264,6 +261,20 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 
 }
 
+=======
+	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
+	// if err := rp.Route(); err != nil {
+	// 	r.handlePktError(rp, err, "Error routing packet")
+	// 	l.Result = metrics.ErrRoute
+	// 	metrics.Process.Pkts(l).Inc()
+	// }
+
+	log.Debug("Should queue packet")
+	r.qosConfig.QueuePacket(rp)
+	// r.forwardPacket(rp);
+}
+
+>>>>>>> Suggestion for new file structure
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
 
@@ -276,63 +287,5 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 		}
 		l.Result = metrics.ErrRoute
 		metrics.Process.Pkts(l).Inc()
-	}
-}
-
-func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
-
-	log.Debug("preRouteStep")
-	log.Debug("We have rules: ", "len(Rules)", len(r.config.Rules))
-
-	queueNo := qosqueues.GetQueueNumberWithHashFor(&r.config, rp)
-	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
-
-	r.workerChannels[(queueNo % noWorker)] <- &qp
-
-}
-
-func worker(workChannel *chan *qosqueues.QPkt) {
-
-	for {
-		qp := <-*workChannel
-		queueNo := qp.QueueNo
-
-		log.Debug("Queuenumber is ", "queuenumber", queueNo)
-		log.Debug("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
-
-		putOnQueue(queueNo, qp)
-	}
-
-}
-
-func putOnQueue(queueNo int, qp *qosqueues.QPkt) {
-	polAct := r.config.Queues[queueNo].Police(qp)
-	profAct := r.config.Queues[queueNo].CheckAction()
-
-	act := qosqueues.ReturnAction(polAct, profAct)
-
-	switch act {
-	case qosqueues.PASS:
-		r.config.Queues[queueNo].Enqueue(qp)
-	case qosqueues.NOTIFY:
-		r.config.Queues[queueNo].Enqueue(qp)
-		r.sendNotification(qp)
-	case qosqueues.DROPNOTIFY:
-		r.dropPacket(qp.Rp)
-		r.sendNotification(qp)
-	case qosqueues.DROP:
-		r.dropPacket(qp.Rp)
-	default:
-		r.config.Queues[queueNo].Enqueue(qp)
-	}
-}
-
-func (r *Router) sendNotification(qp *qosqueues.QPkt) {
-
-	np := qosqueues.NPkt{Rule: qosqueues.GetRuleWithHashFor(&r.config, qp.Rp), Qpkt: qp}
-
-	select {
-	case r.notifications <- &np:
-	default:
 	}
 }
