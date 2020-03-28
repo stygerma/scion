@@ -40,11 +40,6 @@ const processBufCnt = 128
 // TODO: this path should be configure in br.toml
 const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
 
-const noWorker = 1
-const workLength = 32
-
-var droppedPackets = 0
-
 // Router struct
 type Router struct {
 	// Id is the SCION element ID, e.g. "br4-ff00:0:2f".
@@ -60,12 +55,12 @@ type Router struct {
 	// setCtxMtx serializes modifications to the router context. Topology updates
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
-
-	// TODO: Put this configuration somewhere else
-
+	// qosConfig holds all data structures and state required for the quality of service
+	// subsystem in the router
 	qosConfig qos.QosConfiguration
-
 }
+
+
 
 // NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
@@ -111,9 +106,6 @@ func (r *Router) ReloadConfig() error {
 	}
 	if err := r.setupCtxFromConfig(config); err != nil {
 		return common.NewBasicError("Unable to set up new context", err)
-	}
-	if r.qosConfig, err = qos.InitQueueing(configFileLocation, r.forwardPacket); err != nil {
-		return common.NewBasicError("Unable to load QoS config", err)
 	}
 	return nil
 }
@@ -200,6 +192,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
+<<<<<<< d10741ee0bebfdc0e0dde2767e0b40e613843681
 <<<<<<< f16301dffc0c16e207054bda4679d0e039854fdb
 	// TODO(joelfischerr): This is for the demo only. Remove this for the final PR.
 	if r.Id == "br1-ff00_0_113-1" || r.Id == "br1-ff00_0_112-1" {
@@ -211,6 +204,8 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	}
 =======
 <<<<<<< f03ea997fce1af649af243cb79390d70594c2605
+=======
+>>>>>>> Fixup! removed some commented out lines
 
 	r.qosConfig.QueuePacket(rp)
 >>>>>>> Suggestion for new file structure
@@ -225,7 +220,6 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 
 }
 
-=======
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	// if err := rp.Route(); err != nil {
 	// 	r.handlePktError(rp, err, "Error routing packet")
@@ -238,7 +232,6 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	// r.forwardPacket(rp);
 }
 
->>>>>>> Suggestion for new file structure
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
 
