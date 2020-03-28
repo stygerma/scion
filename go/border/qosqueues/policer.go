@@ -23,15 +23,30 @@ import (
 )
 
 type tokenBucket struct {
-	MaxBandWidth int // In bps
-	tokens       int // One token is 1 b
+	maxBandWidth int // In Bps
+	tokens       int // One token is 1 B
 	tokenSpent   int
 	lastRefill   time.Time
 	mutex        *sync.Mutex
 	CurrBW       uint64
 }
 
+func (tb *tokenBucket) Init(maxBandwidth int) {
+	tb.maxBandWidth = maxBandwidth
+	tb.tokens = maxBandwidth
+	tb.tokenSpent = 0
+	tb.lastRefill = time.Now()
+	tb.mutex = &sync.Mutex{}
+}
+
 func (tb *tokenBucket) refill() {
+
+	tb.mutex.Lock()
+	defer tb.mutex.Unlock()
+
+	log.Trace("Overall available bandwidth per second", "MaxBandWidth", tb.maxBandWidth)
+	log.Trace("Spent token in last period", "#tokens", tb.tokenSpent)
+	log.Trace("Available bandwidth before refill", "bandwidth", tb.tokens)
 
 	now := time.Now()
 
@@ -41,7 +56,7 @@ func (tb *tokenBucket) refill() {
 
 	if timeSinceLastUpdate > 100 {
 
-		newTokens := ((tb.MaxBandWidth) * int(timeSinceLastUpdate)) / (1000)
+		newTokens := ((tb.maxBandWidth) * int(timeSinceLastUpdate)) / (1000)
 		tb.lastRefill = now
 
 		log.Trace("Add new tokens", "#tokens", newTokens)
@@ -51,11 +66,42 @@ func (tb *tokenBucket) refill() {
 
 		tb.tokenSpent = 0
 
-		if tb.tokens+newTokens > tb.MaxBandWidth {
-			tb.tokens = tb.MaxBandWidth
+		if tb.tokens+newTokens > tb.maxBandWidth {
+			tb.tokens = tb.maxBandWidth
 		} else {
 			tb.tokens += newTokens
 		}
 	}
+
+	log.Trace("Available bandwidth after refill", "bandwidth", tb.tokens)
+
+}
+
+func (tb *tokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
+
+	tb.mutex.Lock()
+	defer tb.mutex.Unlock()
+
+	packetSize := (qp.Rp.Bytes().Len()) // In byte
+
+	tokenForPacket := packetSize * 8 // In bit
+
+	tb.refill()
+	log.Trace("Tokens necessary for packet", "tokens", tokenForPacket)
+	log.Trace("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
+
+	if tb.tokens-tokenForPacket > 0 {
+		tb.tokens = tb.tokens - tokenForPacket
+		tb.tokenSpent += tokenForPacket
+		qp.Act.action = PASS
+		qp.Act.reason = None
+	} else {
+		qp.Act.action = DROP
+		qp.Act.reason = BandWidthExceeded
+	}
+
+	log.Trace("Available bandwidth after update", "bandwidth", tb.tokens)
+
+	return qp.Act.action
 
 }
