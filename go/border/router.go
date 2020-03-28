@@ -40,11 +40,6 @@ const processBufCnt = 128
 // TODO: this path should be configure in br.toml
 const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
 
-const noWorker = 1
-const workLength = 32
-
-var droppedPackets = 0
-
 // Router struct
 type Router struct {
 	// Id is the SCION element ID, e.g. "br4-ff00:0:2f".
@@ -60,50 +55,12 @@ type Router struct {
 	// setCtxMtx serializes modifications to the router context. Topology updates
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
-<<<<<<< 9fe6884a06075d4213175d5498fd46b140b5d03e
 	// qosConfig holds all data structures and state required for the quality of service
 	// subsystem in the router
 	qosConfig qos.QosConfiguration
 }
 
-// routerConfig is what I am loading from the config file
-type routerConfig struct {
-	Queues           []qosqueues.PacketQueueInterface
-	Rules            []classRule
-	SourceRules      map[addr.IA][]*classRule
-	DestinationRules map[addr.IA][]*classRule
-=======
 
-<<<<<<< 1a0e0cc3f5b8eb1869b70b2fb2579fb32a8b0fd0
-	config              qosqueues.InternalRouterConfig
-	legacyConfig        qosqueues.RouterConfig
-	notifications       chan *qosqueues.NPkt
-	schedulerSurplus    qosqueues.Surplus
-	schedulerSurplusMtx sync.Mutex
-	workerChannels      [](chan *qosqueues.QPkt)
-	forwarder           func(rp *rpkt.RtrPkt)
->>>>>>> Move ClassRule to qosqueues
-=======
-	// TODO: Put this configuration somewhere else
-<<<<<<< f03ea997fce1af649af243cb79390d70594c2605
-	config         qosqueues.InternalRouterConfig
-	schedul        qosscheduler.SchedulerInterface
-	legacyConfig   qosqueues.RouterConfig
-	notifications  chan *qosqueues.NPkt
-	workerChannels [](chan *qosqueues.QPkt)
-	forwarder      func(rp *rpkt.RtrPkt)
->>>>>>> Put scheduler into its own package, but now there is an import cycle.
-=======
-	// config         qosqueues.InternalRouterConfig
-	// schedul        qosscheduler.SchedulerInterface
-	// legacyConfig   qosqueues.RouterConfig
-	// notifications  chan *qosqueues.NPkt
-	// workerChannels [](chan *qosqueues.QPkt)
-	// forwarder      func(rp *rpkt.RtrPkt)
-
-	qosConfig qos.QosConfiguration
->>>>>>> Suggestion for new file structure
-}
 
 // NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
@@ -114,17 +71,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 	//TODO: Figure out the actual path where the other config files are loaded --> this path should be configure in br.toml
 	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
-<<<<<<< f03ea997fce1af649af243cb79390d70594c2605
-	r.loadConfigFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
-
-	log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
-	log.Debug("We have rules: ", "numberOfRules", len(r.config.Rules))
-
-	r.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
-	r.forwarder = r.forwardPacket
-=======
 	r.qosConfig, _ = qos.InitQueueing(configFileLocation, r.forwardPacket)
->>>>>>> Suggestion for new file structure
 
 	return r, nil
 }
@@ -156,12 +103,6 @@ func (r *Router) ReloadConfig() error {
 	if err := r.setupCtxFromConfig(config); err != nil {
 		return common.NewBasicError("Unable to set up new context", err)
 	}
-<<<<<<< f03ea997fce1af649af243cb79390d70594c2605
-=======
-	if r.qosConfig, err = qos.InitQueueing(configFileLocation, r.forwardPacket); err != nil {
-		return common.NewBasicError("Unable to load QoS config", err)
-	}
->>>>>>> Suggestion for new file structure
 	return nil
 }
 
@@ -247,7 +188,6 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-<<<<<<< f03ea997fce1af649af243cb79390d70594c2605
 
 	r.qosConfig.QueuePacket(rp)
 }
@@ -261,7 +201,6 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 
 }
 
-=======
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	// if err := rp.Route(); err != nil {
 	// 	r.handlePktError(rp, err, "Error routing packet")
@@ -274,7 +213,6 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	// r.forwardPacket(rp);
 }
 
->>>>>>> Suggestion for new file structure
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
 
