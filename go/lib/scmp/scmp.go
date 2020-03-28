@@ -151,3 +151,13 @@ const (
 	RawExtHdrs
 	RawL4Hdr
 )
+
+//IMPL: Used to specify which parts to include in the congestion warning
+type InfoRestrictions int
+
+const (
+	Restrict        InfoRestrictions = iota //only include the interface
+	RestrictDynamic                         //include static info about queue
+	RestrictRule                            //include current BW and current fullness
+	RestrictNone                            //no restriction
+)

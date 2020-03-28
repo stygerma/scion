@@ -78,7 +78,7 @@ func (rp *RtrPkt) processSCMP() (HookResult, error) { //IMP: implement the behav
 				return HookError, err
 			}
 		}
-	/*case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_BasicCongWarn: //IMPL:
+	/*case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_BasicCongWarn: //IMPL: should not be necessary, as the router can just forward the packet like it's normally done
 		if err := rp.processSCMPBasicCongWarn(); err != nil {
 			return HookError, err
 		}

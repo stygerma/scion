@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/scionproto/scion/go/border/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/layers"
@@ -12,29 +13,30 @@ import (
 
 //Sends notification for each
 func (r *Router) bscNotify() {
-	for {
-		select {
-		case qp := <-r.notifications:
-			/*TODO: create scmp.BscCongWarn according to qp, the
-			restrictions imposed by the ISP and the current IF state*/
-			//TODO:	create SCMP message with createNotificationSCMP()
-			//if bscCW, err := do this in createNotificationSCMP
-			bscCW := r.createCongWarn(qp)
-			if rpkt, err := r.createNotificationSCMP(qp, bscCW); err != nil {
-				log.Debug("unable to create notification SCMP")
-			}
-			rpkt.Forward()
-		}
-
+	for np := range r.notifications {
+		//TODO:	create SCMP message with createNotificationSCMP()
+		bscCW := r.createCongWarn(np)
+		r.sendNotificationSCMP(np.Qpkt, bscCW)
 	}
 
 }
 
-func (r *Router) createNotificationSCMP(qp *QPkt, info scmp.Info) (*rpkt.RtrPkt, error) {
-	/*BC: basically just modification from the createSCMPErrorReply method
-	from border/error.go*/
+//Similar to PacketError method maybe could assign the approaches in here too
+func (r *Router) sendNotificationSCMP(qp *qosqueues.QPkt, info scmp.Info) {
 
-	sp, err := qp.rp.CreateReplyScnPkt()
+	notification, err := r.createSCMPNotification(qp, scmp.ClassType{Class: scmp.C_General, Type: scmp.T_G_BasicCongWarn}, info)
+	if err != nil {
+		log.Error("unable to create notification SCMP", "err", err)
+		return
+	}
+	notification.Route()
+
+}
+
+func (r *Router) createSCMPNotification(qp *qosqueues.QPkt,
+	ct scmp.ClassType, info scmp.Info) (*rpkt.RtrPkt, error) {
+
+	sp, err := qp.Rp.CreateReplyScnPkt()
 	if err != nil {
 		return nil, err
 	}
@@ -51,25 +53,37 @@ func (r *Router) createNotificationSCMP(qp *QPkt, info scmp.Info) (*rpkt.RtrPkt,
 	if err := drkeyExt.SetMAC()
 	*/
 
-	// sp.Pld = createPld(bscCongWarn)
-	// sp.L4 = scmp.NewHdr(&scmp.ClassType{scmp.Class: scmp.C_General, scmp.Type: scmp.T_G_BasicCongWarn}, sp.Pld.Len())
-	// return rp.CreateReply(sp)
+	sp.Pld = scmp.NotifyPld(info)
+	sp.L4 = scmp.NewHdr(scmp.ClassType{Class: scmp.C_General, Type: scmp.T_G_BasicCongWarn}, sp.Pld.Len())
+	return qp.Rp.CreateReply(sp)
 }
 
-/*
-func createPld() *scmp.Payload {
-	return
-}
-*/
-
-func (r *Router) createCongWarn(qp *QPkt) *scmp.InfoBscCW {
+//TODO: include information according to restrictions
+func (r *Router) createCongWarn(np *qosqueues.NPkt) *scmp.InfoBscCW {
+	restriction := r.config.Queues[np.Qpkt.QueueNo].GetCongestionWarning().InfoContent
+	if restriction > 3 {
+		log.Error("Unable to create congestion warning", "restriction on information content", restriction)
+		return nil
+	}
 	bscCW := &scmp.InfoBscCW{}
-	bscCW.CurrBW = r.config.Queues[qp.queueNo].tb.CurrBW
-	bscCW.QueueLength = uint64((r.config.Queues[qp.queueNo]).getLength())
-	bscCW.QueueFullness = uint64((r.config.Queues[qp.queueNo]).getFillLevel())
-	bscCW.ConsIngress = common.IFIDType(qp.rp.Ingress.IFID)
-	bscCW.Violation = uint64(qp.act.reason)
-
-	//TODO find way to include something that identifies the BR or its interface
+	bscCW.ConsIngress = common.IFIDType(np.Qpkt.Rp.Ingress.IfID)
+	/*EndHost, err := np.Qpkt.Rp.SrcHost()
+	if err != nil {
+		log.Error("Unable to create congestion warning", "restriction on information content", restriction)
+		return nil
+	}
+	bscCW.EndHost = EndHost*/
+	if restriction > 0 {
+		bscCW.QueueLength = uint64((r.config.Queues[np.Qpkt.QueueNo]).GetLength())
+	}
+	if restriction > 1 {
+		bscCW.CurrBW = r.config.Queues[np.Qpkt.QueueNo].GetTokenBucket().CurrBW
+		bscCW.QueueFullness = uint64((r.config.Queues[np.Qpkt.QueueNo]).GetFillLevel())
+	}
+	if restriction > 2 {
+		bscCW.Violation = uint64(np.Qpkt.Act.Reason)
+		bscCW.ClassRule = np.Qpkt.Act.Rule
+	}
+	//bscCW.ClassRule = np.Rule
 	return bscCW
 }
