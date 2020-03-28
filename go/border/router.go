@@ -24,6 +24,7 @@ import (
 	"github.com/scionproto/scion/go/border/internal/metrics"
 	"github.com/scionproto/scion/go/border/qos"
 	"github.com/scionproto/scion/go/border/qosqueues"
+	"github.com/scionproto/scion/go/border/qosscheduler"
 	"github.com/scionproto/scion/go/border/rcmn"
 	"github.com/scionproto/scion/go/border/rctrl"
 	"github.com/scionproto/scion/go/border/rctx"
@@ -79,6 +80,7 @@ type routerConfig struct {
 	DestinationRules map[addr.IA][]*classRule
 =======
 
+<<<<<<< 1a0e0cc3f5b8eb1869b70b2fb2579fb32a8b0fd0
 	config              qosqueues.InternalRouterConfig
 	legacyConfig        qosqueues.RouterConfig
 	notifications       chan *qosqueues.NPkt
@@ -87,6 +89,15 @@ type routerConfig struct {
 	workerChannels      [](chan *qosqueues.QPkt)
 	forwarder           func(rp *rpkt.RtrPkt)
 >>>>>>> Move ClassRule to qosqueues
+=======
+	// TODO: Put this configuration somewhere else
+	config         qosqueues.InternalRouterConfig
+	schedul        qosscheduler.SchedulerInterface
+	legacyConfig   qosqueues.RouterConfig
+	notifications  chan *qosqueues.NPkt
+	workerChannels [](chan *qosqueues.QPkt)
+	forwarder      func(rp *rpkt.RtrPkt)
+>>>>>>> Put scheduler into its own package, but now there is an import cycle.
 }
 
 // NewRouter returns a new router
@@ -113,7 +124,9 @@ func (r *Router) initQueueing(location string) {
 	r.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	r.forwarder = r.forwardPacket
 
-	go r.drrDequer()
+	r.schedul = &qosscheduler.RoundRobinScheduler{}
+
+	go r.schedul.Dequeuer(r.config, r.forwarder)
 
 	r.workerChannels = make([]chan *qosqueues.QPkt, min(noWorker, len(r.config.Queues)))
 
