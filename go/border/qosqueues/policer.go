@@ -84,7 +84,7 @@ func (tb *tokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
 
 	packetSize := (qp.Rp.Bytes().Len()) // In byte
 
-	tokenForPacket := packetSize * 8 // In bit
+	tokenForPacket := packetSize // In byte
 
 	tb.refill()
 	log.Trace("Tokens necessary for packet", "tokens", tokenForPacket)

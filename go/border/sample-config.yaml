@@ -29,7 +29,7 @@ Queues :
         id: 1
         CIR: 0 #Previously named min-bandwidth
         PIR: 70 #Previously named max-bandwidth
-        policeRate: 5000000 #5Mbit/s
+        policeRate: 5Mbps #5Mbit/s
         maxLength: 1024
         priority: 1
         congestionWarning:

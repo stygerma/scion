@@ -18,8 +18,6 @@ package main
 import (
 	"fmt"
 	"testing"
-
-	"github.com/scionproto/scion/go/lib/addr"
 )
 
 func TestLoadSampleConfig(t *testing.T) {
@@ -61,82 +59,84 @@ func TestLoadSampleConfig(t *testing.T) {
 	}
 }
 
-func TestMaps(t *testing.T) {
-	m := make(map[addr.IA]*InternalClassRule)
+// TODO: Move these tests somewhere else
 
-	IA1, _ := addr.IAFromString("1-ff00:0:110")
-	IA2, _ := addr.IAFromString("2-ff00:0:110")
-	IA3, _ := addr.IAFromString("3-ff00:0:110")
-	IA4, _ := addr.IAFromString("4-ff00:0:110")
+// func TestMaps(t *testing.T) {
+// 	m := make(map[addr.IA]*qosqueues.InternalClassRule)
 
-	rul1 := InternalClassRule{Name: "Hello Test", SourceAs: matchRule{IA: IA1}}
-	rul2 := InternalClassRule{Name: "Hello World", SourceAs: matchRule{IA: IA2}}
-	rul3 := InternalClassRule{Name: "Hello SCION", SourceAs: matchRule{IA: IA3}}
-	rul4 := InternalClassRule{Name: "Hello Internet", SourceAs: matchRule{IA: IA4}}
+// 	IA1, _ := addr.IAFromString("1-ff00:0:110")
+// 	IA2, _ := addr.IAFromString("2-ff00:0:110")
+// 	IA3, _ := addr.IAFromString("3-ff00:0:110")
+// 	IA4, _ := addr.IAFromString("4-ff00:0:110")
 
-	m[IA1] = &rul1
-	m[IA2] = &rul2
-	m[IA3] = &rul3
-	m[IA4] = &rul4
+// 	rul1 := InternalClassRule{Name: "Hello Test", SourceAs: matchRule{IA: IA1}}
+// 	rul2 := InternalClassRule{Name: "Hello World", SourceAs: matchRule{IA: IA2}}
+// 	rul3 := InternalClassRule{Name: "Hello SCION", SourceAs: matchRule{IA: IA3}}
+// 	rul4 := InternalClassRule{Name: "Hello Internet", SourceAs: matchRule{IA: IA4}}
 
-	search, _ := addr.IAFromString("3-ff00:0:110")
+// 	m[IA1] = &rul1
+// 	m[IA2] = &rul2
+// 	m[IA3] = &rul3
+// 	m[IA4] = &rul4
 
-	rule, found := m[search]
-	fmt.Println("We have found", found, rule)
+// 	search, _ := addr.IAFromString("3-ff00:0:110")
 
-	search, _ = addr.IAFromString("5-ff00:0:110")
+// 	rule, found := m[search]
+// 	fmt.Println("We have found", found, rule)
 
-	rule, found = m[search]
-	fmt.Println("We have found", found, rule)
+// 	search, _ = addr.IAFromString("5-ff00:0:110")
 
-	t.Errorf("See logs")
+// 	rule, found = m[search]
+// 	fmt.Println("We have found", found, rule)
 
-}
+// 	t.Errorf("See logs")
 
-func TestLoadingToMaps(t *testing.T) {
-	r, _ := setupTestRouter(t)
+// }
 
-	r.initQueueing("sample-config.yaml")
+// func TestLoadingToMaps(t *testing.T) {
+// 	r, _ := setupTestRouter(t)
 
-	r.config.SourceRules, r.config.DestinationRules = rulesToMap(r.config.Rules)
+// 	r.initQueueing("sample-config.yaml")
 
-	search, _ := addr.IAFromString("1-ff00:0:110")
-	rule, found := r.config.SourceRules[search]
-	fmt.Println("We have found", found, rule)
+// 	r.config.SourceRules, r.config.DestinationRules = rulesToMap(r.config.Rules)
 
-	if !found {
-		t.Errorf("See logs")
-	}
+// 	search, _ := addr.IAFromString("1-ff00:0:110")
+// 	rule, found := r.config.SourceRules[search]
+// 	fmt.Println("We have found", found, rule)
 
-	search, _ = addr.IAFromString("5-ff00:0:110")
-	rule, found = r.config.SourceRules[search]
-	fmt.Println("We have found", found, rule)
+// 	if !found {
+// 		t.Errorf("See logs")
+// 	}
 
-	if found {
-		t.Errorf("See logs")
-	}
+// 	search, _ = addr.IAFromString("5-ff00:0:110")
+// 	rule, found = r.config.SourceRules[search]
+// 	fmt.Println("We have found", found, rule)
 
-}
+// 	if found {
+// 		t.Errorf("See logs")
+// 	}
 
-func TestMatchingRules(t *testing.T) {
+// }
 
-	r, _ := setupTestRouter(t)
+// func TestMatchingRules(t *testing.T) {
 
-	r.initQueueing("sample-config.yaml")
+// 	r, _ := setupTestRouter(t)
 
-	srcAddr, _ := addr.IAFromString("1-ff00:0:110")
-	dstAddr, _ := addr.IAFromString("1-ff00:0:111")
+// 	r.initQueueing("sample-config.yaml")
 
-	queues1 := r.config.SourceRules[srcAddr]
-	queues2 := r.config.DestinationRules[dstAddr]
+// 	srcAddr, _ := addr.IAFromString("1-ff00:0:110")
+// 	dstAddr, _ := addr.IAFromString("1-ff00:0:111")
 
-	for _, rul1 := range queues1 {
-		for _, rul2 := range queues2 {
-			if rul1 == rul2 {
-				if rul1.QueueNumber != 2 {
-					t.Errorf("See logs")
-				}
-			}
-		}
-	}
-}
+// 	queues1 := r.config.SourceRules[srcAddr]
+// 	queues2 := r.config.DestinationRules[dstAddr]
+
+// 	for _, rul1 := range queues1 {
+// 		for _, rul2 := range queues2 {
+// 			if rul1 == rul2 {
+// 				if rul1.QueueNumber != 2 {
+// 					t.Errorf("See logs")
+// 				}
+// 			}
+// 		}
+// 	}
+// }
