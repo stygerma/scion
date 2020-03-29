@@ -35,7 +35,7 @@ Queues:
         priority: 1
         congestionWarning: {approach: 22, informationContent: 29}
         profile:
-            - {fill-level: 0, prob: 25, action: 2}
+            - {fill-level: 0, prob: 0, action: 2}
 Rules:
     -
         name: 'Test rule'
