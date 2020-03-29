@@ -39,10 +39,11 @@ func (tb *tokenBucket) Init(maxBandwidth int) {
 	tb.mutex = &sync.Mutex{}
 }
 
+// Only call this if you have a lock on tb!
 func (tb *tokenBucket) refill() {
 
-	tb.mutex.Lock()
-	defer tb.mutex.Unlock()
+	// tb.mutex.Lock()
+	// defer tb.mutex.Unlock()
 
 	log.Trace("Overall available bandwidth per second", "MaxBandWidth", tb.maxBandWidth)
 	log.Trace("Spent token in last period", "#tokens", tb.tokenSpent)
@@ -79,8 +80,12 @@ func (tb *tokenBucket) refill() {
 
 func (tb *tokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
 
+	log.Debug("PoliceBucket try to get lock")
+
 	tb.mutex.Lock()
 	defer tb.mutex.Unlock()
+
+	log.Debug("PoliceBucket got lock")
 
 	packetSize := (qp.Rp.Bytes().Len()) // In byte
 

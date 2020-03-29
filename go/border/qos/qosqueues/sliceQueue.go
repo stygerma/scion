@@ -31,11 +31,17 @@ func (pq *PacketSliceQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb
 
 func (pq *PacketSliceQueue) Enqueue(rp *QPkt) {
 
+	log.Debug("Packet Slice queue: Getting lock")
+
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
 
+	log.Debug("Packet Slice queue: Got lock")
+
 	pq.queue = append(pq.queue, rp)
 	pq.length = pq.length + 1
+
+	log.Debug("Finished appending")
 
 }
 
