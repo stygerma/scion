@@ -211,8 +211,8 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	// 	metrics.Process.Pkts(l).Inc()
 	// }
 
-	// log.Debug("Should queue packet")
 	r.qosConfig.QueuePacket(rp)
+
 	// r.forwardPacket(rp);
 }
 
