@@ -7,9 +7,7 @@ Queues:
         policeRate: 50000000
         maxLength: 1024
         priority: 5
-        congestionWarning:
-            approach: 3
-            informationContent: 1
+        congestionWarning: {approach: 0, informationContent: 25}
         profile:
             - {fill-level: 20, prob: 10, action: 0}
             - {fill-level: 50, prob: 20, action: 1}
@@ -22,13 +20,11 @@ Queues:
         policeRate: 5Mbps
         maxLength: 1024
         priority: 1
-        congestionWarning:
-            approach: 3
-            informationContent: 1
+        congestionWarning: {approach: 11, informationContent: 27}
         profile:
-            - {fill-level: 20, prob: 10, action: 0}
-            - {fill-level: 50, prob: 20, action: 1}
-            - {fill-level: 80, prob: 50, action: 2}
+            - {fill-level: 30, prob: 10, action: 0}
+            - {fill-level: 60, prob: 20, action: 1}
+            - {fill-level: 90, prob: 50, action: 2}
     -
         name: 'Droppy Queue'
         id: 2
@@ -37,9 +33,7 @@ Queues:
         policeRate: 5000000
         maxLength: 1024
         priority: 1
-        congestionWarning:
-            approach: 3
-            informationContent: 1
+        congestionWarning: {approach: 22, informationContent: 29}
         profile:
             - {fill-level: 0, prob: 25, action: 2}
 Rules:
