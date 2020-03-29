@@ -37,7 +37,7 @@ import (
 const processBufCnt = 128
 
 // TODO: this path should be configure in br.toml
-const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
+const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/testdata/sample-config.yaml"
 
 // Router struct
 type Router struct {
@@ -68,6 +68,8 @@ func NewRouter(id, confDir string) (*Router, error) {
 	//TODO: Figure out the actual path where the other config files are loaded --> this path should be configure in br.toml
 	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
 	r.qosConfig, _ = qos.InitQueueing(configFileLocation, r.forwardPacket)
+
+	// log.Debug("We have the congestion warning configuration", "queue 0", r.qosConfig.GetQueue(0).GetCongestionWarning())
 
 	return r, nil
 }
