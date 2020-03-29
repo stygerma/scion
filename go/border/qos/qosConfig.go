@@ -129,6 +129,13 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	log.Debug("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
 	log.Debug("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
 
+	select {
+	case *qosConfig.schedul.GetMessages() <- true:
+		log.Debug("sent message")
+	default:
+		log.Debug("no message sent")
+	}
+
 	qosConfig.SendToWorker(queueNo%qosConfig.worker.noWorker, &qp)
 
 	log.Debug("Finished QueuePacket")
