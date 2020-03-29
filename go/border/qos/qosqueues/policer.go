@@ -18,8 +18,6 @@ package qosqueues
 import (
 	"sync"
 	"time"
-
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 type tokenBucket struct {
@@ -39,29 +37,29 @@ func (tb *tokenBucket) Init(maxBandwidth int) {
 	tb.mutex = &sync.Mutex{}
 }
 
+// TODO: This uses a lot of resources on the dataplane. Put this onto a separate thread with a ticket updating all tockenBuckets.
 // Only call this if you have a lock on tb!
 func (tb *tokenBucket) refill() {
 
 	// tb.mutex.Lock()
 	// defer tb.mutex.Unlock()
 
-	log.Trace("Overall available bandwidth per second", "MaxBandWidth", tb.maxBandWidth)
-	log.Trace("Spent token in last period", "#tokens", tb.tokenSpent)
-	log.Trace("Available bandwidth before refill", "bandwidth", tb.tokens)
+	//log.Trace("Overall available bandwidth per second", "MaxBandWidth", tb.maxBandWidth)
+	//log.Trace("Spent token in last period", "#tokens", tb.tokenSpent)
+	//log.Trace("Available bandwidth before refill", "bandwidth", tb.tokens)
 
 	now := time.Now()
 
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
-	log.Trace("Last update was", "ms ago", timeSinceLastUpdate)
-
+	//log.Trace("Last update was", "ms ago", timeSinceLastUpdate)
 	if timeSinceLastUpdate > 100 {
 
 		newTokens := ((tb.maxBandWidth) * int(timeSinceLastUpdate)) / (1000)
 		tb.lastRefill = now
 
-		log.Trace("Add new tokens", "#tokens", newTokens)
-		log.Trace("On Update: Spent token in last period", "#tokens", tb.tokenSpent)
+		//log.Trace("Add new tokens", "#tokens", newTokens)
+		//log.Trace("On Update: Spent token in last period", "#tokens", tb.tokenSpent)
 
 		tb.CurrBW = uint64(tb.tokenSpent/int(timeSinceLastUpdate)) * 1000
 
@@ -74,7 +72,7 @@ func (tb *tokenBucket) refill() {
 		}
 	}
 
-	log.Trace("Available bandwidth after refill", "bandwidth", tb.tokens)
+	//log.Trace("Available bandwidth after refill", "bandwidth", tb.tokens)
 
 }
 
@@ -88,8 +86,8 @@ func (tb *tokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
 	tokenForPacket := packetSize // In byte
 
 	tb.refill()
-	log.Trace("Tokens necessary for packet", "tokens", tokenForPacket)
-	log.Trace("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
+	//log.Trace("Tokens necessary for packet", "tokens", tokenForPacket)
+	//log.Trace("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
 
 	if tb.tokens-tokenForPacket > 0 {
 		tb.tokens = tb.tokens - tokenForPacket
@@ -101,7 +99,7 @@ func (tb *tokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
 		qp.Act.reason = BandWidthExceeded
 	}
 
-	log.Trace("Available bandwidth after update", "bandwidth", tb.tokens)
+	//log.Trace("Available bandwidth after update", "bandwidth", tb.tokens)
 
 	return qp.Act.action
 
