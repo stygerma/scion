@@ -90,8 +90,8 @@ func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfigur
 		panic("Loading config file failed")
 	}
 
-	log.Trace("We have queues: ", "numberOfQueues", len(qConfig.config.Queues))
-	log.Trace("We have rules: ", "numberOfRules", len(qConfig.config.Rules))
+	//log.Trace("We have queues: ", "numberOfQueues", len(qConfig.config.Queues))
+	//log.Trace("We have rules: ", "numberOfRules", len(qConfig.config.Rules))
 
 	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
@@ -106,37 +106,39 @@ func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfigur
 	for i := range qConfig.workerChannels {
 		qConfig.workerChannels[i] = make(chan *qosqueues.QPkt, qConfig.worker.workLength)
 
-		log.Trace("Start worker", "workerno", i)
+		//log.Trace("Start worker", "workerno", i)
 		go worker(&qConfig, &qConfig.workerChannels[i])
 	}
 
-	log.Trace("Finish init queueing")
+	//log.Trace("Finish init queueing")
 
 	return qConfig, nil
 }
 
 func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 
-	log.Trace("preRouteStep")
-	log.Trace("We have rules: ", "len(Rules)", len(qosConfig.GetConfig().Rules))
+	//log.Trace("preRouteStep")
+	//log.Trace("We have rules: ", "len(Rules)", len(qosConfig.GetConfig().Rules))
 
 	queueNo := qosqueues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), rp)
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
-	log.Trace("Our packet is", "QPkt", qp)
-	log.Trace("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
-	log.Trace("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
+	//log.Trace("Our packet is", "QPkt", qp)
+	//log.Trace("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
+	//log.Trace("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
 
 	select {
 	case *qosConfig.schedul.GetMessages() <- true:
-		log.Trace("sent message")
+		//log.Trace("sent message")
 	default:
-		log.Trace("no message sent")
+		//log.Trace("no message sent")
 	}
 
-	qosConfig.SendToWorker(queueNo%qosConfig.worker.noWorker, &qp)
+	// qosConfig.SendToWorker(queueNo%qosConfig.worker.noWorker, &qp)
 
-	log.Trace("Finished QueuePacket")
+	putOnQueue(qosConfig, queueNo, &qp)
+
+	//log.Trace("Finished QueuePacket")
 
 }
 
@@ -194,7 +196,7 @@ func loadConfigFile(path string) (qosqueues.RouterConfig, qosqueues.InternalRout
 	var rc qosqueues.RouterConfig
 
 	// dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	// log.Trace("Current Path is", "path", dir)
+	// //log.Trace("Current Path is", "path", dir)
 
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -222,15 +224,15 @@ func loadConfigFile(path string) (qosqueues.RouterConfig, qosqueues.InternalRout
 
 		queueToUse := &qosqueues.PacketSliceQueue{}
 
-		log.Trace("We have loaded rc.Queues", "rc.Queues", rc.Queues)
-		log.Trace("We have gotten the queue", "externalQueue", extQue.CongWarning)
-		log.Trace("We have gotten the queue", "externalQueue", extQue.Name)
+		//log.Trace("We have loaded rc.Queues", "rc.Queues", rc.Queues)
+		//log.Trace("We have gotten the queue", "externalQueue", extQue.CongWarning)
+		//log.Trace("We have gotten the queue", "externalQueue", extQue.Name)
 		intQue = convertExternalToInteralQueue(extQue)
-		log.Trace("We have gotten the queue", "queue", intQue.CongWarning)
-		log.Trace("We have gotten the queue", "queue", intQue.Name)
+		//log.Trace("We have gotten the queue", "queue", intQue.CongWarning)
+		//log.Trace("We have gotten the queue", "queue", intQue.Name)
 		queueToUse.InitQueue(intQue, muta, mutb)
-		log.Trace("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().CongWarning)
-		log.Trace("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().Name)
+		//log.Trace("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().CongWarning)
+		//log.Trace("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().Name)
 		internalQueues = append(internalQueues, queueToUse)
 	}
 

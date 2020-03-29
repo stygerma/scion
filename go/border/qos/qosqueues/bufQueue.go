@@ -19,7 +19,6 @@ import (
 	"math/rand"
 	"sync"
 
-	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
 )
 
@@ -93,21 +92,22 @@ func (pq *PacketBufQueue) PopMultiple(number int) []*QPkt {
 	return retArr
 }
 
+// TODO: I suspect that rand.Intn isn't very fast. We can probably get by with worse random numbers
 func (pq *PacketBufQueue) CheckAction() PoliceAction {
 
 	level := pq.GetFillLevel()
 
-	log.Trace("Current level is", "level", level)
-	log.Trace("Profiles are", "profiles", pq.pktQue.Profile)
+	//log.Trace("Current level is", "level", level)
+	//log.Trace("Profiles are", "profiles", pq.pktQue.Profile)
 
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
-			log.Trace("Matched a rule!")
+			//log.Trace("Matched a rule!")
 			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
-				log.Trace("Take Action!")
+				//log.Trace("Take Action!")
 				return pq.pktQue.Profile[j].Action
 			}
-			log.Trace("Do not take Action")
+			//log.Trace("Do not take Action")
 
 		}
 	}
