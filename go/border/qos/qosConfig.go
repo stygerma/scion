@@ -80,7 +80,9 @@ func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfigur
 
 	qConfig := QosConfiguration{}
 
-	qConfig.worker = workerConfiguration{1, 64}
+	noWorkers := max(1, min(3, len(qConfig.config.Queues)))
+
+	qConfig.worker = workerConfiguration{noWorkers, 64}
 
 	var err error
 	qConfig.legacyConfig, qConfig.config, err = loadConfigFile(location)
@@ -101,14 +103,13 @@ func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfigur
 
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
-	qConfig.workerChannels = make([]chan *qosqueues.QPkt, min(qConfig.worker.noWorker, len(qConfig.config.Queues)))
+	qConfig.workerChannels = make([]chan *qosqueues.QPkt, qConfig.worker.noWorker)
 
 	for i := range qConfig.workerChannels {
 		qConfig.workerChannels[i] = make(chan *qosqueues.QPkt, qConfig.worker.workLength)
 
 		log.Debug("Start worker", "workerno", i)
-		// TODO: Readd this
-		// go worker(&qConfig, &qConfig.workerChannels[i])
+		go worker(&qConfig, &qConfig.workerChannels[i])
 	}
 
 	log.Debug("Finish init queueing")
@@ -125,12 +126,10 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
 	log.Debug("Our packet is", "QPkt", qp)
+	log.Debug("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
 	log.Debug("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
 
-	// qosConfig.SendToWorker(queueNo%qosConfig.worker.noWorker, &qp)
-	// qosConfig.SendToWorker(0, &qp)
-	qosConfig.SendToWorker(0, &qp)
-	worker(qosConfig, &qosConfig.workerChannels[0])
+	qosConfig.SendToWorker(queueNo%qosConfig.worker.noWorker, &qp)
 
 	log.Debug("Finished QueuePacket")
 
@@ -139,19 +138,18 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 func worker(qosConfig *QosConfiguration, workChannel *chan *qosqueues.QPkt) {
 
 	log.Debug("Started worker")
-	// TODO: Add this again
-	// for {
-	log.Debug("Worker Waiting for new packet")
-	qp := <-*workChannel
-	log.Debug("Worker Received new packet")
-	queueNo := qp.QueueNo
+	for {
+		log.Debug("Worker Waiting for new packet")
+		qp := <-*workChannel
+		log.Debug("Worker Received new packet")
+		queueNo := qp.QueueNo
 
-	log.Debug("Queuenumber is", "queuenumber", queueNo)
-	log.Debug("Queue length is", "len(r.config.Queues)", len(qosConfig.config.Queues))
+		log.Debug("Queuenumber is", "queuenumber", queueNo)
+		log.Debug("Queue length is", "len(r.config.Queues)", len(qosConfig.config.Queues))
 
-	log.Debug("Worker calling putOnQueue", "queueNo", queueNo, "packet", qp)
-	putOnQueue(qosConfig, queueNo, qp)
-	// }
+		log.Debug("Worker calling putOnQueue", "queueNo", queueNo, "packet", qp)
+		putOnQueue(qosConfig, queueNo, qp)
+	}
 
 }
 
