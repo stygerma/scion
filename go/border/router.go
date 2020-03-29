@@ -37,7 +37,7 @@ import (
 const processBufCnt = 128
 
 // TODO: this path should be configure in br.toml
-const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/testdata/sample-config.yaml"
+const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml"
 
 // Router struct
 type Router struct {
