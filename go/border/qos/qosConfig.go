@@ -79,6 +79,9 @@ func (q *QosConfiguration) GetLegacyConfig() *qosqueues.RouterConfig {
 func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {
 
 	qConfig := QosConfiguration{}
+
+	qConfig.worker = workerConfiguration{3, 32}
+
 	var err error
 	qConfig.legacyConfig, qConfig.config, err = loadConfigFile(location)
 
@@ -205,7 +208,10 @@ func loadConfigFile(path string) (qosqueues.RouterConfig, qosqueues.InternalRout
 	for _, extQue := range rc.Queues {
 		muta := &sync.Mutex{}
 		mutb := &sync.Mutex{}
+		log.Debug("We have loaded rc.Queues", "rc.Queues", rc.Queues)
+		log.Debug("We have gotten the queue", "externalQueue", extQue.CongWarning)
 		intQue := convertExternalToInteralQueue(extQue)
+		log.Debug("We have gotten the queue", "queue", intQue.CongWarning)
 		queueToUse.InitQueue(intQue, muta, mutb)
 		internalQueues = append(internalQueues, queueToUse)
 	}
