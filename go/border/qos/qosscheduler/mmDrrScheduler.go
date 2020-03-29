@@ -15,6 +15,7 @@ type MinMaxDeficitRoundRobinScheduler struct {
 	totalLength         int
 	schedulerSurplus    surplus
 	schedulerSurplusMtx *sync.Mutex
+	messages            chan bool
 }
 
 type surplus struct {
@@ -113,4 +114,8 @@ func (sched *MinMaxDeficitRoundRobinScheduler) surplusAvailable() bool {
 	defer sched.schedulerSurplusMtx.Unlock()
 
 	return sched.schedulerSurplus.Surplus > 0
+}
+
+func (sched *MinMaxDeficitRoundRobinScheduler) GetMessages() *chan bool {
+	return &sched.messages
 }
