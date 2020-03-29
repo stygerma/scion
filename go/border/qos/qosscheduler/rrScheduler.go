@@ -5,7 +5,6 @@ import (
 
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 type RoundRobinScheduler struct {
@@ -25,7 +24,6 @@ func (sched *RoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConf
 func (sched *RoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	length := routerConfig.Queues[queueNo].GetLength()
-	log.Debug("The queue has length", "length", length)
 
 	if length > 0 {
 		qps := routerConfig.Queues[queueNo].PopMultiple(length)
