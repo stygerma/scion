@@ -51,7 +51,9 @@ type workerConfiguration struct {
 }
 
 func (q *QosConfiguration) SendToWorker(i int, qpkt *qosqueues.QPkt) {
+	log.Debug("Start sending to worker")
 	q.workerChannels[i] <- qpkt
+	log.Debug("Finished sending to worker")
 }
 
 func (q *QosConfiguration) GetWorkerChannels() *[](chan *qosqueues.QPkt) {
@@ -78,7 +80,7 @@ func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfigur
 
 	qConfig := QosConfiguration{}
 
-	qConfig.worker = workerConfiguration{3, 32}
+	qConfig.worker = workerConfiguration{1, 64}
 
 	var err error
 	qConfig.legacyConfig, qConfig.config, err = loadConfigFile(location)
@@ -95,6 +97,7 @@ func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfigur
 	qConfig.Forwarder = forwarder
 
 	qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
+	qConfig.schedul.Init(qConfig.config)
 
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
@@ -103,7 +106,9 @@ func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfigur
 	for i := range qConfig.workerChannels {
 		qConfig.workerChannels[i] = make(chan *qosqueues.QPkt, qConfig.worker.workLength)
 
-		go worker(&qConfig, &qConfig.workerChannels[i])
+		log.Debug("Start worker", "workerno", i)
+		// TODO: Readd this
+		// go worker(&qConfig, &qConfig.workerChannels[i])
 	}
 
 	log.Debug("Finish init queueing")
@@ -119,40 +124,62 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	queueNo := qosqueues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), rp)
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
-	qosConfig.SendToWorker(queueNo%qosConfig.worker.noWorker, &qp)
+	log.Debug("Our packet is", "QPkt", qp)
+	log.Debug("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
+
+	// qosConfig.SendToWorker(queueNo%qosConfig.worker.noWorker, &qp)
+	// qosConfig.SendToWorker(0, &qp)
+	qosConfig.SendToWorker(0, &qp)
+	worker(qosConfig, &qosConfig.workerChannels[0])
+
+	log.Debug("Finished QueuePacket")
 
 }
 
 func worker(qosConfig *QosConfiguration, workChannel *chan *qosqueues.QPkt) {
 
-	for {
-		qp := <-*workChannel
-		queueNo := qp.QueueNo
+	log.Debug("Started worker")
+	// TODO: Add this again
+	// for {
+	log.Debug("Worker Waiting for new packet")
+	qp := <-*workChannel
+	log.Debug("Worker Received new packet")
+	queueNo := qp.QueueNo
 
-		log.Debug("Queuenumber is ", "queuenumber", queueNo)
-		log.Debug("Queue length is ", "len(r.config.Queues)", len(qosConfig.config.Queues))
+	log.Debug("Queuenumber is", "queuenumber", queueNo)
+	log.Debug("Queue length is", "len(r.config.Queues)", len(qosConfig.config.Queues))
 
-		putOnQueue(qosConfig, queueNo, qp)
-	}
+	log.Debug("Worker calling putOnQueue", "queueNo", queueNo, "packet", qp)
+	putOnQueue(qosConfig, queueNo, qp)
+	// }
 
 }
 
 func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *qosqueues.QPkt) {
+	log.Debug("putOnQueue")
 	polAct := qosConfig.config.Queues[queueNo].Police(qp)
+	log.Debug("Got polAct")
 	profAct := qosConfig.config.Queues[queueNo].CheckAction()
+	log.Debug("Got profAct")
 
 	act := qosqueues.ReturnAction(polAct, profAct)
 
+	log.Debug("Action is", "act", act)
+
 	switch act {
 	case qosqueues.PASS:
+		log.Debug("pass")
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	case qosqueues.NOTIFY:
+		log.Debug("Notify")
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 		qosConfig.SendNotification(qp)
 	case qosqueues.DROPNOTIFY:
+		log.Debug("DROPNOTIFY")
 		qosConfig.dropPacket(qp.Rp)
 		qosConfig.SendNotification(qp)
 	case qosqueues.DROP:
+		log.Debug("DROP")
 		qosConfig.dropPacket(qp.Rp)
 	default:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
@@ -210,7 +237,7 @@ func loadConfigFile(path string) (qosqueues.RouterConfig, qosqueues.InternalRout
 		muta := &sync.Mutex{}
 		mutb := &sync.Mutex{}
 
-		queueToUse := &qosqueues.ChannelPacketQueue{}
+		queueToUse := &qosqueues.PacketSliceQueue{}
 
 		log.Debug("We have loaded rc.Queues", "rc.Queues", rc.Queues)
 		log.Debug("We have gotten the queue", "externalQueue", extQue.CongWarning)
@@ -246,6 +273,7 @@ func convertExternalToInteralQueue(extQueue qosqueues.ExternalPacketQueue) qosqu
 		MinBandwidth: extQueue.MinBandwidth,
 		MaxBandWidth: extQueue.MaxBandWidth,
 		PoliceRate:   convStringToNumber(extQueue.PoliceRate),
+		MaxLength:    extQueue.MaxLength,
 		Priority:     extQueue.Priority,
 		CongWarning:  extQueue.CongWarning,
 		Profile:      extQueue.Profile,
