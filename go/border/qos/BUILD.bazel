@@ -19,17 +19,12 @@ go_library(
 go_test(
     name = "go_default_test",
     srcs = [
-        "bufQueue_test.go",
-        "channelQueue_test.go",
-        "classRule_test.go",
-        "customQueue_test.go",
         "queue_test.go",
-        "sliceQueue_test.go",
-        "policer_test.go"
     ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
     deps = [
         "//go/border/qos/qosqueues:go_default_library",
+        "//go/border/qos/qosscheduler:go_default_library",
     ],
 )

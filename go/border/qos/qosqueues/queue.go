@@ -81,9 +81,14 @@ type actionProfile struct {
 type congestionWarningApproach int
 type congestionWarningInformationContent int
 
+// type CongestionWarning struct {
+// 	approach    congestionWarningApproach           `yaml:"approach"`
+// 	infoContent congestionWarningInformationContent `yaml:"informationContent"`
+// }
+
 type CongestionWarning struct {
-	approach    congestionWarningApproach           `yaml:"approach"`
-	infoContent congestionWarningInformationContent `yaml:"informationContent"`
+	Approach    congestionWarningApproach           `yaml:"approach"`
+	InfoContent congestionWarningInformationContent `yaml:"informationContent"`
 }
 
 type ExternalPacketQueue struct {
