@@ -237,6 +237,8 @@ func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
 
+	log.Debug("Forwarding packet")
+
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
 		r.handlePktError(rp, err, "Error routing packet")

@@ -44,7 +44,9 @@ func (sched *deficitRoundRobinScheduler) dequeue(routerConfig qosqueues.Internal
 }
 
 func (sched *deficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
-
+	if sched.totalLength == 0 {
+		panic("There are no queues to dequeue from. Please check that Init is called")
+	}
 	for {
 		for i := 0; i < sched.totalLength; i++ {
 			sched.dequeue(routerConfig, forwarder, i)
