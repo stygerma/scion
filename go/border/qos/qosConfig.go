@@ -30,8 +30,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var queueToUse = &qosqueues.ChannelPacketQueue{}
-
 const maxNotificationCount = 512
 
 type QosConfiguration struct {
@@ -205,15 +203,33 @@ func loadConfigFile(path string) (qosqueues.RouterConfig, qosqueues.InternalRout
 		internalRules = append(internalRules, intRule)
 	}
 
+	var intQue qosqueues.PacketQueue
+
 	for _, extQue := range rc.Queues {
+
 		muta := &sync.Mutex{}
 		mutb := &sync.Mutex{}
+
+		queueToUse := &qosqueues.ChannelPacketQueue{}
+
 		log.Debug("We have loaded rc.Queues", "rc.Queues", rc.Queues)
 		log.Debug("We have gotten the queue", "externalQueue", extQue.CongWarning)
-		intQue := convertExternalToInteralQueue(extQue)
+		log.Debug("We have gotten the queue", "externalQueue", extQue.Name)
+		intQue = convertExternalToInteralQueue(extQue)
 		log.Debug("We have gotten the queue", "queue", intQue.CongWarning)
+		log.Debug("We have gotten the queue", "queue", intQue.Name)
 		queueToUse.InitQueue(intQue, muta, mutb)
+		log.Debug("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().CongWarning)
+		log.Debug("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().Name)
 		internalQueues = append(internalQueues, queueToUse)
+	}
+
+	log.Debug("Loop over queues")
+	for _, iq := range internalQueues {
+
+		log.Debug("We have gotten the queue", "queue", iq.GetPacketQueue().CongWarning)
+		log.Debug("We have gotten the queue", "queue", iq.GetPacketQueue().Name)
+
 	}
 
 	// r.legacyConfig = rc
