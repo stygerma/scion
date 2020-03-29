@@ -38,7 +38,6 @@ func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouter
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
 	for {
-		log.Debug("New round on the scheduler!", "length of queues is", sched.totalLength)
 		time.Sleep(500 * time.Millisecond)
 		for i := 0; i < sched.totalLength; i++ {
 			sched.dequeue(routerConfig, forwarder, i)
