@@ -61,7 +61,8 @@ type Router struct {
 // NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
 	r := &Router{Id: id, confDir: confDir}
-	if err := r.setup(); err != nil {
+	var err error
+	if err = r.setup(); err != nil {
 		return nil, err
 	}
 
@@ -71,7 +72,7 @@ func NewRouter(id, confDir string) (*Router, error) {
 
 	// log.Debug("We have the congestion warning configuration", "queue 0", r.qosConfig.GetQueue(0).GetCongestionWarning())
 
-	return r, nil
+	return r, err
 }
 
 // Start sets up networking, and starts go routines for handling the main packet
