@@ -80,12 +80,8 @@ func (tb *tokenBucket) refill() {
 
 func (tb *tokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
 
-	log.Debug("PoliceBucket try to get lock")
-
 	tb.mutex.Lock()
 	defer tb.mutex.Unlock()
-
-	log.Debug("PoliceBucket got lock")
 
 	packetSize := (qp.Rp.Bytes().Len()) // In byte
 
