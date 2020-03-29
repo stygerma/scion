@@ -11,6 +11,7 @@ import (
 type deficitRoundRobinScheduler struct {
 	quantumSum  int
 	totalLength int
+	messages    chan bool
 }
 
 var _ SchedulerInterface = (*deficitRoundRobinScheduler)(nil)
@@ -52,4 +53,8 @@ func (sched *deficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.Interna
 			sched.dequeue(routerConfig, forwarder, i)
 		}
 	}
+}
+
+func (sched *deficitRoundRobinScheduler) GetMessages() *chan bool {
+	return &sched.messages
 }

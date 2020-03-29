@@ -24,6 +24,7 @@ type SchedulerInterface interface {
 	Init(routerConfig qosqueues.InternalRouterConfig)
 	Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt))
 	dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int)
+	GetMessages() *chan bool
 }
 
 func max(a, b int) int {
