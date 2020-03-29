@@ -51,9 +51,7 @@ type workerConfiguration struct {
 }
 
 func (q *QosConfiguration) SendToWorker(i int, qpkt *qosqueues.QPkt) {
-	log.Debug("Start sending to worker")
 	q.workerChannels[i] <- qpkt
-	log.Debug("Finished sending to worker")
 }
 
 func (q *QosConfiguration) GetWorkerChannels() *[](chan *qosqueues.QPkt) {
@@ -92,8 +90,8 @@ func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfigur
 		panic("Loading config file failed")
 	}
 
-	log.Debug("We have queues: ", "numberOfQueues", len(qConfig.config.Queues))
-	log.Debug("We have rules: ", "numberOfRules", len(qConfig.config.Rules))
+	log.Trace("We have queues: ", "numberOfQueues", len(qConfig.config.Queues))
+	log.Trace("We have rules: ", "numberOfRules", len(qConfig.config.Rules))
 
 	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
@@ -108,83 +106,64 @@ func InitQueueing(location string, forwarder func(rp *rpkt.RtrPkt)) (QosConfigur
 	for i := range qConfig.workerChannels {
 		qConfig.workerChannels[i] = make(chan *qosqueues.QPkt, qConfig.worker.workLength)
 
-		log.Debug("Start worker", "workerno", i)
+		log.Trace("Start worker", "workerno", i)
 		go worker(&qConfig, &qConfig.workerChannels[i])
 	}
 
-	log.Debug("Finish init queueing")
+	log.Trace("Finish init queueing")
 
 	return qConfig, nil
 }
 
 func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 
-	log.Debug("preRouteStep")
-	log.Debug("We have rules: ", "len(Rules)", len(qosConfig.GetConfig().Rules))
+	log.Trace("preRouteStep")
+	log.Trace("We have rules: ", "len(Rules)", len(qosConfig.GetConfig().Rules))
 
 	queueNo := qosqueues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), rp)
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
-	log.Debug("Our packet is", "QPkt", qp)
-	log.Debug("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
-	log.Debug("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
+	log.Trace("Our packet is", "QPkt", qp)
+	log.Trace("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
+	log.Trace("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
 
 	select {
 	case *qosConfig.schedul.GetMessages() <- true:
-		log.Debug("sent message")
+		log.Trace("sent message")
 	default:
-		log.Debug("no message sent")
+		log.Trace("no message sent")
 	}
 
 	qosConfig.SendToWorker(queueNo%qosConfig.worker.noWorker, &qp)
 
-	log.Debug("Finished QueuePacket")
+	log.Trace("Finished QueuePacket")
 
 }
 
 func worker(qosConfig *QosConfiguration, workChannel *chan *qosqueues.QPkt) {
-
-	log.Debug("Started worker")
 	for {
-		log.Debug("Worker Waiting for new packet")
 		qp := <-*workChannel
-		log.Debug("Worker Received new packet")
 		queueNo := qp.QueueNo
-
-		log.Debug("Queuenumber is", "queuenumber", queueNo)
-		log.Debug("Queue length is", "len(r.config.Queues)", len(qosConfig.config.Queues))
-
-		log.Debug("Worker calling putOnQueue", "queueNo", queueNo, "packet", qp)
 		putOnQueue(qosConfig, queueNo, qp)
 	}
-
 }
 
 func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *qosqueues.QPkt) {
-	log.Debug("putOnQueue")
 	polAct := qosConfig.config.Queues[queueNo].Police(qp)
-	log.Debug("Got polAct")
 	profAct := qosConfig.config.Queues[queueNo].CheckAction()
-	log.Debug("Got profAct")
 
 	act := qosqueues.ReturnAction(polAct, profAct)
 
-	log.Debug("Action is", "act", act)
-
 	switch act {
 	case qosqueues.PASS:
-		log.Debug("pass")
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	case qosqueues.NOTIFY:
-		log.Debug("Notify")
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 		qosConfig.SendNotification(qp)
 	case qosqueues.DROPNOTIFY:
-		log.Debug("DROPNOTIFY")
 		qosConfig.dropPacket(qp.Rp)
 		qosConfig.SendNotification(qp)
 	case qosqueues.DROP:
-		log.Debug("DROP")
 		qosConfig.dropPacket(qp.Rp)
 	default:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
@@ -203,8 +182,7 @@ func (qosConfig *QosConfiguration) SendNotification(qp *qosqueues.QPkt) {
 
 func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
-	qosConfig.droppedPackets += 1
-	log.Debug("Dropped Packet", "dropped", qosConfig.droppedPackets)
+	qosConfig.droppedPackets++
 
 }
 
@@ -216,7 +194,7 @@ func loadConfigFile(path string) (qosqueues.RouterConfig, qosqueues.InternalRout
 	var rc qosqueues.RouterConfig
 
 	// dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-	// log.Debug("Current Path is", "path", dir)
+	// log.Trace("Current Path is", "path", dir)
 
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -244,23 +222,23 @@ func loadConfigFile(path string) (qosqueues.RouterConfig, qosqueues.InternalRout
 
 		queueToUse := &qosqueues.PacketSliceQueue{}
 
-		log.Debug("We have loaded rc.Queues", "rc.Queues", rc.Queues)
-		log.Debug("We have gotten the queue", "externalQueue", extQue.CongWarning)
-		log.Debug("We have gotten the queue", "externalQueue", extQue.Name)
+		log.Trace("We have loaded rc.Queues", "rc.Queues", rc.Queues)
+		log.Trace("We have gotten the queue", "externalQueue", extQue.CongWarning)
+		log.Trace("We have gotten the queue", "externalQueue", extQue.Name)
 		intQue = convertExternalToInteralQueue(extQue)
-		log.Debug("We have gotten the queue", "queue", intQue.CongWarning)
-		log.Debug("We have gotten the queue", "queue", intQue.Name)
+		log.Trace("We have gotten the queue", "queue", intQue.CongWarning)
+		log.Trace("We have gotten the queue", "queue", intQue.Name)
 		queueToUse.InitQueue(intQue, muta, mutb)
-		log.Debug("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().CongWarning)
-		log.Debug("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().Name)
+		log.Trace("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().CongWarning)
+		log.Trace("We have gotten the queue", "channelPacketQueue", queueToUse.GetPacketQueue().Name)
 		internalQueues = append(internalQueues, queueToUse)
 	}
 
-	log.Debug("Loop over queues")
+	log.Trace("Loop over queues")
 	for _, iq := range internalQueues {
 
-		log.Debug("We have gotten the queue", "queue", iq.GetPacketQueue().CongWarning)
-		log.Debug("We have gotten the queue", "queue", iq.GetPacketQueue().Name)
+		log.Trace("We have gotten the queue", "queue", iq.GetPacketQueue().CongWarning)
+		log.Trace("We have gotten the queue", "queue", iq.GetPacketQueue().Name)
 
 	}
 
