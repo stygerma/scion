@@ -46,6 +46,17 @@ const (
 	PrimeDROPNOTIFY PrimePoliceAction = 13
 )
 
+type QPkt struct {
+	QueueNo int
+	Act     Action
+	Rp      *rpkt.RtrPkt
+}
+
+type NPkt struct {
+	Rule *InternalClassRule
+	Qpkt *QPkt
+}
+
 type Violation int
 
 const (
@@ -59,17 +70,6 @@ type Action struct {
 	rule   *InternalClassRule
 	reason Violation
 	action PoliceAction
-}
-
-type QPkt struct {
-	QueueNo int
-	Act     Action
-	Rp      *rpkt.RtrPkt
-}
-
-type NPkt struct {
-	Rule *InternalClassRule
-	Qpkt *QPkt
 }
 
 type actionProfile struct {
