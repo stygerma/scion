@@ -10,6 +10,7 @@ import (
 
 type RoundRobinScheduler struct {
 	totalLength int
+	messages    chan bool
 }
 
 var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
@@ -18,6 +19,7 @@ var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
 
 func (sched *RoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConfig) {
 	sched.totalLength = len(routerConfig.Queues)
+	sched.messages = make(chan bool)
 }
 
 func (sched *RoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
@@ -38,9 +40,14 @@ func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouter
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
 	for {
-		time.Sleep(500 * time.Millisecond)
+		<-sched.messages
+		time.Sleep(100 * time.Millisecond)
 		for i := 0; i < sched.totalLength; i++ {
 			sched.dequeue(routerConfig, forwarder, i)
 		}
 	}
+}
+
+func (sched *RoundRobinScheduler) GetMessages() *chan bool {
+	return &sched.messages
 }
