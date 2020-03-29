@@ -191,8 +191,8 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		return
 	}
 
-	// log.Debug("Should queue packet")
 	r.qosConfig.QueuePacket(rp)
+
 	// r.forwardPacket(rp);
 }
 
