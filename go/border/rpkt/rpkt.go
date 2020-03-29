@@ -131,8 +131,8 @@ type RtrPkt struct {
 }
 
 func NewRtrPkt() *RtrPkt {
-	r := &RtrPkt{}                            //MS: memory address of new Rtrpkt-Struct with uninitialized fields
-	r.Raw = make(common.RawBytes, pktBufSize) //MS create slice of type Byte and len = pktBufsize which is about 64 kb
+	r := &RtrPkt{}
+	r.Raw = make(common.RawBytes, pktBufSize)
 	r.refCnt = 1
 	return r
 }

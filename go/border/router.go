@@ -38,7 +38,7 @@ const processBufCnt = 128
 
 const maxNotificationCount = 512
 
-const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
+const configFileLocation = "/home/marc/go/src/github.com/scionproto/scion/go/border/sample-config.yaml"
 
 const noWorker = 1
 const workLength = 32
@@ -95,8 +95,8 @@ func (r *Router) initQueueing(location string) {
 		panic("Loading config file failed")
 	}
 
-	log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
-	log.Debug("We have rules: ", "numberOfRules", len(r.config.Rules))
+	//log.Debug("We have queues: ", "numberOfQueues", len(r.config.Queues))
+	//log.Debug("We have rules: ", "numberOfRules", len(r.config.Rules))
 
 	r.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	r.forwarder = r.forwardPacket
@@ -111,7 +111,7 @@ func (r *Router) initQueueing(location string) {
 		go worker(&r.workerChannels[i])
 	}
 
-	log.Debug("Finish init queueing")
+	//log.Debug("Finish init queueing")
 }
 
 // Start sets up networking, and starts go routines for handling the main packet
@@ -194,14 +194,14 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	rp.Logger = log.New("rpkt", rp.Id)
 	// XXX(kormat): uncomment for debugging:
 	//rp.Debug("processPacket", "raw", rp.Raw)
-	rp.Debug("new Packet processing", "rpkt", rp) //MS
+	//rp.Debug("new Packet processing", "rpkt", rp) //MS
 	if err := rp.Parse(); err != nil {
 		r.handlePktError(rp, err, "Error parsing packet")
 		l.Result = metrics.ErrParse
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-	log.Debug("packet parsed", "rpkt", rp) //MS
+	//log.Debug("packet parsed", "rpkt", rp) //MS
 	// Validation looks for errors in the packet that didn't break basic
 	// parsing.
 	valid, err := rp.Validate()
@@ -211,7 +211,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-	log.Debug("packet validated", "rpkt", rp) //MS
+	//log.Debug("packet validated", "rpkt", rp) //MS
 	if !valid {
 		rp.Error("Error validating packet, no specific error")
 		l.Result = metrics.ErrValidate
@@ -220,7 +220,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	}
 	// Check if the packet needs to be processed locally, and if so register hooks for doing so.
 	rp.NeedsLocalProcessing()
-	log.Debug("packet checked for local processing", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
+	//log.Debug("packet checked for local processing", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
 	// Parse the packet payload, if a previous step has registered a relevant hook for doing so.
 	if _, err := rp.Payload(true); err != nil {
 		// Any errors at this point are application-level, and hence not
@@ -230,7 +230,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-	log.Debug("packet payload checked if necessary", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
+	//log.Debug("packet payload checked if necessary", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
 	// Process the packet, if a previous step has registered a relevant hook for doing so.
 	if err := rp.Process(); err != nil {
 		r.handlePktError(rp, err, "Error processing packet")
@@ -238,7 +238,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-	log.Debug("processed packet if necessary", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
+	//log.Debug("processed packet if necessary", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	// if err := rp.Route(); err != nil {
 	// 	r.handlePktError(rp, err, "Error routing packet")
@@ -246,7 +246,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 	// 	metrics.Process.Pkts(l).Inc()
 	// }
 
-	log.Debug("Should queue packet")
+	//log.Debug("Should queue packet")
 	r.queuePacket(rp)
 	// r.forwardPacket(rp);
 }
@@ -254,7 +254,8 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
 	droppedPackets = droppedPackets + 1
-	log.Debug("Dropped Packet", "dropped", droppedPackets)
+	//log.Debug("Packet about to be dropped", "Rpkt", rp.Id)
+	//log.Debug("Dropped Packet", "dropped", droppedPackets)
 
 }
 
@@ -272,13 +273,13 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 		l.Result = metrics.ErrRoute
 		metrics.Process.Pkts(l).Inc()
 	}
-	log.Debug("packet forwarded", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
+	//log.Debug("packet forwarded", "Id", rp.Id, "Hooks", rp.Hooks()) //MS
 }
 
 func (r *Router) queuePacket(rp *rpkt.RtrPkt) {
 
-	log.Debug("preRouteStep")
-	log.Debug("We have rules: ", "len(Rules)", len(r.config.Rules))
+	//log.Debug("preRouteStep")
+	//log.Debug("We have rules: ", "len(Rules)", len(r.config.Rules))
 
 	queueNo := qosqueues.GetQueueNumberWithHashFor(&r.config, rp)
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
@@ -293,8 +294,8 @@ func worker(workChannel *chan *qosqueues.QPkt) {
 		qp := <-*workChannel
 		queueNo := qp.QueueNo
 
-		log.Debug("Queuenumber is ", "queuenumber", queueNo)
-		log.Debug("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
+		//log.Debug("Queuenumber is ", "queuenumber", queueNo)
+		//log.Debug("Queue length is ", "len(r.config.Queues)", len(r.config.Queues))
 
 		putOnQueue(queueNo, qp)
 	}
@@ -309,6 +310,7 @@ func putOnQueue(queueNo int, qp *qosqueues.QPkt) {
 
 	if act == qosqueues.PASS {
 		r.config.Queues[queueNo].Enqueue(qp)
+		r.sendNotification(qp) //MS: remove this again
 	} else if act == qosqueues.NOTIFY {
 		r.config.Queues[queueNo].Enqueue(qp)
 		r.sendNotification(qp)
@@ -326,6 +328,10 @@ func putOnQueue(queueNo int, qp *qosqueues.QPkt) {
 func (r *Router) sendNotification(qp *qosqueues.QPkt) {
 
 	np := qosqueues.NPkt{Rule: qosqueues.GetRuleWithHashFor(&r.config, qp.Rp), Qpkt: qp}
+	//log.Debug("Send notification method in router")
+	restriction := r.config.Queues[np.Qpkt.QueueNo].GetCongestionWarning().InfoContent
+	log.Debug("restrictions on information content", "restriction", restriction)
+	np.Qpkt.Rp.RefInc(1) //should avoid the packet being dropped before we can create the scmp notification
 
 	select {
 	case r.notifications <- &np:

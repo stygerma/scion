@@ -91,17 +91,18 @@ func (pq *packetSliceQueue) CheckAction() PoliceAction {
 
 	level := pq.GetFillLevel()
 
-	log.Info("Current level is", "level", level)
-	log.Info("Profiles are", "profiles", pq.pktQue.Profile)
+	//log.info("Current level is", "level", level)
+	//log.info("Profiles are", "profiles", pq.pktQue.Profile)
+	log.Debug("Is it working here", "CW", pq.pktQue.congWarning)
 
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
 			log.Info("Matched a rule!")
 			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
-				log.Info("Take Action!")
+				//log.info("Take Action!")
 				return pq.pktQue.Profile[j].Action
 			}
-			log.Info("Do not take Action")
+			//log.info("Do not take Action")
 
 		}
 	}
@@ -118,16 +119,16 @@ func (pq *packetSliceQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	tokenForPacket := packetSize * 8 // In bit
 
 	if shouldLog {
-		log.Debug("Overall available bandwidth per second", "MaxBandWidth", pq.tb.MaxBandWidth)
-		log.Debug("Spent token in last period", "#tokens", pq.tb.tokenSpent)
-		log.Debug("Available bandwidth before refill", "bandwidth", pq.tb.tokens)
+		//log.Debug("Overall available bandwidth per second", "MaxBandWidth", pq.tb.MaxBandWidth)
+		//log.Debug("Spent token in last period", "#tokens", pq.tb.tokenSpent)
+		//log.Debug("Available bandwidth before refill", "bandwidth", pq.tb.tokens)
 	}
 
 	pq.tb.refill(shouldLog)
 
 	if shouldLog {
-		log.Debug("Available bandwidth after refill", "bandwidth", pq.tb.tokens)
-		log.Debug("Tokens necessary for packet", "tokens", tokenForPacket)
+		//log.Debug("Available bandwidth after refill", "bandwidth", pq.tb.tokens)
+		//log.Debug("Tokens necessary for packet", "tokens", tokenForPacket)
 		log.Debug("Tokens necessary for packet", "bytes", qp.Rp.Bytes().Len())
 	}
 
@@ -142,7 +143,7 @@ func (pq *packetSliceQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 	}
 
 	if shouldLog {
-		log.Debug("Available bandwidth after update", "bandwidth", pq.tb.tokens)
+		//log.Debug("Available bandwidth after update", "bandwidth", pq.tb.tokens)
 	}
 
 	return qp.Act.action

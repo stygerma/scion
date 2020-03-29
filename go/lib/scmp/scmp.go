@@ -92,7 +92,6 @@ const (
 	T_P_BadSegment
 	T_P_BadInfoField
 	T_P_BadHopField
-	T_P_CongWarn //MS
 )
 
 // C_Ext types
@@ -111,15 +110,15 @@ const (
 
 var typeNameMap = map[Class][]string{
 	C_General: {"UNSPECIFIED", "ECHO_REQUEST", "ECHO_REPLY", "TRACE_ROUTE_REQUEST",
-		"TRACE_ROUTE_REPLY", "RECORD_PATH_REQUEST", "RECORD_PATH_REPLY"},
+		"TRACE_ROUTE_REPLY", "RECORD_PATH_REQUEST", "RECORD_PATH_REPLY", "BASIC_CONG_WARN", "HBH_CONG_WARN",
+		"STOCHASTIC_CONG_WARN", "COMBI_CONG_WARN"},
 	C_Routing: {"UNREACH_NET", "UNREACH_HOST", "L2_ERROR", "UNREACH_PROTO",
 		"UNREACH_PORT", "UNKNOWN_HOST", "BAD_HOST", "OVERSIZE_PKT", "ADMIN_DENIED"},
 	C_CmnHdr: {"BAD_VERSION", "BAD_DST_TYPE", "BAD_SRC_TYPE",
 		"BAD_PKT_LEN", "BAD_IOF_OFFSET", "BAD_HOF_OFFSET"},
 	C_Path: {"PATH_REQUIRED", "BAD_MAC", "EXPIRED_HOPF", "BAD_IF", "REVOKED_IF",
 		"NON_ROUTING_HOPF", "DELIVERY_NON_LOCAL", "BAD_SEGMENT",
-		"BAD_INFO_FIELD", "BAD_HOP_FIELD", "BASIC_CONG_WARN", "HBH_CONG_WARN",
-		"STOCHASTIC_CONG_WARN", "COMBI_CONG_WARN"},
+		"BAD_INFO_FIELD", "BAD_HOP_FIELD"},
 	C_Ext:   {"TOO_MANY_HOPBYHOP", "BAD_EXT_ORDER", "BAD_HOPBYHOP", "BAD_END2END"},
 	C_Sibra: {"BAD_VERSION", "SETUP_NO_REQ"},
 }
@@ -153,11 +152,20 @@ const (
 )
 
 //IMPL: Used to specify which parts to include in the congestion warning
-type InfoRestrictions int
+type InfoRestrictions uint8
 
 const (
 	Restrict        InfoRestrictions = iota //only include the interface
 	RestrictDynamic                         //include static info about queue
 	RestrictRule                            //include current BW and current fullness
 	RestrictNone                            //no restriction
+)
+
+type CWApproach uint8
+
+const (
+	BasicApproach CWApproach = iota
+	HBHApproach
+	StochApproach
+	CombiApproach
 )

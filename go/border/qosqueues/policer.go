@@ -18,8 +18,6 @@ package qosqueues
 import (
 	"sync"
 	"time"
-
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 type tokenBucket struct {
@@ -39,7 +37,7 @@ func (tb *tokenBucket) refill(shouldLog bool) {
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
 	if shouldLog {
-		log.Debug("Last update was", "ms ago", timeSinceLastUpdate)
+		//log.Debug("Last update was", "ms ago", timeSinceLastUpdate)
 	}
 
 	if timeSinceLastUpdate > 100 {
@@ -48,12 +46,12 @@ func (tb *tokenBucket) refill(shouldLog bool) {
 		tb.lastRefill = now
 
 		if shouldLog {
-			log.Debug("Add new tokens", "#tokens", newTokens)
-			log.Debug("On Update: Spent token in last period", "#tokens", tb.tokenSpent)
+			//log.Debug("Add new tokens", "#tokens", newTokens)
+			//log.Debug("On Update: Spent token in last period", "#tokens", tb.tokenSpent)
 		}
 
 		tb.CurrBW = uint64(tb.tokenSpent * 1000 / int(timeSinceLastUpdate))
-
+		//log.Debug("Current Bandwidth approximation", "CurrBW", tb.CurrBW)
 		tb.tokenSpent = 0
 
 		if tb.tokens+newTokens > tb.MaxBandWidth {

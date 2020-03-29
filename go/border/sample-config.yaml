@@ -10,7 +10,7 @@ Queues :
         priority: 5
         congestionWarning:
             - approach: 3
-            - informationContent: 1
+            - informationContent: 3
         profile:
             - 
                 fill-level: 20
@@ -34,7 +34,7 @@ Queues :
         priority: 1
         congestionWarning:
             - approach: 3
-            - informationContent: 1
+            - informationContent: 3
         profile:
             - 
                 fill-level: 20
@@ -56,6 +56,9 @@ Queues :
         policeRate: 5000000 #5Mbit/s
         maxLength: 1024
         priority: 1
+        congestionWarning:
+            - approach: 3
+            - informationContent: 3
         profile:
             - 
                 fill-level: 0

@@ -16,6 +16,7 @@
 package qosqueues
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/scionproto/scion/go/border/rpkt"
@@ -66,12 +67,12 @@ type actionProfile struct {
 	Action    PoliceAction `yaml:"action"`
 }
 
-type congestionWarningApproach int
-type congestionWarningInformationContent int
+// type congestionWarningApproach int
+// type congestionWarningInformationContent int
 
 type CongestionWarning struct {
-	Approach    congestionWarningApproach           `yaml:"approach"`
-	InfoContent congestionWarningInformationContent `yaml:"informationContent"`
+	Approach    int `yaml:"approach"`
+	InfoContent int `yaml:"informationContent"`
 }
 
 type PacketQueue struct {
@@ -116,4 +117,9 @@ func ReturnAction(polAction PoliceAction, profAction PoliceAction) PoliceAction 
 	}
 
 	return PASS
+}
+
+func (qp *QPkt) String() string {
+	return fmt.Sprintf("QueueNo: %v Action: %v \n RPkt: %v",
+		qp.QueueNo, qp.Act, qp.Rp.String())
 }
