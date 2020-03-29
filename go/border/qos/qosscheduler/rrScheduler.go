@@ -1,6 +1,8 @@
 package qosscheduler
 
 import (
+	"time"
+
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/log"
@@ -32,7 +34,12 @@ func (sched *RoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterC
 }
 
 func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
+	if sched.totalLength == 0 {
+		panic("There are no queues to dequeue from. Please check that Init is called")
+	}
 	for {
+		log.Debug("New round on the scheduler!", "length of queues is", sched.totalLength)
+		time.Sleep(500 * time.Millisecond)
 		for i := 0; i < sched.totalLength; i++ {
 			sched.dequeue(routerConfig, forwarder, i)
 		}
