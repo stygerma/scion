@@ -12,12 +12,10 @@ import (
 	"github.com/scionproto/scion/go/lib/scmp"
 )
 
-const logEnabled = true
+const logEnabled = false
 
-//Sends notification for each
 func (r *Router) bscNotify() {
 	for np := range r.notifications {
-
 		//TODO: uncomment later when all approaches are implemented
 		//if r.config.Queues[np.Qpkt.QueueNo].GetCongestionWarning().Approach == 0 {
 		if logEnabled {
@@ -34,13 +32,13 @@ func (r *Router) bscNotify() {
 			log.Debug("Created basic congestion warning", "bscCW", bscCW, "Pkt ID", np.Qpkt.Rp.Id)
 		}
 		r.sendNotificationSCMP(np.Qpkt, bscCW)
+		np.Qpkt.Rp.RefInc(-1)
 		//}
 	}
 
 }
 
-//check creation of messages from local AS, such messages are not created in the doPKTError method
-//Similar to PacketError method maybe could assign the approaches in here too
+/
 func (r *Router) sendNotificationSCMP(qp *qosqueues.QPkt, info scmp.Info) {
 	if logEnabled {
 		srcIA, _ := qp.Rp.SrcIA()
@@ -63,9 +61,13 @@ func (r *Router) sendNotificationSCMP(qp *qosqueues.QPkt, info scmp.Info) {
 		DstHost, _ := notification.DstHost()
 		pub := qp.Rp.Ctx.Conf.BR.InternalAddr
 		routerAddr := addr.HostFromIP(pub.IP)
+		pld, _ := notification.Payload(false)
+		l4, _ := notification.L4Hdr(false)
 		log.Debug("New SCMP Notification", "SrcIA", srcIA, "SrcHost",
-			srcHost, "DstIA", DstIA, "DstHost", DstHost, "RtrAddr", routerAddr,
-			"CurrBW", r.config.Queues[qp.QueueNo].GetTokenBucket().CurrBW, "Pkt ID", id)
+			srcHost, "DstIA", DstIA, "DstHost", DstHost, "\n RtrAddr", routerAddr,
+			"CurrBW", r.config.Queues[qp.QueueNo].GetTokenBucket().CurrBW, "Pkt ID", id,
+			"\n L4", l4,
+			"\n Congestion Warning", pld)
 	}
 	notification.Route()
 
@@ -87,7 +89,7 @@ func (r *Router) createSCMPNotification(qp *qosqueues.QPkt,
 	if err != nil {
 		return nil, err, ""
 	}
-	qp.Rp.RefInc(-1) //original packet is not needed anymore, possible to free it
+	//qp.Rp.RefInc(-1) //
 
 	sp.HBHExt = make([]common.Extension, 0, common.ExtnMaxHBH+1)
 	/*MS: We classify the congestion warning as not erroneous and don't need the

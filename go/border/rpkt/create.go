@@ -31,6 +31,8 @@ import (
 	"github.com/scionproto/scion/go/lib/spkt"
 )
 
+const logEnabled = false
+
 // RtrPktFromScnPkt creates an RtrPkt from an spkt.ScnPkt.
 func RtrPktFromScnPkt(sp *spkt.ScnPkt, ctx *rctx.Ctx) (*RtrPkt, error) {
 	rp := NewRtrPkt()
@@ -170,17 +172,38 @@ func (rp *RtrPkt) SetPld(pld common.Payload) error {
 // CreateReplyScnPkt creates a generic ScnPkt reply, by converting the RtrPkt
 // to an ScnPkt, then reversing the ScnPkt, and setting the reply source address.
 func (rp *RtrPkt) CreateReplyScnPkt() (*spkt.ScnPkt, error) {
+	if logEnabled {
+		srcIA, _ := rp.SrcIA()
+		srcHost, _ := rp.SrcHost()
+		DstIA, _ := rp.DstIA()
+		DstHost, _ := rp.DstHost()
+		log.Debug("RtrPkr when entering CreateReplyScnPkt", "SrcIA", srcIA, "SrcHost",
+			srcHost, "DstIA", DstIA, "DstHost", DstHost, "Pkt ID", rp.Id)
+	}
+	id := rp.Id
 	sp, err := rp.ToScnPkt(false)
 	if err != nil {
 		return nil, err
 	}
+	if logEnabled {
+		log.Debug("SPkt after ToScnPkt()", "SrcIA", sp.SrcIA, "SrcHost",
+			sp.SrcHost, "DstIA", sp.DstIA, "DstHost", sp.DstHost, "Pkt ID", id)
+	}
 	if err = sp.Reverse(); err != nil {
 		return nil, err
+	}
+	if logEnabled {
+		log.Debug("SPkt after Reverse()", "SrcIA", sp.SrcIA, "SrcHost",
+			sp.SrcHost, "DstIA", sp.DstIA, "DstHost", sp.DstHost, "Pkt ID", id)
 	}
 	sp.SrcIA = rp.Ctx.Conf.IA
 	// Use the local address as the source host
 	pub := rp.Ctx.Conf.BR.InternalAddr
 	sp.SrcHost = addr.HostFromIP(pub.IP)
+	if logEnabled {
+		log.Debug("SPkt before returning in CreateReplyScnPkt", "SrcIA", sp.SrcIA, "SrcHost",
+			sp.SrcHost, "DstIA", sp.DstIA, "DstHost", sp.DstHost, "Pkt ID", id)
+	}
 	return sp, nil
 }
 
