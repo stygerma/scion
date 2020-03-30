@@ -8,8 +8,10 @@ import (
 )
 
 type RoundRobinScheduler struct {
-	totalLength int
-	messages    chan bool
+	totalLength   int
+	messages      chan bool
+	sleepTime     int
+	sleptLastTime bool
 }
 
 var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
@@ -19,6 +21,8 @@ var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
 func (sched *RoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConfig) {
 	sched.totalLength = len(routerConfig.Queues)
 	sched.messages = make(chan bool)
+	sched.sleepTime = 2
+	sched.sleptLastTime = true
 }
 
 func (sched *RoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
@@ -31,6 +35,7 @@ func (sched *RoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterC
 			forwarder(qp.Rp)
 		}
 	}
+	// log.Debug("Finished Dequeue")
 }
 
 func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
@@ -38,11 +43,20 @@ func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouter
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
 	for {
-		switch {
+		// log.Debug("Start of Dequeuer")
+		select {
 		case <-sched.messages:
+			// sched.sleptLastTime = false
 		default:
-			time.Sleep(10 * time.Millisecond)
+			// if sched.sleptLastTime {
+			// 	sched.sleepTime = max(sched.sleepTime*2, 2)
+			// } else {
+			// 	sched.sleepTime = 2
+			// }
+			// sched.sleptLastTime = true
+			time.Sleep(1 * time.Millisecond)
 		}
+		// time.Sleep(10 * time.Millisecond)
 		for i := 0; i < sched.totalLength; i++ {
 			sched.dequeue(routerConfig, forwarder, i)
 		}
@@ -52,3 +66,10 @@ func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouter
 func (sched *RoundRobinScheduler) GetMessages() *chan bool {
 	return &sched.messages
 }
+
+// func max(a, b int) int {
+// 	if a > b {
+// 		return a
+// 	}
+// 	return b
+// }
