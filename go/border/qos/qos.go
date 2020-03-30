@@ -210,12 +210,20 @@ func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 
 	restriction := qosConfig.config.Queues[queueNo].GetCongestionWarning().InformationContent
 	fmt.Printf("restrictions on information content restriction %v", restriction)
-	np.Qpkt.Rp.RefInc(1) //should avoid the packet being dropped before we can create the scmp notification
 
+	// TODO: Remove later
 	select {
 	case qosConfig.notifications <- &np:
 	default:
+		panic("We are overwhelmed")
 	}
+}
+
+func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
+	defer qp.Rp.Release()
+	qosConfig.SendNotification(qp)
+	qosConfig.droppedPackets++
+	log.Info("Dropping packet", "qosConfig.droppedPackets", qosConfig.droppedPackets)
 }
 
 func convertExternalToInteral(extConf qosconf.ExternalConfig) (qosqueues.InternalRouterConfig, error) {
