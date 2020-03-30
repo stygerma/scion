@@ -30,7 +30,7 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
-const maxNotificationCount = 512
+const maxNotificationCount = 1024
 
 type QosConfiguration struct {
 	worker workerConfiguration
@@ -193,10 +193,13 @@ func (qosConfig *QosConfiguration) SendNotification(qp *qosqueues.QPkt) {
 
 	np := qosqueues.NPkt{Rule: qosqueues.GetRuleWithHashFor(&qosConfig.config, qp.Rp), Qpkt: qp}
 
-	select {
-	case qosConfig.notifications <- &np:
-	default:
-	}
+	qosConfig.notifications <- &np
+
+	// select {
+	// case qosConfig.notifications <- &np:
+	// default:
+	// 	panic("We are overwhelmed")
+	// }
 }
 
 func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
