@@ -120,14 +120,14 @@ func TestEnqueueWithProfile(t *testing.T) {
 
 	start := time.Now()
 
-	runs := 6 * 100 * 1000
-	singleRun := 1024 // Should not exceed maximum queue length + capacity of notification
+	runs := 6 * 1000 * 10
+	singleRun := 1000 // Should not exceed maximum queue length + capacity of notification
 
 	qosConfig, _ := InitQueueing(configFileLocation, forwardPacketByDrop)
 	arr := getPackets(singleRun)
 
 	runtime.SetCPUProfileRate(500)
-	f, err := os.Create("test/dataTestQueueSinglePacketProfile.prof")
+	f, err := os.Create("testdata/TestQueueSinglePacketProfile.prof")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -138,17 +138,17 @@ func TestEnqueueWithProfile(t *testing.T) {
 
 	for j := 0; j < runs; j++ {
 		for _, pkt := range arr {
-			// fmt.Println(k)
+			// fmt.Println("Enqueue", k)
 			qosConfig.QueuePacket(pkt)
 		}
-
 		for i := 0; i < len(arr); i++ {
+			// fmt.Println("Dequeue", i)
 			select {
 			case <-testQueue:
 			case <-qosConfig.notifications:
 			}
 		}
-		if j < 11 || j%111 == 0 {
+		if j < 11 || j%11 == 0 {
 			printLog("Runs", j, runs, start)
 		}
 	}
@@ -164,4 +164,44 @@ func printLog(leading string, j int, runs int, start time.Time) {
 
 		fmt.Printf("%v %06d / %06d in %v. Estimated total time %v. Remaining %v\n", leading, j, runs, ts.Truncate(time.Second).String(), et.Truncate(time.Second).String(), (et - ts).Truncate(time.Second).String())
 	}
+}
+
+func BenchmarkEnqueueForProfile(b *testing.B) {
+
+	start := time.Now()
+	singleRun := 1024 // Should not exceed maximum queue length + capacity of notification
+
+	qosConfig, _ := InitQueueing(configFileLocation, forwardPacketByDrop)
+	arr := getPackets(singleRun)
+
+	runtime.SetCPUProfileRate(500)
+	f, err := os.Create("testdata/TestQueueSinglePacketProfile.prof")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pprof.StartCPUProfile(f)
+	defer pprof.StopCPUProfile()
+
+	fmt.Println("Array is", len(arr))
+
+	for j := 0; j < b.N; j++ {
+		for k, pkt := range arr {
+			fmt.Println(k)
+			qosConfig.QueuePacket(pkt)
+		}
+
+		fmt.Println("Start dequeue")
+
+		for i := 0; i < len(arr); i++ {
+			fmt.Println("Dequeue", i)
+			select {
+			case <-testQueue:
+			case <-qosConfig.notifications:
+			}
+		}
+		if j < 11 || j%111 == 0 {
+			printLog("Runs", j, b.N, start)
+		}
+	}
+
 }
