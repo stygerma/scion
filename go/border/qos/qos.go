@@ -22,7 +22,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/qos/qosconf"
+	"github.com/scionproto/scion/go/border/qos/queues"
 
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/qos/qosscheduler"
@@ -31,7 +33,7 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
-const maxNotificationCount = 512
+const maxNotificationCount = 1024
 
 type QosConfiguration struct {
 	worker workerConfiguration
@@ -75,23 +77,7 @@ func (q *QosConfiguration) GetLegacyConfig() *qosconf.ExternalConfig {
 	return &q.legacyConfig
 }
 
-<<<<<<< a119cfd99361b50bd6765ba863fb92ebb6609d56
-func (q *QosConfiguration) GetNotification() chan *queues.NPkt {
-	return q.notifications
-}
-
-// SetAndInitSchedul is necessary to set up
-// a mock scheduler for testing. Do not use for anything else.
-func (qosConfig *QosConfiguration) SetAndInitSchedul(sched scheduler.SchedulerInterface) {
-	qosConfig.schedul = sched
-	qosConfig.schedul.Init(qosConfig.config)
-}
-
-func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
-	QosConfiguration, error) {
-=======
 func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {
->>>>>>> Review Round 3 (#24)
 
 	qConfig := QosConfiguration{}
 
@@ -128,13 +114,7 @@ func initClassification(qConfig *QosConfiguration) error {
 func initScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
-<<<<<<< a119cfd99361b50bd6765ba863fb92ebb6609d56
-	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
-	qConfig.schedul = &scheduler.DeficitRoundRobinScheduler{}
-	// qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
-=======
 	qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
->>>>>>> Review Round 3 (#24)
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
@@ -199,12 +179,8 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *qosqueues.QPkt) {
 	switch act {
 	case qosqueues.PASS:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
-<<<<<<< a119cfd99361b50bd6765ba863fb92ebb6609d56
 		qosConfig.SendNotification(qp) //MS: Used for testing
 	case conf.NOTIFY:
-=======
-	case qosqueues.NOTIFY:
->>>>>>> Review Round 3 (#24)
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 		qosConfig.SendNotification(qp)
 	case qosqueues.DROPNOTIFY:
@@ -215,20 +191,6 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *qosqueues.QPkt) {
 	default:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	}
-}
-
-func (qosConfig *QosConfiguration) SendNotification(qp *qosqueues.QPkt) {
-
-	np := qosqueues.NPkt{Rule: qosqueues.GetRuleWithHashFor(&qosConfig.config, qp.Rp), Qpkt: qp}
-
-<<<<<<< a119cfd99361b50bd6765ba863fb92ebb6609d56
-	// select {
-	// case *qosConfig.schedul.GetMessages() <- true:
-	// default:
-	// }
-	// log.Debug("Before send", "len(*qosConfig.schedul.GetMessages())", len(*qosConfig.schedul.GetMessages()))
-	*qosConfig.schedul.GetMessages() <- true
-	// log.Debug("After send", "len(*qosConfig.schedul.GetMessages())", len(*qosConfig.schedul.GetMessages()))
 }
 
 func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
@@ -254,23 +216,6 @@ func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 	case qosConfig.notifications <- &np:
 	default:
 	}
-}
-
-func (qosConfig *QosConfiguration) dropPacket(qp *queues.QPkt) {
-	defer qp.Rp.Release()
-	qosConfig.SendNotification(qp)
-=======
-	select {
-	case qosConfig.notifications <- &np:
-	default:
-	}
-}
-
-func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
-	defer rp.Release()
->>>>>>> Review Round 3 (#24)
-	qosConfig.droppedPackets++
-
 }
 
 func convertExternalToInteral(extConf qosconf.ExternalConfig) (qosqueues.InternalRouterConfig, error) {
