@@ -186,9 +186,6 @@ func GetRuleWithHashFor(config *InternalRouterConfig, rp *rpkt.RtrPkt) *Internal
 	queues1 := config.SourceRules[srcAddr]
 	queues2 := config.DestinationRules[dstAddr]
 
-	matches = []InternalClassRule{}
-	returnRule = InternalClassRule{QueueNumber: 0}
-
 	for _, rul1 := range queues1 {
 		for _, rul2 := range queues2 {
 			if rul1 == rul2 {
