@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"runtime/pprof"
 	"testing"
@@ -81,11 +82,7 @@ func BenchmarkQueueSinglePacket(b *testing.B) {
 	}
 }
 
-func forwardPacketByDrop(rp *rpkt.RtrPkt) {
-	rp.Release()
-}
-
-func TestQueueSinglePacket(t *testing.T) {
+func TestSingleEnqueue(t *testing.T) {
 
 	root := log15.Root()
 
@@ -95,18 +92,51 @@ func TestQueueSinglePacket(t *testing.T) {
 	}
 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 
-	qosConfig, _ := InitQos(configFileLocation, forwardPacketByDrop)
-	arr := getPackets(7 * 5 * 1000 * 1000) // To get to around 20 seconds on my machine which will give a decent profile
+	qosConfig, _ := InitQueueing(configFileLocation, forwardPacketByDrop)
+	pkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
 
-	f, err := os.Create("sadJoelProfile.prof")
+	qosConfig.QueuePacket(pkt)
+
+}
+
+func BenchmarkGolangRandom(b *testing.B) {
+
+	for n := 0; n < b.N; n++ {
+		_ = rand.Intn(100)
+	}
+
+}
+
+var testQueue = make(chan int, 1000)
+
+func forwardPacketByDrop(rp *rpkt.RtrPkt) {
+	testQueue <- 0
+	rp.Release()
+}
+
+func TestEnqueueWithProfile(t *testing.T) {
+
+	runs := 6 * 1000
+	singleRun := 1024
+
+	qosConfig, _ := InitQueueing(configFileLocation, forwardPacketByDrop)
+	arr := getPackets(singleRun)
+
+	f, err := os.Create("TestQueueSinglePacketProfile.prof")
 	if err != nil {
 		log.Fatal(err)
 	}
 	pprof.StartCPUProfile(f)
 	defer pprof.StopCPUProfile()
 
-	for _, pkt := range arr {
-		qosConfig.QueuePacket(pkt)
+	for j := 0; j < runs; j++ {
+		for _, pkt := range arr {
+			qosConfig.QueuePacket(pkt)
+		}
+		fmt.Println("Run", j, "/", runs)
+		for i := 0; i < singleRun; i++ {
+			<-testQueue
+		}
 	}
 
 }
