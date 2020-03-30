@@ -6,8 +6,10 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"runtime"
 	"runtime/pprof"
 	"testing"
+	"time"
 
 	"github.com/inconshreveable/log15"
 	"github.com/scionproto/scion/go/border/rpkt"
@@ -116,27 +118,50 @@ func forwardPacketByDrop(rp *rpkt.RtrPkt) {
 
 func TestEnqueueWithProfile(t *testing.T) {
 
-	runs := 6 * 1000
-	singleRun := 1024
+	start := time.Now()
+
+	runs := 6 * 100 * 1000
+	singleRun := 1024 // Should not exceed maximum queue length + capacity of notification
 
 	qosConfig, _ := InitQueueing(configFileLocation, forwardPacketByDrop)
 	arr := getPackets(singleRun)
 
-	f, err := os.Create("TestQueueSinglePacketProfile.prof")
+	runtime.SetCPUProfileRate(500)
+	f, err := os.Create("test/dataTestQueueSinglePacketProfile.prof")
 	if err != nil {
 		log.Fatal(err)
 	}
 	pprof.StartCPUProfile(f)
 	defer pprof.StopCPUProfile()
 
+	fmt.Println("Array is", len(arr))
+
 	for j := 0; j < runs; j++ {
 		for _, pkt := range arr {
+			// fmt.Println(k)
 			qosConfig.QueuePacket(pkt)
 		}
-		fmt.Println("Run", j, "/", runs)
-		for i := 0; i < singleRun; i++ {
-			<-testQueue
+
+		for i := 0; i < len(arr); i++ {
+			select {
+			case <-testQueue:
+			case <-qosConfig.notifications:
+			}
+		}
+		if j < 11 || j%111 == 0 {
+			printLog("Runs", j, runs, start)
 		}
 	}
 
+}
+
+func printLog(leading string, j int, runs int, start time.Time) {
+	if j > 0 {
+		ts := time.Since(start)
+		et := time.Since(start) * time.Duration(runs) / time.Duration(j)
+		_ = et - ts
+		// fmt.Println("Run", j, "/", runs, "in", ts.Truncate(time.Second).String(), "estimated total time", et.Truncate(time.Second).String(), "remaining", (et - ts).Truncate(time.Second).String())
+
+		fmt.Printf("%v %06d / %06d in %v. Estimated total time %v. Remaining %v\n", leading, j, runs, ts.Truncate(time.Second).String(), et.Truncate(time.Second).String(), (et - ts).Truncate(time.Second).String())
+	}
 }
