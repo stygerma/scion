@@ -38,8 +38,11 @@ func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouter
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
 	for {
-		<-sched.messages
-		time.Sleep(100 * time.Millisecond)
+		switch {
+		case <-sched.messages:
+		default:
+			time.Sleep(10 * time.Millisecond)
+		}
 		for i := 0; i < sched.totalLength; i++ {
 			sched.dequeue(routerConfig, forwarder, i)
 		}
