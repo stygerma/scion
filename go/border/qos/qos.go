@@ -193,17 +193,21 @@ func (qosConfig *QosConfiguration) SendNotification(qp *qosqueues.QPkt) {
 
 	np := qosqueues.NPkt{Rule: qosqueues.GetRuleWithHashFor(&qosConfig.config, qp.Rp), Qpkt: qp}
 
-	qosConfig.notifications <- &np
+	// qosConfig.notifications <- &np
 
-	// select {
-	// case qosConfig.notifications <- &np:
-	// default:
-	// 	panic("We are overwhelmed")
-	// }
+	// TODO: Remove later
+	select {
+	case qosConfig.notifications <- &np:
+	default:
+		panic("We are overwhelmed")
+	}
 }
 
 func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
+	//TODO: Remove later
+	// qosConfig.notifications <- &qosqueues.NPkt{}
+	panic("Do not drop packets")
 	qosConfig.droppedPackets++
 
 }
