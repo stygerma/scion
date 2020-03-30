@@ -231,7 +231,7 @@ func convertExternalToInteral(extConf qosconf.ExternalConfig) (qosqueues.Interna
 		muta := &sync.Mutex{}
 		mutb := &sync.Mutex{}
 
-		queueToUse := &qosqueues.PacketSliceQueue{}
+		queueToUse := &qosqueues.ChannelPacketQueue{}
 
 		intQue = convertExternalToInteralQueue(extQue)
 		queueToUse.InitQueue(intQue, muta, mutb)
