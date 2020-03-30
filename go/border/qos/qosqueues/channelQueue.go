@@ -106,8 +106,7 @@ func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
 func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
 
 	if pq.pktQue.MaxLength == pq.GetLength() {
-		panic("We are overwhelmed")
-		return DROP
+		return DROPNOTIFY
 	}
 
 	level := pq.GetFillLevel()
