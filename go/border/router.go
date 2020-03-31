@@ -180,27 +180,8 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-<<<<<<< a119cfd99361b50bd6765ba863fb92ebb6609d56
-<<<<<<< d10741ee0bebfdc0e0dde2767e0b40e613843681
-<<<<<<< f16301dffc0c16e207054bda4679d0e039854fdb
-	// TODO(joelfischerr): This is for the demo only. Remove this for the final PR.
-	if r.Id == "br1-ff00_0_113-1" || r.Id == "br1-ff00_0_112-1" {
-		// 	// Enqueue the packet. Packets will be classified, put on different queues,
-		// 	// scheduled and forwarded by forwardPacket
-		r.qosConfig.QueuePacket(rp)
-	} else {
-		r.forwardPacket(rp)
-	}
-=======
-<<<<<<< f03ea997fce1af649af243cb79390d70594c2605
-=======
->>>>>>> Fixup! removed some commented out lines
-
-=======
-	// Enqueue the packet. Packets will be classified, put on different queues, scheduled and forwarded by forwardPacket
->>>>>>> Review Round 3 (#24)
 	r.qosConfig.QueuePacket(rp)
->>>>>>> Suggestion for new file structure
+
 }
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
