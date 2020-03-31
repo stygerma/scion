@@ -207,8 +207,8 @@ func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
 	//TODO: Remove later
 	// qosConfig.notifications <- &qosqueues.NPkt{}
-	panic("Do not drop packets")
 	qosConfig.droppedPackets++
+	panic("Do not drop packets")
 
 }
 
