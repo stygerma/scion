@@ -23,6 +23,7 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 // TODO: Matching rules is currently based on string comparisons
@@ -302,9 +303,12 @@ func matchRuleFromConfig(cr *qosconf.ExternalClassRule, rp *rpkt.RtrPkt) bool {
 		match = false
 	}
 
-	// log.Debug("L4Type is", "L4Type", rp.CmnHdr.NextHdr)
-	// log.Debug("L4Type as int is", "L4TypeInt", int(rp.CmnHdr.NextHdr))
-	if !contains(cr.L4Type, int(rp.CmnHdr.NextHdr)) {
+	l4hd, _ := rp.L4Hdr(true)
+
+	// log.Debug("L4Type is", "rp.L4Type", rp.L4Type)
+	// log.Debug("L4Type as int is", "rp.CmnHdr.NextHdr", int(rp.CmnHdr.NextHdr))
+	log.Debug("L4Type is", "rp.L4Hdr(true).L4Type", l4hd.L4Type)
+	if !contains(cr.L4Type, int(l4hd.L4Type())) {
 		match = false
 	} else {
 		// log.Debug("Matched an L4Type!")
