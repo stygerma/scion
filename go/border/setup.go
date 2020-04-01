@@ -53,7 +53,6 @@ var registeredExtSockOps = map[brconf.SockType]extSockOps{}
 // setup creates the router's channels and map, sets up the rpkt package, and
 // sets up a new router context. This function can only be called once during startup.
 func (r *Router) setup() error {
-	log.Info("============ MS ============ we setting up a new router with id", r.Id, "============ MS ============")
 	r.freePkts = ringbuf.New(1024, func() interface{} {
 		return rpkt.NewRtrPkt()
 	}, "free_pkts")

@@ -12,13 +12,12 @@ import (
 	"github.com/scionproto/scion/go/lib/scmp"
 )
 
-const logEnabled = false
+const logEnabledBsc = true
 
 func (r *Router) bscNotify() {
 	for np := range r.notifications {
-		//TODO: uncomment later when all approaches are implemented
 		//if r.config.Queues[np.Qpkt.QueueNo].GetCongestionWarning().Approach == 0 {
-		if logEnabled {
+		if logEnabledBsc {
 			/*srcIA, _ := np.Qpkt.Rp.SrcIA()
 			srcHost, _ := np.Qpkt.Rp.SrcHost()
 			DstIA, _ := np.Qpkt.Rp.DstIA()
@@ -27,20 +26,19 @@ func (r *Router) bscNotify() {
 			srcHost, "DstIA", DstIA, "DstHost", DstHost)*/
 			log.Debug("New notification packet", "NPkt", np, "Pkt ID", np.Qpkt.Rp.Id)
 		}
-		bscCW := r.createCongWarn(np)
-		if logEnabled {
+		bscCW := r.createBscCongWarn(np)
+		if logEnabledBsc {
 			log.Debug("Created basic congestion warning", "bscCW", bscCW, "Pkt ID", np.Qpkt.Rp.Id)
 		}
-		r.sendNotificationSCMP(np.Qpkt, bscCW)
+		r.sendBscNotificationSCMP(np.Qpkt, bscCW)
 		np.Qpkt.Rp.RefInc(-1)
 		//}
 	}
 
 }
 
-/
-func (r *Router) sendNotificationSCMP(qp *qosqueues.QPkt, info scmp.Info) {
-	if logEnabled {
+func (r *Router) sendBscNotificationSCMP(qp *qosqueues.QPkt, info scmp.Info) {
+	if logEnabledBsc {
 		srcIA, _ := qp.Rp.SrcIA()
 		srcHost, _ := qp.Rp.SrcHost()
 		DstIA, _ := qp.Rp.DstIA()
@@ -49,12 +47,12 @@ func (r *Router) sendNotificationSCMP(qp *qosqueues.QPkt, info scmp.Info) {
 			srcHost, "DstIA", DstIA, "DstHost", DstHost, "QNo", qp.QueueNo, "Pkt ID",
 			qp.Rp.Id)
 	}
-	notification, err, id := r.createSCMPNotification(qp, scmp.ClassType{Class: scmp.C_General, Type: scmp.T_G_BasicCongWarn}, info)
+	notification, err, id := r.createBscSCMPNotification(qp, scmp.ClassType{Class: scmp.C_General, Type: scmp.T_G_BasicCongWarn}, info)
 	if err != nil {
 		log.Error("unable to create notification SCMP", "err", err)
 		return
 	}
-	if logEnabled {
+	if logEnabledBsc {
 		srcIA, _ := notification.SrcIA()
 		srcHost, _ := notification.SrcHost()
 		DstIA, _ := notification.DstIA()
@@ -73,10 +71,10 @@ func (r *Router) sendNotificationSCMP(qp *qosqueues.QPkt, info scmp.Info) {
 
 }
 
-func (r *Router) createSCMPNotification(qp *qosqueues.QPkt,
+func (r *Router) createBscSCMPNotification(qp *qosqueues.QPkt,
 	ct scmp.ClassType, info scmp.Info) (*rpkt.RtrPkt, error, string) {
 
-	if logEnabled {
+	if logEnabledBsc {
 		srcIA, _ := qp.Rp.SrcIA()
 		srcHost, _ := qp.Rp.SrcHost()
 		DstIA, _ := qp.Rp.DstIA()
@@ -89,8 +87,6 @@ func (r *Router) createSCMPNotification(qp *qosqueues.QPkt,
 	if err != nil {
 		return nil, err, ""
 	}
-	//qp.Rp.RefInc(-1) //
-
 	sp.HBHExt = make([]common.Extension, 0, common.ExtnMaxHBH+1)
 	/*MS: We classify the congestion warning as not erroneous and don't need the
 	Basic congestion warning to be HBH*/
@@ -108,7 +104,7 @@ func (r *Router) createSCMPNotification(qp *qosqueues.QPkt,
 	sp.L4 = scmp.NewHdr(scmp.ClassType{Class: scmp.C_General, Type: scmp.T_G_BasicCongWarn}, sp.Pld.Len())
 	log.Debug("Created SPkt reply", "sp", sp, "Pkt ID", id)
 	reply, err := qp.Rp.CreateReply(sp)
-	if logEnabled {
+	if logEnabledBsc {
 		srcIA, _ := reply.SrcIA()
 		srcHost, _ := reply.SrcHost()
 		DstIA, _ := reply.DstIA()
@@ -119,11 +115,11 @@ func (r *Router) createSCMPNotification(qp *qosqueues.QPkt,
 	return reply, err, id
 }
 
-func (r *Router) createCongWarn(np *qosqueues.NPkt) *scmp.InfoBscCW {
+func (r *Router) createBscCongWarn(np *qosqueues.NPkt) *scmp.InfoBscCW {
 	restrictionPrint := r.config.Queues[np.Qpkt.QueueNo].GetCongestionWarning()
 	testing := r.config.Queues[np.Qpkt.QueueNo].GetMinBandwidth()
 	restriction := 3
-	if logEnabled {
+	if logEnabledBsc {
 		log.Debug("restrictions on information content", "restriction", restrictionPrint, "MinBW", testing)
 	}
 	if restriction > 3 {
@@ -132,7 +128,7 @@ func (r *Router) createCongWarn(np *qosqueues.NPkt) *scmp.InfoBscCW {
 	}
 	bscCW := &scmp.InfoBscCW{}
 	bscCW.ConsIngress = common.IFIDType(np.Qpkt.Rp.Ingress.IfID)
-	if logEnabled {
+	if logEnabledBsc {
 		log.Debug("InfoBscCW", "ConsIngress", common.IFIDType(np.Qpkt.Rp.Ingress.IfID),
 			"QueueLength", (r.config.Queues[np.Qpkt.QueueNo]).GetLength(), "CurrBW",
 			r.config.Queues[np.Qpkt.QueueNo].GetTokenBucket().CurrBW, "QueueFullness",
@@ -147,7 +143,7 @@ func (r *Router) createCongWarn(np *qosqueues.NPkt) *scmp.InfoBscCW {
 	}
 	if restriction > 2 {
 		bscCW.Violation = uint64(np.Qpkt.Act.Reason)
-		bscCW.ClassRule = np.Qpkt.Act.Rule
+		//bscCW.ClassRule = np.Qpkt.Act.Rule
 	}
 	return bscCW
 }

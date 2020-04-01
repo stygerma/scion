@@ -20,7 +20,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/scionproto/scion/go/lib/log"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type customPacketQueue struct {
@@ -34,6 +34,7 @@ type customPacketQueue struct {
 	head   int
 	tail   int
 	mask   int
+	pid    scmp.PID
 }
 
 var _ PacketQueueInterface = (*customPacketQueue)(nil)
@@ -52,6 +53,11 @@ func (pq *customPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutT
 	pq.head = 0
 	pq.tail = 0
 	pq.mask = pq.pktQue.MaxLength - 1
+	//if pq.pktQue.congWarning.Approach == 2 { //TODO: uncomment when congestionWarning is correctly assigned in pktQue
+	pq.pid = scmp.PID{FactorProportional: .1, FactorIntegral: .3,
+		FactorDerivative: .3, LastUpdate: time.Now(), SetPoint: 70,
+		Min: 60, Max: 90}
+	//}
 
 	// fmt.Println("Finish init")
 }
@@ -148,7 +154,7 @@ func (pq *customPacketQueue) CheckAction() PoliceAction {
 
 	//log.info("Current level is", "level", level)
 	//log.info("Profiles are", "profiles", pq.pktQue.Profile)
-	log.Debug("Is it working here", "CW", pq.pktQue.congWarning)
+	//log.Debug("Is it working here", "CW", pq.pktQue.congWarning)
 
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
@@ -218,4 +224,8 @@ func (pq *customPacketQueue) GetTokenBucket() *tokenBucket {
 
 func (pq *customPacketQueue) GetCongestionWarning() *CongestionWarning {
 	return &pq.pktQue.congWarning
+}
+
+func (pq *customPacketQueue) GetPID() *scmp.PID {
+	return &pq.pid
 }

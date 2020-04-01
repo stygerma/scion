@@ -152,14 +152,23 @@ const (
 )
 
 //IMPL: Used to specify which parts to include in the congestion warning
-type InfoRestrictions uint8
+type InfoRestriction uint8
 
 const (
-	Restrict        InfoRestrictions = iota //only include the interface
-	RestrictDynamic                         //include static info about queue
-	RestrictRule                            //include current BW and current fullness
-	RestrictNone                            //no restriction
+	Restrict        InfoRestriction = iota //only include the interface
+	RestrictDynamic                        //include static info about queue
+	RestrictRule                           //include current BW and current fullness
+	RestrictNone                           //no restriction
 )
+
+var restrictionNames = []string{"RESTRICT", "RESTRICTDYNAMIC", "RESTRICTRULE", "RESTRICTNONE"}
+
+func (iR InfoRestriction) String() string {
+	if int(iR) > len(restrictionNames) {
+		return fmt.Sprintf("InfoRestriction(%d)", iR)
+	}
+	return fmt.Sprintf("%s(%d)", restrictionNames[iR], iR)
+}
 
 type CWApproach uint8
 
@@ -169,3 +178,12 @@ const (
 	StochApproach
 	CombiApproach
 )
+
+var approachNames = []string{"BASICAPPROACH", "HBHAPPROACH", "STOCHAPPROACH", "COMBIAPPROACH"}
+
+func (cwA CWApproach) String() string {
+	if int(cwA) > len(approachNames) {
+		return fmt.Sprintf("CWApproach(%d)", cwA)
+	}
+	return fmt.Sprintf("%s(%d)", approachNames[cwA], cwA)
+}

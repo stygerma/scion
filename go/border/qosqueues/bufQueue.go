@@ -22,6 +22,7 @@ import (
 
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type packetBufQueue struct {
@@ -32,6 +33,7 @@ type packetBufQueue struct {
 	bufQueue *ringbuf.Ring
 	length   int
 	tb       tokenBucket
+	pid      scmp.PID
 }
 
 // type QPktList []QPkt
@@ -52,7 +54,11 @@ func (pq *packetBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *
 	pq.bufQueue = ringbuf.New(pq.pktQue.MaxLength, func() interface{} {
 		return &QPkt{}
 	}, pq.pktQue.Name)
-
+	//if pq.pktQue.congWarning.Approach == 2 { //TODO: uncomment when congestionWarning is correctly assigned in pktQue
+	pq.pid = scmp.PID{FactorProportional: .1, FactorIntegral: .5,
+		FactorDerivative: .1, LastUpdate: time.Now(), SetPoint: 70,
+		Min: 60, Max: 90}
+	//}
 }
 
 func (pq *packetBufQueue) Enqueue(rp *QPkt) {
@@ -110,7 +116,7 @@ func (pq *packetBufQueue) CheckAction() PoliceAction {
 
 	//log.Info("Current level is", "level", level)
 	//log.Info("Profiles are", "profiles", pq.pktQue.Profile)
-	log.Debug("Is it working here", "CW", pq.pktQue.congWarning)
+	//log.Debug("Is it working here", "CW", pq.pktQue.congWarning)
 
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
@@ -180,4 +186,8 @@ func (pq *packetBufQueue) GetTokenBucket() *tokenBucket {
 
 func (pq *packetBufQueue) GetCongestionWarning() *CongestionWarning {
 	return &pq.pktQue.congWarning
+}
+
+func (pq *packetBufQueue) GetPID() *scmp.PID {
+	return &pq.pid
 }

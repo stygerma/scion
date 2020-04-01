@@ -20,6 +20,7 @@ import (
 	"sync"
 
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type PoliceAction int
@@ -100,6 +101,7 @@ type PacketQueueInterface interface {
 	GetMinBandwidth() int
 	GetTokenBucket() *tokenBucket
 	GetCongestionWarning() *CongestionWarning
+	GetPID() *scmp.PID //TODO: add PID variables to Joel's configuration file, import from there
 }
 
 func ReturnAction(polAction PoliceAction, profAction PoliceAction) PoliceAction {

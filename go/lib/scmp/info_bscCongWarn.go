@@ -17,19 +17,16 @@ const (
 )
 
 type InfoBscCW struct {
-	//EndHost addr.HostAddr MS: Router can just forward the package, i.e. does not need this info
 	CurrBW        uint64
 	QueueLength   uint64
 	QueueFullness uint64
-	QueueNo       uint64          //MS: used for debugging
-	ConsIngress   common.IFIDType /*Q: Joel's policies should enforce some contracts between ISP and also be inmplemented such BRs are not overwhelmed, this means that we should
-	somehow add all the IFs of this BR to this field or find a way to identify this BR such that path segments over this BR will be avoided in
-	the future*/
-	Violation uint64 /*classRules as defined by Joel, this would introduce big space overhead, however, there are no real incentives for an ISP to share this.*/
-	//ClassRule *qosqueues.InternalClassRule TODO: include this in the read from raw thingy and also the constant above
-	ClassRule interface{}
+	QueueNo       uint64 //MS: used for debugging //TODO: either fully include or remove
+	ConsIngress   common.IFIDType
+	Violation     uint64
+	//ClassRule     interface{} //TODO: include if we can limit its length
 }
 
+//TODO: integrate the  classrule to the following functions and methods
 func InfoBscCWFromRaw(b common.RawBytes) (*InfoBscCW, error) {
 	if len(b) < bscCWLen {
 		return nil, serrors.New("Unable to parse InfoBscCW, small buffer size")

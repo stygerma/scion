@@ -59,14 +59,14 @@ func (r *Router) PacketError() {
 		args.rp.Release()
 		//log.Debug("============ MS ============ handled this pkterr", args, "============ MS ============")
 	}
-	log.Debug("============ MS ============ PacketError() end (should not appear ============ MS ============")
+	//log.Debug("============ MS ============ PacketError() end (should not appear ============ MS ============")
 }
 
 // doPktError is called for protocol-level packet errors. If there's SCMP
 // metadata attached to the error object, then an SCMP error response is
 // generated and sent.
 func (r *Router) doPktError(rp *rpkt.RtrPkt, perr error) {
-	log.Debug("============ MS ============ doPktErro() beginning ============ MS ============")
+	//log.Debug("============ MS ============ doPktErro() beginning ============ MS ============")
 	var serr *scmp.Error
 	isSCMPErr := errors.As(perr, &serr)
 	if !isSCMPErr || rp.DirFrom == rcmn.DirSelf || rp.SCMPError {
