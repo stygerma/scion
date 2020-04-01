@@ -1,9 +1,10 @@
 package qosscheduler
 
 import (
+	"time"
+
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 // This is a deficit round robin dequeuer. Queues with higher priority will have more packets dequeued at the same time.
@@ -33,9 +34,6 @@ func (sched *deficitRoundRobinScheduler) dequeue(routerConfig qosqueues.Internal
 	var nopkts int = 64 * (routerConfig.Queues[queueNo].GetPriority() / sched.quantumSum)
 	pktToDequeue := min(1, nopkts)
 
-	log.Debug("The queue has length", "length", length)
-	log.Debug("Dequeueing packets", "quantum", pktToDequeue)
-
 	if length > 0 {
 		qps := routerConfig.Queues[queueNo].PopMultiple(max(length, pktToDequeue))
 		for _, qp := range qps {
@@ -52,6 +50,7 @@ func (sched *deficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.Interna
 		for i := 0; i < sched.totalLength; i++ {
 			sched.dequeue(routerConfig, forwarder, i)
 		}
+		time.Sleep(1 * time.Millisecond)
 	}
 }
 

@@ -20,6 +20,8 @@ go_test(
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
     deps = [
+        "//bazel-scion/go/border/qos:go_default_library",
+        "//go/border/qos/qosconf:go_default_library",
         "//go/border/rpkt:go_default_library",
         "@com_github_inconshreveable_log15//:go_default_library",
     ],
