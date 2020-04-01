@@ -3,6 +3,7 @@ package qosconf
 import (
 	"io/ioutil"
 
+	"github.com/scionproto/scion/go/lib/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -63,14 +64,16 @@ func LoadConfig(path string) (ExternalConfig, error) {
 	var yamlFile []byte
 	var err error
 
-	yamlFile, err = ioutil.ReadFile(configFileLocation)
-	// yamlFile, err := ioutil.ReadFile(path)
+	// yamlFile, err = ioutil.ReadFile(configFileLocation)
+	yamlFile, err = ioutil.ReadFile(path)
 
 	if err != nil {
+		log.Error("Loading the config file has failed", "error", err)
 		return ExternalConfig{}, err
 	}
 	err = yaml.Unmarshal(yamlFile, &ec)
 	if err != nil {
+		log.Error("Loading the config file has failed", "error", err)
 		return ExternalConfig{}, err
 	}
 
