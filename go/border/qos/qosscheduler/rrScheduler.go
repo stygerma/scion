@@ -1,8 +1,6 @@
 package qosscheduler
 
 import (
-	"time"
-
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
@@ -28,13 +26,20 @@ func (sched *RoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConf
 func (sched *RoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	length := routerConfig.Queues[queueNo].GetLength()
+	var qp *qosqueues.QPkt
 
-	if length > 0 {
-		qps := routerConfig.Queues[queueNo].PopMultiple(length)
-		for _, qp := range qps {
-			forwarder(qp.Rp)
-		}
+	for i := 0; i < length; i++ {
+		qp = routerConfig.Queues[queueNo].Pop()
+		forwarder(qp.Rp)
 	}
+
+	// if length > 0 {
+	// qps := routerConfig.Queues[queueNo].PopMultiple(length)
+	// for _, qp := range qps {
+	// 	forwarder(qp.Rp)
+	// }
+
+	// }
 	// log.Debug("Finished Dequeue")
 }
 
@@ -44,18 +49,18 @@ func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouter
 	}
 	for {
 		// log.Debug("Start of Dequeuer")
-		select {
-		case <-sched.messages:
-			// sched.sleptLastTime = false
-		default:
-			// if sched.sleptLastTime {
-			// 	sched.sleepTime = max(sched.sleepTime*2, 2)
-			// } else {
-			// 	sched.sleepTime = 2
-			// }
-			// sched.sleptLastTime = true
-			time.Sleep(1 * time.Millisecond)
-		}
+		// select {
+		// case <-sched.messages:
+		// 	// sched.sleptLastTime = false
+		// default:
+		// 	// if sched.sleptLastTime {
+		// 	// 	sched.sleepTime = max(sched.sleepTime*2, 2)
+		// 	// } else {
+		// 	// 	sched.sleepTime = 2
+		// 	// }
+		// 	// sched.sleptLastTime = true
+		// 	// time.Sleep(1 * time.Millisecond)
+		// }
 		// time.Sleep(10 * time.Millisecond)
 		for i := 0; i < sched.totalLength; i++ {
 			sched.dequeue(routerConfig, forwarder, i)

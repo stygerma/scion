@@ -105,8 +105,6 @@ func convertExternalToInternalConfig(qConfig *QosConfiguration, extConf qosconf.
 func initClassification(qConfig *QosConfiguration) error {
 	qConfig.config.Rules = *qosqueues.RulesToMap(qConfig.config.Rules.RulesList)
 
-	log.Debug("qConfig.config.Rules", "qConfig.config.Rules", qConfig.config.Rules.ISDOnlyDestRules)
-
 	return nil
 }
 
