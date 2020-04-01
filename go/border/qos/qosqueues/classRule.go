@@ -23,23 +23,9 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 // TODO: Matching rules is currently based on string comparisons
-
-// Rule contains a rule for matching packets
-// type classRule struct {
-// 	// This is currently means the ID of the sending border router
-// 	Name                 string `yaml:"name"`
-// 	Priority             int    `yaml:"priority"`
-// 	SourceAs             string `yaml:"sourceAs"`
-// 	SourceMatchMode      int    `yaml:"sourceMatchMode"`
-// 	DestinationAs        string `yaml:"destinationAs"`
-// 	DestinationMatchMode int    `yaml:"destinationMatchMode"`
-// 	L4Type               []int  `yaml:"L4Type"`
-// 	QueueNumber          int    `yaml:"queueNumber"`
-// }
 
 type InternalClassRule struct {
 	// This is currently means the ID of the sending border router
@@ -76,11 +62,11 @@ const (
 
 func ConvClassRuleToInternal(cr qosconf.ExternalClassRule) (InternalClassRule, error) {
 
-	sourceMatch, err := getMatchFromRule(cr, cr.SourceMatchMode, cr.SourceAs)
+	sourceMatch, err := getMatchRuleTypeFromRule(cr, cr.SourceMatchMode, cr.SourceAs)
 	if err != nil {
 		return InternalClassRule{}, err
 	}
-	destinationMatch, err := getMatchFromRule(cr, cr.DestinationMatchMode, cr.DestinationAs)
+	destinationMatch, err := getMatchRuleTypeFromRule(cr, cr.DestinationMatchMode, cr.DestinationAs)
 	if err != nil {
 		return InternalClassRule{}, err
 	}
@@ -103,12 +89,23 @@ func ConvClassRuleToInternal(cr qosconf.ExternalClassRule) (InternalClassRule, e
 	return rule, nil
 }
 
-func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[addr.IA][]*InternalClassRule) {
+func RulesToMap(crs []InternalClassRule) *MapRules {
 	sourceRules := make(map[addr.IA][]*InternalClassRule)
 	destinationRules := make(map[addr.IA][]*InternalClassRule)
 
-	for i, cr := range crs {
-		if cr.SourceAs.matchMode == RANGE {
+	asOnlySourceRules := make(map[addr.AS][]*InternalClassRule)
+	asOnlyDestRules := make(map[addr.AS][]*InternalClassRule)
+	isdOnlySourceRules := make(map[addr.ISD][]*InternalClassRule)
+	isdOnlyDestRules := make(map[addr.ISD][]*InternalClassRule)
+	sourceAnyDestinationRules := make(map[addr.IA][]*InternalClassRule)
+	destinationAnySourceRules := make(map[addr.IA][]*InternalClassRule)
+
+	for k, cr := range crs {
+
+		switch cr.SourceAs.matchMode {
+		case EXACT:
+			sourceRules[cr.SourceAs.IA] = append(sourceRules[cr.SourceAs.IA], &crs[k])
+		case RANGE:
 			lowLimI := uint16(cr.SourceAs.lowLim.I)
 			upLimI := uint16(cr.SourceAs.upLim.I)
 			lowLimA := uint64(cr.SourceAs.lowLim.A)
@@ -116,36 +113,64 @@ func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[
 
 			for i := lowLimI; i <= upLimI; i++ {
 				for j := lowLimA; j <= upLimA; j++ {
-					sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[i])
+					sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[k])
 				}
 			}
-
-		} else {
-
-			sourceRules[cr.SourceAs.IA] = append(sourceRules[cr.SourceAs.IA], &crs[i])
+		case ASONLY:
+			asOnlySourceRules[cr.SourceAs.IA.A] = append(asOnlySourceRules[cr.SourceAs.IA.A], &crs[k])
+		case ISDONLY:
+			isdOnlySourceRules[cr.SourceAs.IA.I] = append(isdOnlySourceRules[cr.SourceAs.IA.I], &crs[k])
+		case ANY:
+			destinationAnySourceRules[cr.SourceAs.IA] = append(destinationAnySourceRules[cr.SourceAs.IA], &crs[k])
 		}
-		if cr.DestinationAs.matchMode == RANGE {
+
+		switch cr.DestinationAs.matchMode {
+		case EXACT:
+			destinationRules[cr.DestinationAs.IA] = append(destinationRules[cr.DestinationAs.IA], &crs[k])
+		case RANGE:
 			lowLimI := uint16(cr.DestinationAs.lowLim.I)
 			upLimI := uint16(cr.DestinationAs.upLim.I)
 			lowLimA := uint64(cr.DestinationAs.lowLim.A)
 			upLimA := uint64(cr.DestinationAs.upLim.A)
 
+			//log.Debug("lowLimI", "lowLimI", lowLimI)
+			//log.Debug("upLimI", "upLimI", upLimI)
+			//log.Debug("lowLimA", "lowLimA", lowLimA)
+			//log.Debug("upLimA", "upLimA", upLimA)
+
 			for i := lowLimI; i <= upLimI; i++ {
 				for j := lowLimA; j <= upLimA; j++ {
-					addr := addr.IA{I: addr.ISD(i), A: addr.AS(j)}
-					destinationRules[addr] = append(destinationRules[addr], &crs[i])
+					//log.Debug("Adding", "I", i, "AS", j)
+					destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[k])
 				}
 			}
-		} else {
-			destinationRules[cr.DestinationAs.IA] = append(destinationRules[cr.DestinationAs.IA], &crs[i])
+		case ASONLY:
+			asOnlyDestRules[cr.DestinationAs.IA.A] = append(asOnlyDestRules[cr.DestinationAs.IA.A], &crs[k])
+		case ISDONLY:
+			//log.Debug("Adding ISDONLY Destination Rule", "IA.I", cr.DestinationAs.IA.I)
+			isdOnlyDestRules[cr.DestinationAs.IA.I] = append(isdOnlyDestRules[cr.DestinationAs.IA.I], &crs[k])
+		case ANY:
+			sourceAnyDestinationRules[cr.SourceAs.IA] = append(sourceAnyDestinationRules[cr.SourceAs.IA], &crs[k])
 		}
 	}
 
-	return sourceRules, destinationRules
+	mp := MapRules{
+		RulesList:                 crs,
+		SourceRules:               sourceRules,
+		DestinationRules:          destinationRules,
+		SourceAnyDestinationRules: sourceAnyDestinationRules,
+		DestinationAnySourceRules: destinationAnySourceRules,
+		ASOnlySourceRules:         asOnlySourceRules,
+		ASOnlyDestRules:           asOnlyDestRules,
+		ISDOnlySourceRules:        isdOnlySourceRules,
+		ISDOnlyDestRules:          isdOnlyDestRules,
+	}
+
+	return &mp
 
 }
 
-func getMatchFromRule(cr qosconf.ExternalClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
+func getMatchRuleTypeFromRule(cr qosconf.ExternalClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
 	switch matchMode(matchModeField) {
 	case EXACT, ASONLY, ISDONLY, ANY:
 		IA, err := addr.IAFromString(matchRuleField)
@@ -160,7 +185,7 @@ func getMatchFromRule(cr qosconf.ExternalClassRule, matchModeField int, matchRul
 			if len(parts) != 2 {
 				return matchRule{}, common.NewBasicError("Invalid Class", nil, "raw", matchModeField)
 			}
-			lowLim, err := addr.IAFromString(parts[1])
+			lowLim, err := addr.IAFromString(parts[0])
 			if err != nil {
 				return matchRule{}, err
 			}
@@ -176,145 +201,77 @@ func getMatchFromRule(cr qosconf.ExternalClassRule, matchModeField int, matchRul
 	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil, "matchMode", matchModeField)
 }
 
-var matches = make([]InternalClassRule, 0)
-var returnRule InternalClassRule
+var returnRule *InternalClassRule
+var exactAndRangeSourceMatches, exactAndRangeDestinationMatches, sourceAnyDestinationMatches, destinationAnySourceRules, asOnlySourceRules, asOnlyDestinationRules []*InternalClassRule
+var isdOnlySourceRules, isdOnlyDestinationRules []*InternalClassRule
 
-func GetRuleWithHashFor(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
+func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
+
+	returnRule := &InternalClassRule{
+		Name:        "default",
+		Priority:    0,
+		QueueNumber: 0,
+	}
 
 	srcAddr, _ := rp.SrcIA()
 	dstAddr, _ := rp.DstIA()
 
-	queues1 := config.SourceRules[srcAddr]
-	queues2 := config.DestinationRules[dstAddr]
+	exactAndRangeSourceMatches = config.Rules.SourceRules[srcAddr]
+	exactAndRangeDestinationMatches = config.Rules.DestinationRules[dstAddr]
 
-	for _, rul1 := range queues1 {
-		for _, rul2 := range queues2 {
-			if rul1 == rul2 {
-				matches = append(matches, *rul1)
-			}
-		}
-	}
+	sourceAnyDestinationMatches = config.Rules.SourceAnyDestinationRules[srcAddr]
+	destinationAnySourceRules = config.Rules.DestinationAnySourceRules[srcAddr]
+
+	asOnlySourceRules = config.Rules.ASOnlySourceRules[srcAddr.A]
+	asOnlyDestinationRules = config.Rules.ASOnlyDestRules[dstAddr.A]
+
+	isdOnlySourceRules := config.Rules.ISDOnlySourceRules[srcAddr.I]
+	isdOnlyDestinationRules := config.Rules.ISDOnlyDestRules[dstAddr.I]
+
+	sources := unionRules(exactAndRangeSourceMatches, asOnlySourceRules)
+	sources = unionRules(sources, isdOnlySourceRules)
+
+	destinations := unionRules(exactAndRangeDestinationMatches, asOnlyDestinationRules)
+	destinations = unionRules(destinations, isdOnlyDestinationRules)
+
+	matched := intersectRules(sources, destinations)
+	matched = unionRules(matched, sourceAnyDestinationMatches)
+	matched = unionRules(matched, destinationAnySourceRules)
 
 	max := -1
-	for _, rul1 := range matches {
+	for _, rul1 := range matched {
 		if rul1.Priority > max {
 			returnRule = rul1
 			max = rul1.Priority
 		}
 	}
 
-	return &returnRule
+	return returnRule
 }
 
-func GetQueueNumberWithHashFor(config *InternalRouterConfig, rp *rpkt.RtrPkt) int {
+var mtMatches = make([]*InternalClassRule, 0)
+var matches []*InternalClassRule
 
-	return GetRuleWithHashFor(config, rp).QueueNumber
+func unionRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalClassRule {
+
+	return append(a, b...)
 }
 
-func getQueueNumberIterativeForInternal(config *InternalRouterConfig, rp *rpkt.RtrPkt) int {
-
-	queueNo := 0
-	matches := make([]InternalClassRule, 0)
-
-	for _, cr := range config.Rules {
-
-		if cr.matchInternalRule(rp) {
-			matches = append(matches, cr)
+func intersectRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalClassRule {
+	matches = mtMatches
+	for _, rul1 := range a {
+		for _, rul2 := range b {
+			if rul1 == rul2 {
+				matches = append(matches, rul1)
+			}
 		}
 	}
-
-	max := -1
-	for _, rul1 := range matches {
-		if rul1.Priority > max {
-			queueNo = rul1.QueueNumber
-			max = rul1.Priority
-		}
-	}
-
-	return queueNo
+	return matches
 }
 
-func getQueueNumberIterativeFor(legacyConfig *qosconf.ExternalConfig, rp *rpkt.RtrPkt) int {
-	queueNo := 0
+func GetQueueNumberForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) int {
 
-	matches := make([]qosconf.ExternalClassRule, 0)
-
-	for _, cr := range legacyConfig.ExternalRules {
-		if matchRuleFromConfig(&cr, rp) {
-			matches = append(matches, cr)
-		}
-	}
-
-	max := -1
-	for _, rul1 := range matches {
-		if rul1.Priority > max {
-			queueNo = rul1.QueueNumber
-			max = rul1.Priority
-		}
-	}
-
-	return queueNo
-}
-
-func (cr *InternalClassRule) matchSingleRule(rp *rpkt.RtrPkt, matchRuleField *matchRule, getIA func() (addr.IA, error)) bool {
-
-	switch matchRuleField.matchMode {
-	case EXACT, ASONLY, ISDONLY, ANY:
-		Addr, err := getIA()
-		if err != nil {
-			return false
-		}
-		return (*matchRuleField).IA.Equal(Addr)
-	case RANGE:
-		addr, err := getIA()
-		if err != nil {
-			return false
-		}
-		if addr.BiggerThan(matchRuleField.lowLim) && addr.SmallerThan(matchRuleField.upLim) {
-			return true
-		}
-	}
-	return false
-}
-
-func (cr *InternalClassRule) matchInternalRule(rp *rpkt.RtrPkt) bool {
-
-	sourceMatches := cr.matchSingleRule(rp, &cr.SourceAs, rp.SrcIA)
-	destinationMatches := cr.matchSingleRule(rp, &cr.DestinationAs, rp.DstIA)
-
-	return sourceMatches && destinationMatches
-}
-
-func matchRuleFromConfig(cr *qosconf.ExternalClassRule, rp *rpkt.RtrPkt) bool {
-
-	match := true
-
-	srcAddr, _ := rp.SrcIA()
-	// log.Debug("Source Address is " + srcAddr.String())
-	// log.Debug("Comparing " + srcAddr.String() + " and " + cr.SourceAs)
-	if !strings.Contains(srcAddr.String(), cr.SourceAs) {
-		match = false
-	}
-
-	dstAddr, _ := rp.DstIA()
-	// log.Debug("Destination Address is " + dstAddr.String())
-	// log.Debug("Comparing " + dstAddr.String() + " and " + cr.DestinationAs)
-	if !strings.Contains(dstAddr.String(), cr.DestinationAs) {
-		match = false
-	}
-
-	l4hd, _ := rp.L4Hdr(true)
-
-	// log.Debug("L4Type is", "rp.L4Type", rp.L4Type)
-	// log.Debug("L4Type as int is", "rp.CmnHdr.NextHdr", int(rp.CmnHdr.NextHdr))
-	log.Debug("L4Type is", "rp.L4Hdr(true).L4Type", l4hd.L4Type)
-	if !contains(cr.L4Type, int(l4hd.L4Type())) {
-		match = false
-	} else {
-		// log.Debug("Matched an L4Type!")
-	}
-
-	return match
+	return GetRuleForPacket(config, rp).QueueNumber
 }
 
 func contains(slice []int, term int) bool {
