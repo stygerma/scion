@@ -69,7 +69,7 @@ func (r *Router) setup() error {
 	if conf, err = r.loadNewConfig(); err != nil {
 		return err
 	}
-	// Initialize the qos subsystem
+	// Initialize the qos configuration
 	if err = r.initQosFromConfig(conf); err != nil {
 		return err
 	}

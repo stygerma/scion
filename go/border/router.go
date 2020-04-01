@@ -29,16 +29,12 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/assert"
 	"github.com/scionproto/scion/go/lib/common"
-	"github.com/scionproto/scion/go/lib/fatal"
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
 	_ "github.com/scionproto/scion/go/lib/scrypto" // Make sure math/rand is seeded
 )
 
 const processBufCnt = 128
-
-// TODO: this path should be configure in br.toml
-const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml"
 
 // Router struct
 type Router struct {
@@ -60,8 +56,6 @@ type Router struct {
 	qosConfig qos.QosConfiguration
 }
 
-
-
 // NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
 	r := &Router{Id: id, confDir: confDir}
@@ -69,12 +63,6 @@ func NewRouter(id, confDir string) (*Router, error) {
 	if err = r.setup(); err != nil {
 		return nil, err
 	}
-
-	//TODO: Figure out the actual path where the other config files are loaded --> this path should be configure in br.toml
-	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
-	r.qosConfig, _ = qos.InitQueueing(configFileLocation, r.forwardPacket)
-
-	// log.Debug("We have the congestion warning configuration", "queue 0", r.qosConfig.GetQueue(0).GetCongestionWarning())
 
 	return r, err
 }
@@ -94,9 +82,6 @@ func (r *Router) Start() {
 		defer log.HandlePanic()
 		r.bscNotify()
 	}()
-	if err := r.startDiscovery(); err != nil {
-		fatal.Fatal(common.NewBasicError("Unable to start discovery", err))
-	}
 }
 
 // TODO: Do we want to we also want to reload the queue config
@@ -195,6 +180,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
+<<<<<<< a119cfd99361b50bd6765ba863fb92ebb6609d56
 <<<<<<< d10741ee0bebfdc0e0dde2767e0b40e613843681
 <<<<<<< f16301dffc0c16e207054bda4679d0e039854fdb
 	// TODO(joelfischerr): This is for the demo only. Remove this for the final PR.
@@ -210,35 +196,15 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 =======
 >>>>>>> Fixup! removed some commented out lines
 
+=======
+	// Enqueue the packet. Packets will be classified, put on different queues, scheduled and forwarded by forwardPacket
+>>>>>>> Review Round 3 (#24)
 	r.qosConfig.QueuePacket(rp)
 >>>>>>> Suggestion for new file structure
 }
 
-func (r *Router) dropPacket(rp *rpkt.RtrPkt) {
-	defer rp.Release()
-	droppedPackets = droppedPackets + 1
-	log.Debug("Dropped Packet", "dropped", droppedPackets)
-
-	// TODO: We probably want some metrics here
-
-}
-
-	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
-	// if err := rp.Route(); err != nil {
-	// 	r.handlePktError(rp, err, "Error routing packet")
-	// 	l.Result = metrics.ErrRoute
-	// 	metrics.Process.Pkts(l).Inc()
-	// }
-
-	r.qosConfig.QueuePacket(rp)
-
-	// r.forwardPacket(rp);
-}
-
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
-
-	// log.Debug("Forwarding packet")
 
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {

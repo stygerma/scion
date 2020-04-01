@@ -72,6 +72,7 @@ func prepareRtrPacketDetailedSample(sourceIA addr.IA, destinationIA addr.IA,
 	r.Egress = []EgressPair{EgressPair{S: nil, Dst: sampleUDPAddr}}
 	r.CmnHdr = spkt.CmnHdr{NextHdr: common.L4ProtocolType(1)}
 	r.IncrementedPath = false
+<<<<<<< 5e86b77c688d01499fac3d3da3caac546b5e2c8a
 	r.idxs = packetIdxs{} // packetIdxs provides offsets into a packet buffer
 	// to the start of various, we might actually need Raw
 	r.dstIA = destinationIA
@@ -110,7 +111,11 @@ func JFPrepareRtrPacketWith(sourceIA addr.IA, destinationIA addr.IA, L4Type comm
 	r.IncrementedPath = false
 	r.idxs = packetIdxs{} // packetIdxs provides offsets into a packet buffer to the start of various, we might actually need Raw
 	r.srcIA = sourceIA
+=======
+	r.idxs = packetIdxs{} // packetIdxs provides offsets into a packet buffer to the start of various, we might actually need Raw
+>>>>>>> Review Round 3 (#24)
 	r.dstIA = destinationIA
+	r.srcIA = sourceIA
 	r.dstHost = nil
 	r.srcHost = nil
 	r.infoF = nil
@@ -120,7 +125,7 @@ func JFPrepareRtrPacketWith(sourceIA addr.IA, destinationIA addr.IA, L4Type comm
 	r.consDirFlag = nil
 	r.HBHExt = nil
 	r.E2EExt = nil
-	r.L4Type = 1 // L4SCMP
+	r.L4Type = L4Type // L4SCMP
 	r.l4 = nil
 	r.pld = nil
 	r.hooks = hooks{}
