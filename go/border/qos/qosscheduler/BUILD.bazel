@@ -11,9 +11,9 @@ go_library(
     importpath = "github.com/scionproto/scion/go/border/qos/qosscheduler",
     visibility = ["//visibility:public"],
     deps = [
-        "//go/lib/log:go_default_library",
-        "//go/border/rpkt:go_default_library",
         "//go/border/qos/qosqueues:go_default_library",
+        "//go/border/rpkt:go_default_library",
+        "//go/lib/log:go_default_library",
     ],
 )
 
@@ -27,7 +27,4 @@ go_test(
     ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
-    deps = [
-        "//go/border/qos/qosqueues:go_default_library",
-    ],
 )
