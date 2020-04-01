@@ -16,6 +16,7 @@
 package qosqueues
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/scionproto/scion/go/border/qos/qosconf"
@@ -203,9 +204,14 @@ func getMatchRuleTypeFromRule(cr qosconf.ExternalClassRule, matchModeField int, 
 
 var returnRule *InternalClassRule
 var exactAndRangeSourceMatches, exactAndRangeDestinationMatches, sourceAnyDestinationMatches, destinationAnySourceRules, asOnlySourceRules, asOnlyDestinationRules []*InternalClassRule
-var isdOnlySourceRules, isdOnlyDestinationRules []*InternalClassRule
+var isdOnlySourceRules, isdOnlyDestinationRules, matched []*InternalClassRule
+
+var sources [3][]*InternalClassRule
+var destinations [3][]*InternalClassRule
 
 func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
+
+	// log.Debug("New call to -------------")
 
 	returnRule := &InternalClassRule{
 		Name:        "default",
@@ -225,31 +231,49 @@ func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalCl
 	asOnlySourceRules = config.Rules.ASOnlySourceRules[srcAddr.A]
 	asOnlyDestinationRules = config.Rules.ASOnlyDestRules[dstAddr.A]
 
-	isdOnlySourceRules := config.Rules.ISDOnlySourceRules[srcAddr.I]
-	isdOnlyDestinationRules := config.Rules.ISDOnlyDestRules[dstAddr.I]
+	isdOnlySourceRules = config.Rules.ISDOnlySourceRules[srcAddr.I]
+	isdOnlyDestinationRules = config.Rules.ISDOnlyDestRules[dstAddr.I]
 
-	sources := unionRules(exactAndRangeSourceMatches, asOnlySourceRules)
-	sources = unionRules(sources, isdOnlySourceRules)
+	sources[0] = exactAndRangeSourceMatches
+	sources[1] = asOnlySourceRules
+	sources[2] = isdOnlySourceRules
 
-	destinations := unionRules(exactAndRangeDestinationMatches, asOnlyDestinationRules)
-	destinations = unionRules(destinations, isdOnlyDestinationRules)
+	destinations[0] = exactAndRangeDestinationMatches
+	destinations[1] = asOnlyDestinationRules
+	destinations[2] = isdOnlyDestinationRules
 
-	matched := intersectRules(sources, destinations)
-	matched = unionRules(matched, sourceAnyDestinationMatches)
-	matched = unionRules(matched, destinationAnySourceRules)
+	matched = intersectListsRules(sources, destinations)
 
 	max := -1
-	for _, rul1 := range matched {
-		if rul1.Priority > max {
-			returnRule = rul1
-			max = rul1.Priority
+	max, returnRule = getRuleWithPrevMax(matched, max)
+	max, returnRule = getRuleWithPrevMax(sourceAnyDestinationMatches, max)
+	max, returnRule = getRuleWithPrevMax(destinationAnySourceRules, max)
+
+	if returnRule == nil {
+		returnRule = &InternalClassRule{
+			Name:        "default",
+			Priority:    0,
+			QueueNumber: 0,
 		}
 	}
 
 	return returnRule
 }
 
-var mtMatches = make([]*InternalClassRule, 0)
+func getRuleWithPrevMax(list []*InternalClassRule, prevMax int) (int, *InternalClassRule) {
+	for _, rul1 := range list {
+		if rul1 != nil {
+			if rul1.Priority > prevMax {
+				returnRule = rul1
+				prevMax = rul1.Priority
+			}
+		} else {
+			break
+		}
+	}
+	return prevMax, returnRule
+}
+
 var matches []*InternalClassRule
 
 func unionRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalClassRule {
@@ -257,12 +281,38 @@ func unionRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalClass
 	return append(a, b...)
 }
 
+func intersectListsRules(a [3][]*InternalClassRule, b [3][]*InternalClassRule) []*InternalClassRule {
+	for i := 0; i < len(matches); i++ {
+		matches[i] = nil
+	}
+	// fmt.Println("Matches before tryiing to find matches", matches)
+	k := 0
+	for l := 0; l < 3; l++ {
+		for m := 0; m < 3; m++ {
+			for _, rul1 := range a[l] {
+				for _, rul2 := range b[m] {
+					if rul1 == rul2 {
+						fmt.Println("Add match", l, m)
+						matches[k] = rul1
+						k++
+					}
+				}
+			}
+		}
+	}
+	return matches
+}
+
 func intersectRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalClassRule {
-	matches = mtMatches
+	for i := 0; i < len(matches); i++ {
+		matches[i] = nil
+	}
+	k := 0
 	for _, rul1 := range a {
 		for _, rul2 := range b {
 			if rul1 == rul2 {
-				matches = append(matches, rul1)
+				matches[k] = rul1
+				k++
 			}
 		}
 	}
