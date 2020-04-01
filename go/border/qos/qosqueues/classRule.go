@@ -1,5 +1,5 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2018 ETH Zurich, Anapaya Systems
+// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package qosqueues
 import (
 	"strings"
 
+	"github.com/scionproto/scion/go/border/qos/qosconf"
+
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
@@ -26,20 +28,17 @@ import (
 // TODO: Matching rules is currently based on string comparisons
 
 // Rule contains a rule for matching packets
-
-type classRule struct {
-	// This is currently means the ID of the sending border router
-	Name                 string `yaml:"name"`
-	Priority             int    `yaml:"priority"`
-	SourceAs             string `yaml:"sourceAs"`
-	SourceMatchMode      int    `yaml:"sourceMatchMode"`
-	NextHopAs            string `yaml:"nextHopAs"`
-	NextHopMatchMode     int    `yaml:"nextHopMatchMode"`
-	DestinationAs        string `yaml:"destinationAs"`
-	DestinationMatchMode int    `yaml:"destinationMatchMode"`
-	L4Type               []int  `yaml:"L4Type"`
-	QueueNumber          int    `yaml:"queueNumber"`
-}
+// type classRule struct {
+// 	// This is currently means the ID of the sending border router
+// 	Name                 string `yaml:"name"`
+// 	Priority             int    `yaml:"priority"`
+// 	SourceAs             string `yaml:"sourceAs"`
+// 	SourceMatchMode      int    `yaml:"sourceMatchMode"`
+// 	DestinationAs        string `yaml:"destinationAs"`
+// 	DestinationMatchMode int    `yaml:"destinationMatchMode"`
+// 	L4Type               []int  `yaml:"L4Type"`
+// 	QueueNumber          int    `yaml:"queueNumber"`
+// }
 
 type InternalClassRule struct {
 	// This is currently means the ID of the sending border router
@@ -74,7 +73,7 @@ const (
 	ANY matchMode = 4
 )
 
-func ConvClassRuleToInternal(cr classRule) (InternalClassRule, error) {
+func ConvClassRuleToInternal(cr qosconf.ExternalClassRule) (InternalClassRule, error) {
 
 	sourceMatch, err := getMatchFromRule(cr, cr.SourceMatchMode, cr.SourceAs)
 	if err != nil {
@@ -96,7 +95,6 @@ func ConvClassRuleToInternal(cr classRule) (InternalClassRule, error) {
 		Name:          cr.Name,
 		Priority:      cr.Priority,
 		SourceAs:      sourceMatch,
-		NextHopAs:     matchRule{},
 		DestinationAs: destinationMatch,
 		L4Type:        l4t,
 		QueueNumber:   cr.QueueNumber}
@@ -104,11 +102,11 @@ func ConvClassRuleToInternal(cr classRule) (InternalClassRule, error) {
 	return rule, nil
 }
 
-func rulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[addr.IA][]*InternalClassRule) {
+func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[addr.IA][]*InternalClassRule) {
 	sourceRules := make(map[addr.IA][]*InternalClassRule)
 	destinationRules := make(map[addr.IA][]*InternalClassRule)
 
-	for _, cr := range crs {
+	for i, cr := range crs {
 		if cr.SourceAs.matchMode == RANGE {
 			lowLimI := uint16(cr.SourceAs.lowLim.I)
 			upLimI := uint16(cr.SourceAs.upLim.I)
@@ -117,13 +115,13 @@ func rulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[
 
 			for i := lowLimI; i <= upLimI; i++ {
 				for j := lowLimA; j <= upLimA; j++ {
-					sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &cr)
+					sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[i])
 				}
 			}
 
 		} else {
 
-			sourceRules[cr.SourceAs.IA] = append(sourceRules[cr.SourceAs.IA], &cr)
+			sourceRules[cr.SourceAs.IA] = append(sourceRules[cr.SourceAs.IA], &crs[i])
 		}
 		if cr.DestinationAs.matchMode == RANGE {
 			lowLimI := uint16(cr.DestinationAs.lowLim.I)
@@ -134,11 +132,11 @@ func rulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[
 			for i := lowLimI; i <= upLimI; i++ {
 				for j := lowLimA; j <= upLimA; j++ {
 					addr := addr.IA{I: addr.ISD(i), A: addr.AS(j)}
-					destinationRules[addr] = append(destinationRules[addr], &cr)
+					destinationRules[addr] = append(destinationRules[addr], &crs[i])
 				}
 			}
 		} else {
-			destinationRules[cr.DestinationAs.IA] = append(destinationRules[cr.DestinationAs.IA], &cr)
+			destinationRules[cr.DestinationAs.IA] = append(destinationRules[cr.DestinationAs.IA], &crs[i])
 		}
 	}
 
@@ -146,7 +144,7 @@ func rulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[
 
 }
 
-func getMatchFromRule(cr configFileClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
+func getMatchFromRule(cr qosconf.ExternalClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
 	switch matchMode(matchModeField) {
 	case EXACT, ASONLY, ISDONLY, ANY:
 		IA, err := addr.IAFromString(matchRuleField)
@@ -177,6 +175,9 @@ func getMatchFromRule(cr configFileClassRule, matchModeField int, matchRuleField
 	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil, "matchMode", matchModeField)
 }
 
+var matches = make([]InternalClassRule, 0)
+var returnRule InternalClassRule
+
 func GetRuleWithHashFor(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
 
 	srcAddr, _ := rp.SrcIA()
@@ -185,8 +186,8 @@ func GetRuleWithHashFor(config *InternalRouterConfig, rp *rpkt.RtrPkt) *Internal
 	queues1 := config.SourceRules[srcAddr]
 	queues2 := config.DestinationRules[dstAddr]
 
-	matches := make([]InternalClassRule, 0)
-	returnRule := InternalClassRule{QueueNumber: 0}
+	matches = []InternalClassRule{}
+	returnRule = InternalClassRule{QueueNumber: 0}
 
 	for _, rul1 := range queues1 {
 		for _, rul2 := range queues2 {
@@ -235,13 +236,13 @@ func getQueueNumberIterativeForInternal(config *InternalRouterConfig, rp *rpkt.R
 	return queueNo
 }
 
-func getQueueNumberIterativeFor(legacyConfig *RouterConfig, rp *rpkt.RtrPkt) int {
+func getQueueNumberIterativeFor(legacyConfig *qosconf.ExternalConfig, rp *rpkt.RtrPkt) int {
 	queueNo := 0
 
-	matches := make([]classRule, 0)
+	matches := make([]qosconf.ExternalClassRule, 0)
 
-	for _, cr := range legacyConfig.Rules {
-		if cr.matchRule(rp) {
+	for _, cr := range legacyConfig.ExternalRules {
+		if matchRuleFromConfig(&cr, rp) {
 			matches = append(matches, cr)
 		}
 	}
@@ -282,27 +283,25 @@ func (cr *InternalClassRule) matchInternalRule(rp *rpkt.RtrPkt) bool {
 
 	sourceMatches := cr.matchSingleRule(rp, &cr.SourceAs, rp.SrcIA)
 	destinationMatches := cr.matchSingleRule(rp, &cr.DestinationAs, rp.DstIA)
-	// nextHopMatches := cr.matchSingleRule(rp, &cr.NextHopAs, rp.SrcIA)
-	nextHopMatches := true
 
-	return sourceMatches && destinationMatches && nextHopMatches
+	return sourceMatches && destinationMatches
 }
 
-func (cr *classRule) matchRule(rp *rpkt.RtrPkt) bool {
+func matchRuleFromConfig(cr *qosconf.ExternalClassRule, rp *rpkt.RtrPkt) bool {
 
 	match := true
 
 	srcAddr, _ := rp.SrcIA()
 	// log.Debug("Source Address is " + srcAddr.String())
 	// log.Debug("Comparing " + srcAddr.String() + " and " + cr.SourceAs)
-	if !strings.Contains(srcAddr.String(), cr.SourceAs.IA.String()) {
+	if !strings.Contains(srcAddr.String(), cr.SourceAs) {
 		match = false
 	}
 
 	dstAddr, _ := rp.DstIA()
 	// log.Debug("Destination Address is " + dstAddr.String())
 	// log.Debug("Comparing " + dstAddr.String() + " and " + cr.DestinationAs)
-	if !strings.Contains(dstAddr.String(), cr.DestinationAs.IA.String()) {
+	if !strings.Contains(dstAddr.String(), cr.DestinationAs) {
 		match = false
 	}
 

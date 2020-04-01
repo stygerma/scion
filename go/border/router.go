@@ -36,9 +36,6 @@ import (
 
 const processBufCnt = 128
 
-// TODO: this path should be configure in br.toml
-const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml"
-
 // Router struct
 type Router struct {
 	// Id is the SCION element ID, e.g. "br4-ff00:0:2f".
@@ -54,7 +51,8 @@ type Router struct {
 	// setCtxMtx serializes modifications to the router context. Topology updates
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
-
+	// qosConfig holds all data structures and state required for the quality of service
+	// measures in the router
 	qosConfig qos.QosConfiguration
 }
 
@@ -65,12 +63,6 @@ func NewRouter(id, confDir string) (*Router, error) {
 	if err = r.setup(); err != nil {
 		return nil, err
 	}
-
-	//TODO: Figure out the actual path where the other config files are loaded --> this path should be configure in br.toml
-	// r.loadConfigFile("/home/vagrant/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml")
-	r.qosConfig, _ = qos.InitQueueing(configFileLocation, r.forwardPacket)
-
-	// log.Debug("We have the congestion warning configuration", "queue 0", r.qosConfig.GetQueue(0).GetCongestionWarning())
 
 	return r, err
 }
@@ -86,9 +78,6 @@ func (r *Router) Start() {
 		defer log.HandlePanic()
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
 	}()
-	if err := r.startDiscovery(); err != nil {
-		fatal.Fatal(common.NewBasicError("Unable to start discovery", err))
-	}
 }
 
 // ReloadConfig handles reloading the configuration when SIGHUP is received.
@@ -100,9 +89,6 @@ func (r *Router) ReloadConfig() error {
 	}
 	if err := r.setupCtxFromConfig(config); err != nil {
 		return common.NewBasicError("Unable to set up new context", err)
-	}
-	if r.qosConfig, err = qos.InitQueueing(configFileLocation, r.forwardPacket); err != nil {
-		return common.NewBasicError("Unable to load QoS config", err)
 	}
 	return nil
 }
@@ -189,23 +175,13 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
-	// if err := rp.Route(); err != nil {
-	// 	r.handlePktError(rp, err, "Error routing packet")
-	// 	l.Result = metrics.ErrRoute
-	// 	metrics.Process.Pkts(l).Inc()
-	// }
-
+	// Enqueue the packet. Packets will be classified, put on different queues, scheduled and forwarded by forwardPacket
 	r.qosConfig.QueuePacket(rp)
-
-	// r.forwardPacket(rp);
 }
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 
 	defer rp.Release()
-
-	// log.Debug("Forwarding packet")
 
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {

@@ -2,29 +2,25 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "go_default_library",
-    srcs = [
-        "qosConfig.go",
-    ],
+    srcs = ["qos.go"],
     importpath = "github.com/scionproto/scion/go/border/qos",
     visibility = ["//visibility:public"],
     deps = [
-        "//go/border/qos/qosscheduler:go_default_library",
+        "//go/border/qos/qosconf:go_default_library",
         "//go/border/qos/qosqueues:go_default_library",
-        "//go/lib/log:go_default_library",
-        "@in_gopkg_yaml_v2//:go_default_library",
+        "//go/border/qos/qosscheduler:go_default_library",
         "//go/border/rpkt:go_default_library",
+        "//go/lib/log:go_default_library",
     ],
 )
 
 go_test(
     name = "go_default_test",
-    srcs = [
-        "queue_test.go",
-    ],
+    srcs = ["qos_test.go"],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
     deps = [
-        "//go/border/qos/qosqueues:go_default_library",
-        "//go/border/qos/qosscheduler:go_default_library",
+        "//go/border/rpkt:go_default_library",
+        "@com_github_inconshreveable_log15//:go_default_library",
     ],
 )
