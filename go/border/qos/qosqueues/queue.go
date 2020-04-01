@@ -72,35 +72,10 @@ type Action struct {
 	action PoliceAction
 }
 
-type actionProfile struct {
+type ActionProfile struct {
 	FillLevel int          `yaml:"fill-level"`
 	Prob      int          `yaml:"prob"`
 	Action    PoliceAction `yaml:"action"`
-}
-
-type congestionWarningApproach int
-type congestionWarningInformationContent int
-
-// type CongestionWarning struct {
-// 	approach    congestionWarningApproach           `yaml:"approach"`
-// 	infoContent congestionWarningInformationContent `yaml:"informationContent"`
-// }
-
-type CongestionWarning struct {
-	Approach    congestionWarningApproach           `yaml:"approach"`
-	InfoContent congestionWarningInformationContent `yaml:"informationContent"`
-}
-
-type ExternalPacketQueue struct {
-	Name         string            `yaml:"name"`
-	ID           int               `yaml:"id"`
-	MinBandwidth int               `yaml:"CIR"`
-	MaxBandWidth int               `yaml:"PIR"`
-	PoliceRate   string            `yaml:"policeRate"`
-	MaxLength    int               `yaml:"maxLength"`
-	Priority     int               `yaml:"priority"`
-	CongWarning  CongestionWarning `yaml:"congestionWarning"`
-	Profile      []actionProfile   `yaml:"profile"`
 }
 
 type PacketQueue struct {
@@ -111,8 +86,7 @@ type PacketQueue struct {
 	PoliceRate   int
 	MaxLength    int
 	Priority     int
-	CongWarning  CongestionWarning
-	Profile      []actionProfile
+	Profile      []ActionProfile
 }
 
 type PacketQueueInterface interface {
