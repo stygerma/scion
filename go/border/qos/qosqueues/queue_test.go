@@ -322,7 +322,7 @@ Things to do:
 // // func TestBasicRoute(t *testing.T) {
 
 // // 	r, _ := setupTestRouter(t)
-// // 	r.initQueueing("sample-config.yaml")
+// // 	r.InitQos("sample-config.yaml")
 
 // // 	r.forwarder = r.forwardPacketTest
 
@@ -357,7 +357,7 @@ Things to do:
 
 // // 	r, _ := setupTestRouter(t)
 
-// // 	r.initQueueing("sample-config.yaml")
+// // 	r.InitQos("sample-config.yaml")
 // // 	r.forwarder = r.forwardPacketTest
 
 // // 	ps := make([]*rpkt.RtrPkt, 100)
