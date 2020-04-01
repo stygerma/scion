@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/scionproto/scion/go/border/qos/qosconf"
+
 	"github.com/scionproto/scion/go/border/qos"
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
@@ -34,7 +36,8 @@ func TestRulesWithPriority(t *testing.T) {
 	}
 
 	for k, tab := range tables {
-		qosConfig, _ := qos.InitQos(tab.configFile, forwardPacketByDrop)
+		extConf, _ := qosconf.LoadConfig(tab.configFile)
+		qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
 		queueNo := qosqueues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), pkt)
