@@ -103,7 +103,9 @@ func convertExternalToInternalConfig(qConfig *QosConfiguration, extConf qosconf.
 }
 
 func initClassification(qConfig *QosConfiguration) error {
-	qConfig.config.SourceRules, qConfig.config.DestinationRules = qosqueues.RulesToMap(qConfig.config.Rules)
+	qConfig.config.Rules = *qosqueues.RulesToMap(qConfig.config.Rules.RulesList)
+
+	log.Debug("qConfig.config.Rules", "qConfig.config.Rules", qConfig.config.Rules.ISDOnlyDestRules)
 
 	return nil
 }
@@ -137,7 +139,7 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	//log.Trace("preRouteStep")
 	//log.Trace("We have rules: ", "len(Rules)", len(qosConfig.GetConfig().Rules))
 
-	queueNo := qosqueues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), rp)
+	queueNo := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), rp)
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
 	//log.Trace("Our packet is", "QPkt", qp)
@@ -191,7 +193,7 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *qosqueues.QPkt) {
 
 func (qosConfig *QosConfiguration) SendNotification(qp *qosqueues.QPkt) {
 
-	np := qosqueues.NPkt{Rule: qosqueues.GetRuleWithHashFor(&qosConfig.config, qp.Rp), Qpkt: qp}
+	np := qosqueues.NPkt{Rule: qosqueues.GetRuleForPacket(&qosConfig.config, qp.Rp), Qpkt: qp}
 
 	// qosConfig.notifications <- &np
 
@@ -250,7 +252,7 @@ func convertExternalToInteral(extConf qosconf.ExternalConfig) (qosqueues.Interna
 		log.Trace("We have gotten the queue", "queue", iq.GetPacketQueue().Name)
 	}
 
-	return qosqueues.InternalRouterConfig{Queues: internalQueues, Rules: internalRules}, nil
+	return qosqueues.InternalRouterConfig{Queues: internalQueues, Rules: qosqueues.MapRules{RulesList: internalRules}}, nil
 
 }
 
