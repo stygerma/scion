@@ -1,6 +1,3 @@
-Scheduler:
-    Latency: 0
-    Bandwidth: 20Mbps
 Queues:
     -
         name: 'General Queue'
@@ -46,11 +43,11 @@ Rules:
         sourceAs: '2-ff00:0:212'
         destinationAs: '1-ff00:0:110'
         L4Type:
-            - {Protocol: 0, Extension: -1}
-            - {Protocol: 1, Extension: -1}
-            - {Protocol: 6, Extension: -1}
-            - {Protocol: 17, Extension: -1}
-            - {Protocol: 222, Extension: -1}
+            - 0
+            - 1
+            - 6
+            - 17
+            - 222
         queueNumber: 1
     -
         name: 'Drop Test Rule'

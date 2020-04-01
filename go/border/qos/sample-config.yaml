@@ -41,7 +41,6 @@ Rules:
         name: 'Test rule'
         priority: 0
         sourceAs: '2-ff00:0:212'
-        nextHopAs: ""
         destinationAs: '1-ff00:0:110'
         L4Type:
             - 0
@@ -54,7 +53,6 @@ Rules:
         name: 'Drop Test Rule'
         priority: 1
         sourceAs: '1-ff00:0:110'
-        nextHopAs: ""
         destinationAs: '1-ff00:0:111'
         L4Type:
             - 1
