@@ -137,6 +137,7 @@ func BenchmarkEnqueueForProfile(b *testing.B) {
 	arr := getPackets(singleRun)
 	la := len(arr)
 
+	b.ResetTimer()
 	for j := 0; j < b.N; j++ {
 		for k := 0; k < la; k++ {
 			qosConfig.QueuePacket(arr[k])

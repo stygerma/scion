@@ -216,10 +216,26 @@ var emptyRule = &InternalClassRule{
 
 func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
 
-	returnRule = emptyRule
-
 	srcAddr, _ := rp.SrcIA()
 	dstAddr, _ := rp.DstIA()
+	l4h, _ := rp.L4Hdr(false)
+	var l4t common.L4ProtocolType
+
+	if l4h == nil {
+		l4t = 0
+	} else {
+		l4t = l4h.L4Type()
+	}
+
+	// entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, l4type: l4t}
+
+	// returnRule = config.Rules.CrCache.Get(entry)
+
+	// if returnRule != nil {
+	// 	return returnRule
+	// }
+
+	returnRule = emptyRule
 
 	exactAndRangeSourceMatches = config.Rules.SourceRules[srcAddr]
 	exactAndRangeDestinationMatches = config.Rules.DestinationRules[dstAddr]
@@ -243,28 +259,27 @@ func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalCl
 
 	matched = intersectListsRules(sources, destinations)
 
-	matchL4Type(&matched, rp)
+	matchL4Type(&matched, l4t)
 
 	max := -1
 	max, returnRule = getRuleWithPrevMax(returnRule, matched, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, sourceAnyDestinationMatches, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, destinationAnySourceRules, max)
 
+	// config.Rules.CrCache.Put(entry, returnRule)
+
 	return returnRule
 }
 
-func matchL4Type(list *[]*InternalClassRule, rp *rpkt.RtrPkt) {
-
-	l4h, _ := rp.L4Hdr(false)
-
-	if l4h == nil {
-		return
-	}
+func matchL4Type(list *[]*InternalClassRule, l4t common.L4ProtocolType) {
 
 	for i := 0; i < len(*list); i++ {
 		matched := false
+		if (*list)[i] == nil {
+			break
+		}
 		for j := 0; j < len((*list)[i].L4Type); j++ {
-			if (*list)[i].L4Type[j] == l4h.L4Type() {
+			if (*list)[i].L4Type[j] == l4t {
 				matched = true
 				break
 			}

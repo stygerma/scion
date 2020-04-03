@@ -92,6 +92,8 @@ func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (Q
 		log.Error("Initialising the workers has failed", "error", err)
 	}
 
+	qConfig.config.Rules.CrCache.Init(256)
+
 	return qConfig, nil
 }
 
