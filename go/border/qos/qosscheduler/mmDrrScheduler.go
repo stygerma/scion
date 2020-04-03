@@ -52,7 +52,9 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.I
 func (sched *MinMaxDeficitRoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	length := routerConfig.Queues[queueNo].GetLength()
-	pd := 64 * (routerConfig.Queues[queueNo].GetMinBandwidth() / sched.quantumSum)
+	a := routerConfig.Queues[queueNo].GetMinBandwidth()
+	b := a / sched.quantumSum
+	pd := 64 * b
 	pktToDequeue := max(pd, 1)
 
 	// log.Debug("The queue has length", "length", length)
