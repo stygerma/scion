@@ -19,6 +19,7 @@ type InternalRouterConfig struct {
 
 type MapRules struct {
 	RulesList                 []InternalClassRule
+	CrCache                   ClassRuleCache
 	SourceRules               map[addr.IA][]*InternalClassRule
 	DestinationRules          map[addr.IA][]*InternalClassRule
 	SourceAnyDestinationRules map[addr.IA][]*InternalClassRule
