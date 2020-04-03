@@ -227,13 +227,13 @@ func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalCl
 		l4t = l4h.L4Type()
 	}
 
-	// entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, l4type: l4t}
+	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, l4type: l4t}
 
-	// returnRule = config.Rules.CrCache.Get(entry)
+	returnRule = config.Rules.CrCache.Get(entry)
 
-	// if returnRule != nil {
-	// 	return returnRule
-	// }
+	if returnRule != nil {
+		return returnRule
+	}
 
 	returnRule = emptyRule
 
@@ -266,7 +266,7 @@ func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalCl
 	max, returnRule = getRuleWithPrevMax(returnRule, sourceAnyDestinationMatches, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, destinationAnySourceRules, max)
 
-	// config.Rules.CrCache.Put(entry, returnRule)
+	config.Rules.CrCache.Put(entry, returnRule)
 
 	return returnRule
 }
