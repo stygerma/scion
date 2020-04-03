@@ -26,11 +26,7 @@ type ChannelPacketQueue struct {
 	mutex *sync.Mutex
 
 	queue chan *QPkt
-	// length uint64
-	tb   tokenBucket
-	head int
-	tail int
-	mask int
+	tb    tokenBucket
 }
 
 var _ PacketQueueInterface = (*ChannelPacketQueue)(nil)
@@ -43,9 +39,6 @@ func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mut
 	pq.tb = tokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
 	pq.queue = make(chan *QPkt, pq.pktQue.MaxLength)
-	pq.head = 0
-	pq.tail = 0
-	pq.mask = pq.pktQue.MaxLength - 1
 }
 
 func (pq *ChannelPacketQueue) Enqueue(rp *QPkt) {
@@ -63,7 +56,7 @@ func (pq *ChannelPacketQueue) canEnqueue() bool {
 
 func (pq *ChannelPacketQueue) canDequeue() bool {
 
-	return pq.head < pq.tail
+	return true
 }
 
 func (pq *ChannelPacketQueue) GetFillLevel() int {
@@ -83,16 +76,10 @@ func (pq *ChannelPacketQueue) peek() *QPkt {
 
 func (pq *ChannelPacketQueue) Pop() *QPkt {
 
-	// c := 1
-	// atomic.AddUint64(&len(pq.queue), ^uint64(c-1))
-
 	return <-pq.queue
 }
 
 func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
-
-	// c := number
-	// atomic.AddUint64(&len(pq.queue), ^uint64(c-1))
 
 	pkts := make([]*QPkt, number)
 
@@ -111,18 +98,12 @@ func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
 
 	level := pq.GetFillLevel()
 
-	//log.Trace("Current level is", "level", level)
-	//log.Trace("Profiles are", "profiles", pq.pktQue.Profile)
-
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
-			//log.Trace("Matched a rule!")
 			rand := rand.Intn(100)
 			if rand < (pq.pktQue.Profile[j].Prob) {
-				//log.Trace("Take Action!")
 				return pq.pktQue.Profile[j].Action
 			}
-			//log.Trace("Do not take Action")
 
 		}
 	}

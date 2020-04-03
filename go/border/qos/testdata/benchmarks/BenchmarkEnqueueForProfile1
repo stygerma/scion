@@ -58,3 +58,804 @@ pkg: github.com/scionproto/scion/go/border/qos
 BenchmarkEnqueueForProfile-4   	    1448	    871331 ns/op
 PASS
 ok  	github.com/scionproto/scion/go/border/qos	1.551s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1642	    948199 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.749s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1456	    865499 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.572s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1504	    883686 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.636s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1362	    949481 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.535s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1453	    862847 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.534s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1690	    830449 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.628s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1510	    865003 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.527s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1255	    876212 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.332s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1330	    951321 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.550s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1228	    896369 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.333s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1399	    838352 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.439s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1449	    943807 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.642s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1286	    891822 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.451s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1321	    897617 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.459s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1591	    802282 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.530s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1527	  19486777 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	30.608s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1683	    877769 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.753s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1330	    927820 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.544s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1536	    907298 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.658s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1335	    882241 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.438s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1420	    855272 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.438s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1501	  18248938 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	28.687s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1420	    922973 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.540s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1598	    877792 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.642s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1227	  20141745 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	26.062s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1387	    920263 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.536s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1550	    833448 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.527s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1166	    892237 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.326s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1347	   1004642 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.630s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1599	    845772 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.566s
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:02+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+    1368	   1040124 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.681s
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:04+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+    1653	    920765 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.757s
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:06+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+    1418	    995346 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.661s
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:08+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+    1569	    863795 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.632s
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:10+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+    1338	    996525 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.626s
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:12+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] Loop over Rules"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - Exact Priority:4 SourceAs:{IA:11-ff00:0:299 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:22-ff00:0:188 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:1}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ISDONLY Priority:3 SourceAs:{IA:33-ff00:0:277 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:44-ff00:0:166 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:1} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:2}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ASONLY Priority:2 SourceAs:{IA:55-ff00:0:55 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:66-ff00:0:344 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:2} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:3}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - RANGE Priority:17 SourceAs:{IA:77-ff00:0:233 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:0-0 lowLim:{I:85 A:280375465083426} upLim:{I:85 A:280375465085184} matchMode:3} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:4}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the rule" rule="{Name:Exact - ANY Priority:0 SourceAs:{IA:2-ff00:0:11 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} NextHopAs:{IA:0-0 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:0} DestinationAs:{IA:100-ff00:0:989 lowLim:{I:0 A:0} upLim:{I:0 A:0} matchMode:4} L4Type:[None/HopByHop SCMP TCP UDP End2End] QueueNumber:5}"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] Loop over queues"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="General Queue"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Speedy Queue"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Droppy Queue"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 3"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 4"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 5"
+t=2020-04-03T13:52:13+0000 lvl=dbug msg="[TRACE] We have gotten the queue" queue="Queue 6"
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+FAIL	github.com/scionproto/scion/go/border/qos [build failed]
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1524	    923744 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.667s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1381	  19549378 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	28.310s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1578	    872530 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.647s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1335	    961986 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.541s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1536	    989200 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.757s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1186	    932486 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.333s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1664	    864201 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.638s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1351	    795160 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.334s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1452	    903590 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.557s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1312	    803703 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.346s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1515	    818735 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.447s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1207	    908139 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.341s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1255	    883988 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.343s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1312	    897516 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.427s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1567	   1046366 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.848s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1442	    886709 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.551s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1252	    848259 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.322s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1190	    878153 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.345s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1456	    885379 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.541s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1497	    943838 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.657s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1316	  18765985 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	25.867s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1414	    912231 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.542s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1479	    854303 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.538s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1376	    879599 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.423s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1155	   1011111 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.438s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1168	    895968 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.339s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1305	    868709 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.450s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1362	    967371 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.549s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1392	  19482479 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	28.385s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1269	    963002 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.537s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1408	    967319 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.625s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1468	    851520 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.547s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1328	   1024441 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.669s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1546	    960545 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.760s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1309	   1017478 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.644s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1190	    954091 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.429s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1414	    852115 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.430s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1552	    933042 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.735s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1166	    873142 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.324s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1404	  19876248 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	29.255s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1280	    893455 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.445s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1412	    837475 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.426s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1143	   1077865 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.530s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1371	    886491 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.438s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1243	    900783 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.427s
