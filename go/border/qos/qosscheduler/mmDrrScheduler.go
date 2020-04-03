@@ -71,9 +71,10 @@ func (sched *MinMaxDeficitRoundRobinScheduler) dequeue(routerConfig qosqueues.In
 				}
 			}
 		}
-
-		qps := routerConfig.Queues[queueNo].PopMultiple(max(length, pktToDequeue))
-		for _, qp := range qps {
+		var qp *qosqueues.QPkt
+		toDeqlength := max(length, pktToDequeue)
+		for i := 0; i < toDeqlength; i++ {
+			qp = routerConfig.Queues[queueNo].Pop()
 			forwarder(qp.Rp)
 		}
 	}
