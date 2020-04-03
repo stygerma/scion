@@ -75,6 +75,7 @@ func prepareRtrPacketDetailedSample(sourceIA addr.IA, destinationIA addr.IA, L4T
 	// r.log.Logger = nil
 	r.Ctx = rctx.New(config)
 	r.refCnt = -1
+
 	return r
 }
 
