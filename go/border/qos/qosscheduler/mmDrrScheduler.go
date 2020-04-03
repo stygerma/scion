@@ -5,7 +5,6 @@ import (
 
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 // This is also a deficit round robin dequeuer. But instead of the priority field it uses the min-bandwidth field for the minimum number of packets to dequeue. If there are fewer than the minimal value of packets to dequeue, the remaining min-bandwidth will be put onto a surplus counter and another queue might use more than its min-bandwidth (but still less than its max-bandwidth).
@@ -55,20 +54,20 @@ func (sched *MinMaxDeficitRoundRobinScheduler) dequeue(routerConfig qosqueues.In
 	length := routerConfig.Queues[queueNo].GetLength()
 	pktToDequeue := min(64*(routerConfig.Queues[queueNo].GetMinBandwidth()/sched.quantumSum), 1)
 
-	log.Debug("The queue has length", "length", length)
-	log.Debug("Dequeueing packets", "quantum", pktToDequeue)
+	// log.Debug("The queue has length", "length", length)
+	// log.Debug("Dequeueing packets", "quantum", pktToDequeue)
 
 	if length > 0 {
 
 		if sched.surplusAvailable() {
-			log.Debug("Surplus available", "surplus", sched.schedulerSurplus)
+			// log.Debug("Surplus available", "surplus", sched.schedulerSurplus)
 			if length > pktToDequeue {
 				pktToDequeue = sched.getFromSurplus(routerConfig, queueNo, length)
-				log.Debug("Dequeueing above minimum", "quantum", pktToDequeue)
+				// log.Debug("Dequeueing above minimum", "quantum", pktToDequeue)
 			} else {
 				if pktToDequeue-length > 0 {
 					sched.payIntoSurplus(routerConfig, queueNo, pktToDequeue-length)
-					log.Debug("Paying into surplus", "payment", pktToDequeue-length)
+					// log.Debug("Paying into surplus", "payment", pktToDequeue-length)
 				}
 			}
 		}

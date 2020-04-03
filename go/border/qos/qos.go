@@ -111,7 +111,7 @@ func initClassification(qConfig *QosConfiguration) error {
 func initScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
-	qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
+	qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 

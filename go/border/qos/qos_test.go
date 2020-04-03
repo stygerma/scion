@@ -59,14 +59,6 @@ func BenchmarkQueueSinglePacket(b *testing.B) {
 
 func TestSingleEnqueue(t *testing.T) {
 
-	root := log15.Root()
-
-	file, err := ioutil.TempFile("", "benchmark-log")
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
-
 	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
 	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
 	pkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
@@ -136,6 +128,30 @@ func printLog(leading string, j int, runs int, start time.Time) {
 
 func BenchmarkEnqueueForProfile(b *testing.B) {
 
+	disableLog(b)
+
+	singleRun := 1024 // Should not exceed maximum queue length + capacity of notification
+
+	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
+	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
+	arr := getPackets(singleRun)
+	la := len(arr)
+
+	for j := 0; j < b.N; j++ {
+		for k := 0; k < la; k++ {
+			qosConfig.QueuePacket(arr[k])
+		}
+
+		for i := 0; i < la; i++ {
+			select {
+			case <-testQueue:
+			case <-qosConfig.notifications:
+			}
+		}
+	}
+}
+
+func disableLog(b *testing.B) {
 	root := log15.Root()
 
 	file, err := ioutil.TempFile("", "benchmark-log")
@@ -143,23 +159,4 @@ func BenchmarkEnqueueForProfile(b *testing.B) {
 		b.Fatalf("Unexpected error: %v", err)
 	}
 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
-
-	singleRun := 1024 // Should not exceed maximum queue length + capacity of notification
-
-	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
-	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
-	arr := getPackets(singleRun)
-
-	for j := 0; j < b.N; j++ {
-		for _, pkt := range arr {
-			qosConfig.QueuePacket(pkt)
-		}
-
-		for i := 0; i < len(arr); i++ {
-			select {
-			case <-testQueue:
-			case <-qosConfig.notifications:
-			}
-		}
-	}
 }

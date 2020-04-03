@@ -1,0 +1,180 @@
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1507	    923283 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.660s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1386	    939777 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.546s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1011	   1120927 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.482s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1474	   1032187 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.756s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1440	    988140 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.656s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1538	   1098735 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.947s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1326	    960302 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.546s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1098	    978464 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.329s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1304	    983879 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.572s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1228	    978373 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.465s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1306	  19553389 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	26.664s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1178	   1015824 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.442s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1130	   1134076 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.549s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1190	   1136686 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.647s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1425	   1080894 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.845s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1526	   1298010 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.301s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1344	  19775398 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	27.522s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1377	    994261 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.644s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1134	  18687897 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	22.315s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1308	   1040349 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.679s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1180	    932550 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.430s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1600	    968668 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.833s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1399	    902823 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.476s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1452	    998245 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.747s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1314	    978147 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.543s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1168	    999126 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.466s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1275	    993460 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.542s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1359	   1035038 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.649s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1233	    953424 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.427s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkEnqueueForProfile-4   	    1296	   1100273 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	1.682s
