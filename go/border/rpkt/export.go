@@ -129,6 +129,7 @@ func JFPrepareRtrPacketWith(sourceIA addr.IA, destinationIA addr.IA, L4Type comm
 	// r.log.Logger = nil
 	r.Ctx = rctx.New(config)
 	r.refCnt = -1
+
 	return r
 }
 
