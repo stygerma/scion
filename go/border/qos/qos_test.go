@@ -3,11 +3,7 @@ package qos
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"math/rand"
-	"os"
-	"runtime"
-	"runtime/pprof"
 	"testing"
 	"time"
 
@@ -98,21 +94,13 @@ func TestEnqueueWithProfile(t *testing.T) {
 
 	start := time.Now()
 
-	runs := 6 * 1000 * 10
+	runs := 6 * 1000
 	singleRun := 1000 // Should not exceed maximum queue length + capacity of notification
 
 	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
 	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
 
 	arr := getPackets(singleRun)
-
-	runtime.SetCPUProfileRate(500)
-	f, err := os.Create("testdata/TestQueueSinglePacketProfile.prof")
-	if err != nil {
-		log.Fatal(err)
-	}
-	pprof.StartCPUProfile(f)
-	defer pprof.StopCPUProfile()
 
 	fmt.Println("Array is", len(arr))
 
@@ -128,7 +116,7 @@ func TestEnqueueWithProfile(t *testing.T) {
 			case <-qosConfig.notifications:
 			}
 		}
-		if j < 11 || j%11 == 0 {
+		if j < 11 || j%20 == 0 {
 			printLog("Runs", j, runs, start)
 		}
 	}
@@ -148,41 +136,30 @@ func printLog(leading string, j int, runs int, start time.Time) {
 
 func BenchmarkEnqueueForProfile(b *testing.B) {
 
-	start := time.Now()
+	root := log15.Root()
+
+	file, err := ioutil.TempFile("", "benchmark-log")
+	if err != nil {
+		b.Fatalf("Unexpected error: %v", err)
+	}
+	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
+
 	singleRun := 1024 // Should not exceed maximum queue length + capacity of notification
 
 	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
 	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
 	arr := getPackets(singleRun)
 
-	runtime.SetCPUProfileRate(500)
-	f, err := os.Create("testdata/TestQueueSinglePacketProfile.prof")
-	if err != nil {
-		log.Fatal(err)
-	}
-	pprof.StartCPUProfile(f)
-	defer pprof.StopCPUProfile()
-
-	fmt.Println("Array is", len(arr))
-
 	for j := 0; j < b.N; j++ {
-		for k, pkt := range arr {
-			fmt.Println(k)
+		for _, pkt := range arr {
 			qosConfig.QueuePacket(pkt)
 		}
 
-		fmt.Println("Start dequeue")
-
 		for i := 0; i < len(arr); i++ {
-			fmt.Println("Dequeue", i)
 			select {
 			case <-testQueue:
 			case <-qosConfig.notifications:
 			}
 		}
-		if j < 11 || j%111 == 0 {
-			printLog("Runs", j, b.N, start)
-		}
 	}
-
 }
