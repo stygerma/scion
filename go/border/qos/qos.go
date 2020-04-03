@@ -119,7 +119,7 @@ func initScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) e
 }
 
 func initWorkers(qConfig *QosConfiguration) error {
-	noWorkers := max(1, min(3, len(qConfig.config.Queues)))
+	noWorkers := len(qConfig.config.Queues)
 	qConfig.worker = workerConfiguration{noWorkers, 64}
 	qConfig.workerChannels = make([]chan *qosqueues.QPkt, qConfig.worker.noWorker)
 
