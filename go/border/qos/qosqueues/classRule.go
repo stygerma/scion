@@ -243,12 +243,37 @@ func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalCl
 
 	matched = intersectListsRules(sources, destinations)
 
+	matchL4Type(&matched, rp)
+
 	max := -1
 	max, returnRule = getRuleWithPrevMax(returnRule, matched, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, sourceAnyDestinationMatches, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, destinationAnySourceRules, max)
 
 	return returnRule
+}
+
+func matchL4Type(list *[]*InternalClassRule, rp *rpkt.RtrPkt) {
+
+	l4h, _ := rp.L4Hdr(false)
+
+	if l4h == nil {
+		return
+	}
+
+	for i := 0; i < len(*list); i++ {
+		matched := false
+		for j := 0; j < len((*list)[i].L4Type); j++ {
+			if (*list)[i].L4Type[j] == l4h.L4Type() {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			(*list)[i] = nil
+		}
+	}
+
 }
 
 func getRuleWithPrevMax(returnRule *InternalClassRule, list []*InternalClassRule, prevMax int) (int, *InternalClassRule) {
