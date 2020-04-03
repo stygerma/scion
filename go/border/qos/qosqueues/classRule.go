@@ -16,7 +16,6 @@
 package qosqueues
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/scionproto/scion/go/border/qos/qosconf"
@@ -209,15 +208,15 @@ var isdOnlySourceRules, isdOnlyDestinationRules, matched []*InternalClassRule
 var sources [3][]*InternalClassRule
 var destinations [3][]*InternalClassRule
 
+var emptyRule = &InternalClassRule{
+	Name:        "default",
+	Priority:    0,
+	QueueNumber: 0,
+}
+
 func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
 
-	// log.Debug("New call to -------------")
-
-	returnRule := &InternalClassRule{
-		Name:        "default",
-		Priority:    0,
-		QueueNumber: 0,
-	}
+	returnRule = emptyRule
 
 	srcAddr, _ := rp.SrcIA()
 	dstAddr, _ := rp.DstIA()
@@ -245,27 +244,20 @@ func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalCl
 	matched = intersectListsRules(sources, destinations)
 
 	max := -1
-	max, returnRule = getRuleWithPrevMax(matched, max)
-	max, returnRule = getRuleWithPrevMax(sourceAnyDestinationMatches, max)
-	max, returnRule = getRuleWithPrevMax(destinationAnySourceRules, max)
-
-	if returnRule == nil {
-		returnRule = &InternalClassRule{
-			Name:        "default",
-			Priority:    0,
-			QueueNumber: 0,
-		}
-	}
+	max, returnRule = getRuleWithPrevMax(returnRule, matched, max)
+	max, returnRule = getRuleWithPrevMax(returnRule, sourceAnyDestinationMatches, max)
+	max, returnRule = getRuleWithPrevMax(returnRule, destinationAnySourceRules, max)
 
 	return returnRule
 }
 
-func getRuleWithPrevMax(list []*InternalClassRule, prevMax int) (int, *InternalClassRule) {
-	for _, rul1 := range list {
-		if rul1 != nil {
-			if rul1.Priority > prevMax {
-				returnRule = rul1
-				prevMax = rul1.Priority
+func getRuleWithPrevMax(returnRule *InternalClassRule, list []*InternalClassRule, prevMax int) (int, *InternalClassRule) {
+
+	for i := 0; i < len(list); i++ {
+		if list[i] != nil {
+			if list[i].Priority > prevMax {
+				returnRule = list[i]
+				prevMax = list[i].Priority
 			}
 		} else {
 			break
@@ -274,7 +266,7 @@ func getRuleWithPrevMax(list []*InternalClassRule, prevMax int) (int, *InternalC
 	return prevMax, returnRule
 }
 
-var matches []*InternalClassRule
+var matches = make([]*InternalClassRule, 10)
 
 func unionRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalClassRule {
 
@@ -285,15 +277,16 @@ func intersectListsRules(a [3][]*InternalClassRule, b [3][]*InternalClassRule) [
 	for i := 0; i < len(matches); i++ {
 		matches[i] = nil
 	}
-	// fmt.Println("Matches before tryiing to find matches", matches)
 	k := 0
+
 	for l := 0; l < 3; l++ {
 		for m := 0; m < 3; m++ {
-			for _, rul1 := range a[l] {
-				for _, rul2 := range b[m] {
-					if rul1 == rul2 {
-						fmt.Println("Add match", l, m)
-						matches[k] = rul1
+			lb := len(b[m])
+			la := len(a[l])
+			for i := 0; i < la; i++ {
+				for j := 0; j < lb; j++ {
+					if a[l][i] == b[m][j] {
+						matches[k] = a[l][i]
 						k++
 					}
 				}
@@ -308,10 +301,10 @@ func intersectRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalC
 		matches[i] = nil
 	}
 	k := 0
-	for _, rul1 := range a {
-		for _, rul2 := range b {
-			if rul1 == rul2 {
-				matches[k] = rul1
+	for i := 0; i < len(a); i++ {
+		for j := 0; j < len(b); j++ {
+			if a[i] == b[j] {
+				matches[k] = a[i]
 				k++
 			}
 		}
@@ -322,13 +315,4 @@ func intersectRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalC
 func GetQueueNumberForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) int {
 
 	return GetRuleForPacket(config, rp).QueueNumber
-}
-
-func contains(slice []int, term int) bool {
-	for _, item := range slice {
-		if item == term {
-			return true
-		}
-	}
-	return false
 }
