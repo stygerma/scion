@@ -55,9 +55,6 @@ func (tb *tokenBucket) refill() {
 
 func (tb *tokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
 
-	tb.mutex.Lock()
-	defer tb.mutex.Unlock()
-
 	tokenForPacket := (qp.Rp.Bytes().Len()) // In byte
 
 	tb.refill()
