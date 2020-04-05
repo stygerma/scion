@@ -101,8 +101,6 @@ func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (Q
 		log.Error("Initialising the workers has failed", "error", err)
 	}
 
-	qConfig.config.Rules.CrCache.Init(256)
-
 	return qConfig, nil
 }
 
@@ -115,6 +113,7 @@ func ConvertExternalToInternalConfig(qConfig *QosConfiguration, extConf qosconf.
 
 func InitClassification(qConfig *QosConfiguration) error {
 	qConfig.config.Rules = *qosqueues.RulesToMap(qConfig.config.Rules.RulesList)
+	qConfig.config.Rules.CrCache.Init(256)
 
 	return nil
 }
@@ -149,7 +148,11 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	//log.Trace("preRouteStep")
 	//log.Trace("We have rules: ", "len(Rules)", len(qosConfig.GetConfig().Rules))
 
-	queueNo := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), rp)
+	rc := qosqueues.RegularClassRule{}
+
+	// queueNo := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), rp)
+	config := qosConfig.GetConfig()
+	queueNo := rc.GetRuleForPacket(config, rp).QueueNumber
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
 	//log.Trace("Our packet is", "QPkt", qp)

@@ -2,9 +2,12 @@ package qosqueues_test
 
 import (
 	"fmt"
+	"io/ioutil"
 	"testing"
 
+	"github.com/inconshreveable/log15"
 	"github.com/scionproto/scion/go/border/qos/qosconf"
+	"github.com/scionproto/scion/go/lib/log"
 
 	"github.com/scionproto/scion/go/border/qos"
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
@@ -54,6 +57,8 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
+	rc := qosqueues.RegularClassRule{}
+
 	tables := []struct {
 		srcIA       string
 		dstIA       string
@@ -88,7 +93,7 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for k := 0; k < len(tables); k++ {
-			rul := qosqueues.GetRuleForPacket(qosConfig.GetConfig(), &arr[k])
+			rul := rc.GetRuleForPacket(qosConfig.GetConfig(), &arr[k])
 			_ = rul
 
 		}
@@ -96,27 +101,71 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 
 }
 
-func BenchmarkSingleMatch(b *testing.B) {
+func BenchmarkSingleMatchSequential(b *testing.B) {
+	disableLog(b)
 	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
 	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
-	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
+	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
+
+	qConfig := qos.QosConfiguration{}
+
+	var err error
+	if err = qos.ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
+		log.Error("Initialising the classification data structures has failed", "error", err)
+	}
+	if err = qos.InitClassification(&qConfig); err != nil {
+		log.Error("Initialising the classification data structures has failed", "error", err)
+	}
+
+	qosConfig := qConfig
+
+	rc := qosqueues.RegularClassRule{}
 
 	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-
-		rul := qosqueues.GetRuleForPacket(qosConfig.GetConfig(), pkt)
+		rul := rc.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 		_ = rul
+	}
+}
 
+func BenchmarkSingleMatchParallel(b *testing.B) {
+	disableLog(b)
+	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
+	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
+	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
+
+	qConfig := qos.QosConfiguration{}
+
+	var err error
+	if err = qos.ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
+		log.Error("Initialising the classification data structures has failed", "error", err)
+	}
+	if err = qos.InitClassification(&qConfig); err != nil {
+		log.Error("Initialising the classification data structures has failed", "error", err)
 	}
 
+	qosConfig := qConfig
+
+	rc := qosqueues.ParallelClassRule{}
+
+	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		rul := rc.GetRuleForPacket(qosConfig.GetConfig(), pkt)
+		_ = rul
+		// fmt.Println("Iteration", i)
+	}
 }
 
 func TestRuleMatchModes(t *testing.T) {
 
 	extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
+
+	rc := qosqueues.RegularClassRule{}
 
 	tables := []struct {
 		srcIA       string
@@ -146,7 +195,7 @@ func TestRuleMatchModes(t *testing.T) {
 	for k, tab := range tables {
 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
-		rul := qosqueues.GetRuleForPacket(qosConfig.GetConfig(), pkt)
+		rul := rc.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 		// queue := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
 
 		if rul == nil {
@@ -165,6 +214,23 @@ func TestRuleMatchModes(t *testing.T) {
 
 }
 
+var forward = make(chan bool, 1)
+
+func forwardPacketByDropAndWait(rp *rpkt.RtrPkt) {
+	forward <- true
+	rp.Release()
+}
+
 func forwardPacketByDrop(rp *rpkt.RtrPkt) {
 	rp.Release()
+}
+
+func disableLog(b *testing.B) {
+	root := log15.Root()
+
+	file, err := ioutil.TempFile("", "benchmark-log")
+	if err != nil {
+		b.Fatalf("Unexpected error: %v", err)
+	}
+	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 }
