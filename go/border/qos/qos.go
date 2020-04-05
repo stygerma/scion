@@ -74,21 +74,27 @@ func (q *QosConfiguration) GetLegacyConfig() *qosconf.ExternalConfig {
 	return &q.legacyConfig
 }
 
+// SetAndInitSchedul is necessary to set up a mock scheduler for testing. Do not use for anything else.
+func (q *QosConfiguration) SetAndInitSchedul(sched qosscheduler.SchedulerInterface) {
+	q.schedul = sched
+	q.schedul.Init(q.config)
+}
+
 func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {
 
 	qConfig := QosConfiguration{}
 
 	var err error
-	if err = convertExternalToInternalConfig(&qConfig, extConf); err != nil {
+	if err = ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
 		log.Error("Initialising the classification data structures has failed", "error", err)
 	}
-	if err = initClassification(&qConfig); err != nil {
+	if err = InitClassification(&qConfig); err != nil {
 		log.Error("Initialising the classification data structures has failed", "error", err)
 	}
-	if err = initScheduler(&qConfig, forwarder); err != nil {
+	if err = InitScheduler(&qConfig, forwarder); err != nil {
 		log.Error("Initialising the scheduler has failed", "error", err)
 	}
-	if err = initWorkers(&qConfig); err != nil {
+	if err = InitWorkers(&qConfig); err != nil {
 		log.Error("Initialising the workers has failed", "error", err)
 	}
 
@@ -97,30 +103,31 @@ func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (Q
 	return qConfig, nil
 }
 
-func convertExternalToInternalConfig(qConfig *QosConfiguration, extConf qosconf.ExternalConfig) error {
+func ConvertExternalToInternalConfig(qConfig *QosConfiguration, extConf qosconf.ExternalConfig) error {
 	var err error
 	qConfig.config, err = convertExternalToInteral(extConf)
 	qConfig.legacyConfig = extConf
 	return err
 }
 
-func initClassification(qConfig *QosConfiguration) error {
+func InitClassification(qConfig *QosConfiguration) error {
 	qConfig.config.Rules = *qosqueues.RulesToMap(qConfig.config.Rules.RulesList)
 
 	return nil
 }
 
-func initScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
+func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
-	qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
+	// qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
+	qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
 	return nil
 }
 
-func initWorkers(qConfig *QosConfiguration) error {
+func InitWorkers(qConfig *QosConfiguration) error {
 	noWorkers := len(qConfig.config.Queues)
 	qConfig.worker = workerConfiguration{noWorkers, 64}
 	qConfig.workerChannels = make([]chan *qosqueues.QPkt, qConfig.worker.noWorker)
@@ -145,6 +152,8 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	//log.Trace("Our packet is", "QPkt", qp)
 	//log.Trace("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
 	//log.Trace("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
+
+	log.Debug("Put packet on queue", "queueNo", queueNo)
 
 	select {
 	case *qosConfig.schedul.GetMessages() <- true:
@@ -210,7 +219,8 @@ func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
 	//TODO: Remove later
 	// qosConfig.notifications <- &qosqueues.NPkt{}
 	qosConfig.droppedPackets++
-	panic("Do not drop packets")
+	log.Debug("Dropping packet", "qosConfig.droppedPackets", qosConfig.droppedPackets)
+	// panic("Do not drop packets")
 
 }
 

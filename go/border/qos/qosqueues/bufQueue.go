@@ -124,6 +124,10 @@ func (pq *PacketBufQueue) GetMinBandwidth() int {
 	return pq.pktQue.MinBandwidth
 }
 
+func (pq *PacketBufQueue) GetMaxBandwidth() int {
+	return pq.pktQue.MaxBandWidth
+}
+
 func (pq *PacketBufQueue) GetPriority() int {
 	return pq.pktQue.Priority
 }

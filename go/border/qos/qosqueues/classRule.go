@@ -23,6 +23,7 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 // TODO: Matching rules is currently based on string comparisons
@@ -220,6 +221,8 @@ func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalCl
 	dstAddr, _ := rp.DstIA()
 	l4h, _ := rp.L4Hdr(false)
 	var l4t common.L4ProtocolType
+
+	log.Debug("Adresses", "srcAddr", srcAddr, "dstAddr", dstAddr, "l4t", l4t)
 
 	if l4h == nil {
 		l4t = 0
