@@ -115,6 +115,10 @@ func (pq *ChannelPacketQueue) Police(qp *QPkt) PoliceAction {
 	return pq.tb.PoliceBucket(qp)
 }
 
+func (pq *ChannelPacketQueue) GetMaxBandwidth() int {
+	return pq.pktQue.MaxBandWidth
+}
+
 func (pq *ChannelPacketQueue) GetMinBandwidth() int {
 	return pq.pktQue.MinBandwidth
 }

@@ -28,14 +28,14 @@ func (sched *deficitRoundRobinScheduler) Init(routerConfig qosqueues.InternalRou
 
 }
 
-func (sched *deficitRoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
+func (sched *deficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
-	length := routerConfig.Queues[queueNo].GetLength()
-	var nopkts int = 64 * (routerConfig.Queues[queueNo].GetPriority() / sched.quantumSum)
+	length := queue.GetLength()
+	var nopkts int = 64 * (queue.GetPriority() / sched.quantumSum)
 	pktToDequeue := min(1, nopkts)
 
 	if length > 0 {
-		qps := routerConfig.Queues[queueNo].PopMultiple(max(length, pktToDequeue))
+		qps := queue.PopMultiple(max(length, pktToDequeue))
 		for _, qp := range qps {
 			forwarder(qp.Rp)
 		}
@@ -48,7 +48,7 @@ func (sched *deficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.Interna
 	}
 	for {
 		for i := 0; i < sched.totalLength; i++ {
-			sched.dequeue(routerConfig, forwarder, i)
+			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
 		time.Sleep(1 * time.Millisecond)
 	}

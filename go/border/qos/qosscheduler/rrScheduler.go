@@ -23,18 +23,18 @@ func (sched *RoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConf
 	sched.sleptLastTime = true
 }
 
-func (sched *RoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
+func (sched *RoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
-	length := routerConfig.Queues[queueNo].GetLength()
+	length := queue.GetLength()
 	var qp *qosqueues.QPkt
 
 	for i := 0; i < length; i++ {
-		qp = routerConfig.Queues[queueNo].Pop()
+		qp = queue.Pop()
 		forwarder(qp.Rp)
 	}
 
 	// if length > 0 {
-	// qps := routerConfig.Queues[queueNo].PopMultiple(length)
+	// qps := queue.PopMultiple(length)
 	// for _, qp := range qps {
 	// 	forwarder(qp.Rp)
 	// }
@@ -63,7 +63,7 @@ func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouter
 		// }
 		// time.Sleep(10 * time.Millisecond)
 		for i := 0; i < sched.totalLength; i++ {
-			sched.dequeue(routerConfig, forwarder, i)
+			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
 	}
 }
