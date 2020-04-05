@@ -23,10 +23,7 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
-	"github.com/scionproto/scion/go/lib/log"
 )
-
-// TODO: Matching rules is currently based on string comparisons
 
 type InternalClassRule struct {
 	// This is currently means the ID of the sending border router
@@ -60,6 +57,10 @@ const (
 	// ANY match anything
 	ANY matchMode = 4
 )
+
+type RegularClassRule struct{}
+
+var _ ClassRuleInterface = (*RegularClassRule)(nil)
 
 func ConvClassRuleToInternal(cr qosconf.ExternalClassRule) (InternalClassRule, error) {
 
@@ -215,14 +216,14 @@ var emptyRule = &InternalClassRule{
 	QueueNumber: 0,
 }
 
-func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
+func (*RegularClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
 
 	srcAddr, _ := rp.SrcIA()
 	dstAddr, _ := rp.DstIA()
 	l4h, _ := rp.L4Hdr(false)
 	var l4t common.L4ProtocolType
 
-	log.Debug("Adresses", "srcAddr", srcAddr, "dstAddr", dstAddr, "l4t", l4t)
+	// log.Debug("Adresses", "srcAddr", srcAddr, "dstAddr", dstAddr, "l4t", l4t)
 
 	if l4h == nil {
 		l4t = 0
@@ -242,6 +243,11 @@ func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalCl
 
 	exactAndRangeSourceMatches = config.Rules.SourceRules[srcAddr]
 	exactAndRangeDestinationMatches = config.Rules.DestinationRules[dstAddr]
+
+	// log.Debug("Map is", "config.Rules.SourceRules", config.Rules.SourceRules)
+
+	// log.Debug("Matches", "exactAndRangeSourceMatches", exactAndRangeSourceMatches)
+	// log.Debug("Matches", "exactAndRangeDestinationMatches", exactAndRangeDestinationMatches)
 
 	sourceAnyDestinationMatches = config.Rules.SourceAnyDestinationRules[srcAddr]
 	destinationAnySourceRules = config.Rules.DestinationAnySourceRules[srcAddr]
@@ -269,7 +275,7 @@ func GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalCl
 	max, returnRule = getRuleWithPrevMax(returnRule, sourceAnyDestinationMatches, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, destinationAnySourceRules, max)
 
-	config.Rules.CrCache.Put(entry, returnRule)
+	// config.Rules.CrCache.Put(entry, returnRule)
 
 	return returnRule
 }
@@ -355,7 +361,7 @@ func intersectRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalC
 	return matches
 }
 
-func GetQueueNumberForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) int {
+// func GetQueueNumberForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) int {
 
-	return GetRuleForPacket(config, rp).QueueNumber
-}
+// 	return GetRuleForPacket(config, rp).QueueNumber
+// }
