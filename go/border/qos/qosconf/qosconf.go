@@ -64,8 +64,12 @@ func LoadConfig(path string) (ExternalConfig, error) {
 	var yamlFile []byte
 	var err error
 
-	yamlFile, err = ioutil.ReadFile(configFileLocation)
-	// yamlFile, err = ioutil.ReadFile(path)
+	// yamlFile, err = ioutil.ReadFile(configFileLocation)
+	yamlFile, err = ioutil.ReadFile(path)
+
+	if err != nil {
+		yamlFile, err = ioutil.ReadFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml")
+	}
 
 	if err != nil {
 		log.Error("Loading the config file has failed", "error", err)
