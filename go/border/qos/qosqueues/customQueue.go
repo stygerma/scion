@@ -167,6 +167,10 @@ func (pq *CustomPacketQueue) GetMinBandwidth() int {
 	return pq.pktQue.MinBandwidth
 }
 
+func (pq *CustomPacketQueue) GetMaxBandwidth() int {
+	return pq.pktQue.MaxBandWidth
+}
+
 func (pq *CustomPacketQueue) GetPriority() int {
 	return pq.pktQue.Priority
 }

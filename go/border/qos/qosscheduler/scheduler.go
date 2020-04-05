@@ -23,7 +23,7 @@ import (
 type SchedulerInterface interface {
 	Init(routerConfig qosqueues.InternalRouterConfig)
 	Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt))
-	dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int)
+	Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int)
 	GetMessages() *chan bool
 }
 
