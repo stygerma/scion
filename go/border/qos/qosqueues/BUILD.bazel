@@ -8,6 +8,7 @@ go_library(
         "classRule.go",
         "classRuleCache.go",
         "customQueue.go",
+        "parallelClassRule.go",
         "policer.go",
         "qosConfig.go",
         "queue.go",
