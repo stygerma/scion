@@ -17,7 +17,7 @@ Queues:
         id: 1
         CIR: 0
         PIR: 70
-        policeRate: 5Mbps
+        policeRate: 50Mbps
         maxLength: 1024
         priority: 1
         congestionWarning: {approach: 11, informationContent: 27}
@@ -55,5 +55,9 @@ Rules:
         sourceAs: '1-ff00:0:110'
         destinationAs: '1-ff00:0:111'
         L4Type:
+            - 0
             - 1
+            - 6
+            - 17
+            - 222
         queueNumber: 2
