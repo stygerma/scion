@@ -26,6 +26,7 @@ type surplus struct {
 }
 
 var _ SchedulerInterface = (*MinMaxDeficitRoundRobinScheduler)(nil)
+var jobs chan bool
 
 func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConfig) {
 
@@ -34,6 +35,8 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig qosqueues.Inter
 
 	sched.schedulerSurplusMtx = &sync.Mutex{}
 	sched.schedulerSurplus = surplus{0, make([]int, sched.totalLength), -1}
+
+	jobs = make(chan bool, len(routerConfig.Queues))
 
 	for i := 0; i < sched.totalLength; i++ {
 		sched.quantumSum = sched.quantumSum + routerConfig.Queues[i].GetMinBandwidth()
@@ -52,6 +55,9 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.I
 		for i := 0; i < sched.totalLength; i++ {
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
+		for i := 0; i < sched.totalLength; i++ {
+			<-jobs
+		}
 	}
 }
 
@@ -68,9 +74,9 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQue
 
 		pktToDequeue = sched.adjustForSurplus(queue, pktToDequeue, queueNo)
 
-		j := dequeuePackets(queue, pktToDequeue, forwarder)
+		go dequeuePackets(queue, pktToDequeue, forwarder)
 
-		log.Debug("Dequeued packets from queue", "queueNo", queueNo, "toDeqLength", pktToDequeue, "totalLength", length, "forwarded packets", j)
+		log.Debug("Dequeued packets from queue", "queueNo", queueNo, "toDeqLength", pktToDequeue, "totalLength", length)
 	}
 }
 
@@ -85,6 +91,7 @@ func dequeuePackets(queue qosqueues.PacketQueueInterface, pktToDequeue int, forw
 		j++
 		forwarder(qp.Rp)
 	}
+	jobs <- true
 	return j
 }
 
