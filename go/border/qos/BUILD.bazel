@@ -19,4 +19,10 @@ go_test(
     srcs = ["qos_test.go"],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
+    deps = [
+        "//go/border/qos/qosconf:go_default_library",
+        "//go/border/rpkt:go_default_library",
+        "@com_github_inconshreveable_log15//:go_default_library",
+        "@com_github_stretchr_testify//require:go_default_library",
+    ],
 )
