@@ -52,6 +52,7 @@ func getSCMPGeneralID(pktInfo *spkt.ScnPkt) uint64 {
 	return 0
 }
 
+//IMP: have to create include an ID for our CWs or exclude our packets from this function
 // getSCMPQuoteID returns the 8-byte ID of a quoted SCMP General class packet.
 func getQuotedSCMPGeneralID(scmpPayload *scmp.Payload) (uint64, error) {
 	// FIXME(scrye): In the case of an SCMP quote, the L4 header quote

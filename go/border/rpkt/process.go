@@ -78,6 +78,10 @@ func (rp *RtrPkt) processSCMP() (HookResult, error) {
 				return HookError, err
 			}
 		}
+		// case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_HBHCongWarn: //IMPL:
+	// 	if err := rp.processSCMPHBHCongWarn(); err != nil {
+	// 		return HookError, err
+	// 	}
 	default:
 		return HookError, common.NewBasicError("Unsupported destination SCMP payload", nil,
 			"class", hdr.Class, "type", hdr.Type.Name(hdr.Class))
@@ -156,6 +160,11 @@ func (rp *RtrPkt) processSCMPRecordPath() error {
 	}
 	return nil
 }
+
+// func (rp *RtrPkt) processSCMPHBHCongWarn() error { //IMPL: processing of HBH congestion warning at intermediate BR
+// 	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host(s) : remove block for this AS
+// 	//and further disseminate message if necessary
+// }
 
 // processSCMPRevocation handles SCMP revocations.
 // There are 3 cases where the router does more than just forward an SCMP revocation message.

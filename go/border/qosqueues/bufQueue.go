@@ -22,6 +22,7 @@ import (
 
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type packetBufQueue struct {
@@ -29,9 +30,10 @@ type packetBufQueue struct {
 
 	mutex *sync.Mutex
 
-	bufQueue *ringbuf.Ring
-	length   int
-	tb       tokenBucket
+	bufQueue     *ringbuf.Ring
+	length       int
+	tb           tokenBucket
+	hbhSelection scmp.HbhSelection
 }
 
 // type QPktList []QPkt
@@ -152,10 +154,10 @@ func (pq *packetBufQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 		pq.tb.tokens = pq.tb.tokens - tokenForPacket
 		pq.tb.tokenSpent += tokenForPacket
 		qp.Act.action = PASS
-		qp.Act.reason = None
+		qp.Act.Reason = None
 	} else {
 		qp.Act.action = DROP
-		qp.Act.reason = BandWidthExceeded
+		qp.Act.Reason = BandWidthExceeded
 	}
 
 	if shouldLog {
@@ -171,4 +173,12 @@ func (pq *packetBufQueue) GetMinBandwidth() int {
 
 func (pq *packetBufQueue) GetPriority() int {
 	return pq.pktQue.priority
+}
+
+func (pq *packetBufQueue) GetTokenBucket() *tokenBucket {
+	return &pq.tb
+}
+
+func (pq *packetBufQueue) GetCongestionWarning() *CongestionWarning {
+	return &pq.pktQue.congWarning
 }

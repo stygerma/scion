@@ -62,6 +62,8 @@ local scmpTypes = {
         [4] = "TRACE_ROUTE_REPLY",
         [5] = "RECORD_PATH_REQUEST",
         [6] = "RECORD_PATH_REPLY",
+        [8] = "HBH_CONG_WARN",
+
     },
     ["ROUTING"] = {
         [0] = "UNREACH_NET",
