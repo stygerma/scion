@@ -49,8 +49,6 @@ type ExternalClassRule struct {
 	QueueNumber          int    `yaml:"queueNumber"`
 }
 
-const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml"
-
 // ExternalConfig is what I am loading from the config file
 type ExternalConfig struct {
 	ExternalQueues []ExternalPacketQueue `yaml:"Queues"`
@@ -58,14 +56,9 @@ type ExternalConfig struct {
 }
 
 func LoadConfig(path string) (ExternalConfig, error) {
-
 	var ec ExternalConfig
-	var yamlFile []byte
-	var err error
 
-	yamlFile, err = ioutil.ReadFile(configFileLocation)
-	// yamlFile, err := ioutil.ReadFile(path)
-
+	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
 		return ExternalConfig{}, err
 	}
@@ -73,7 +66,5 @@ func LoadConfig(path string) (ExternalConfig, error) {
 	if err != nil {
 		return ExternalConfig{}, err
 	}
-
 	return ec, nil
-
 }
