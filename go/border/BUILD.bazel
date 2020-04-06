@@ -55,7 +55,6 @@ go_test(
     name = "go_default_test",
     srcs = [
         "io_test.go",
-        "router_test.go",
         "setup_test.go",
     ],
     data = glob(["testdata/**"]),

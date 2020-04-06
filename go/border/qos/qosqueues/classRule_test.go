@@ -1,3 +1,17 @@
+// Copyright 2020 ETH Zurich
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package qosqueues_test
 
 import (
@@ -10,6 +24,7 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 
 	"github.com/scionproto/scion/go/border/qos"
+	"github.com/scionproto/scion/go/border/qos/qosconf"
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
@@ -191,7 +206,6 @@ func TestRuleMatchModes(t *testing.T) {
 		{"2-ff00:0:011", "22-344:0:222", "Exact - ANY", 5, true},
 		{"2-ff00:0:011", "123-ff00:344:222", "Exact - ANY", 5, true},
 	}
-
 	for k, tab := range tables {
 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
