@@ -19,6 +19,7 @@ import (
 	"sync"
 
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type PoliceAction int
@@ -44,8 +45,8 @@ const (
 
 // Action is
 type Action struct {
-	rule   *InternalClassRule
-	reason Violation
+	Rule   *InternalClassRule
+	Reason Violation
 	action PoliceAction
 }
 
@@ -70,8 +71,8 @@ type congestionWarningApproach int
 type congestionWarningInformationContent int
 
 type CongestionWarning struct {
-	approach    congestionWarningApproach           `yaml:"approach"`
-	infoContent congestionWarningInformationContent `yaml:"informationContent"`
+	Approach    congestionWarningApproach           `yaml:"approach"`
+	InfoContent congestionWarningInformationContent `yaml:"informationContent"`
 }
 
 type PacketQueue struct {
@@ -97,6 +98,9 @@ type PacketQueueInterface interface {
 	Police(qp *QPkt, shouldLog bool) PoliceAction
 	GetPriority() int
 	GetMinBandwidth() int
+	GetTokenBucket() *tokenBucket
+	GetCongestionWarning() *CongestionWarning
+	GetPID() *scmp.PID //TODO: add PID variables to Joel's configuration file, import from there
 }
 
 func ReturnAction(polAction PoliceAction, profAction PoliceAction) PoliceAction {

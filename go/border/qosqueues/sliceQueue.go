@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/scionproto/scion/go/lib/log"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type packetSliceQueue struct {
@@ -16,6 +17,7 @@ type packetSliceQueue struct {
 	queue  []*QPkt
 	length int
 	tb     tokenBucket
+	pid    scmp.PID
 }
 
 var _ PacketQueueInterface = (*packetSliceQueue)(nil)
@@ -30,6 +32,11 @@ func (pq *packetSliceQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb
 		tokens:       pq.pktQue.PoliceRate,
 		lastRefill:   time.Now(),
 		mutex:        mutTb}
+	//if pq.pktQue.congWarning.Approach == 2 { //TODO: uncomment when congestionWarning is correctly assigned in pktQue
+	pq.pid = scmp.PID{FactorProportional: .1, FactorIntegral: .3,
+		FactorDerivative: .3, LastUpdate: time.Now(), SetPoint: 70,
+		Min: 60, Max: 90}
+	//}
 
 }
 
@@ -135,10 +142,10 @@ func (pq *packetSliceQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 		pq.tb.tokens = pq.tb.tokens - tokenForPacket
 		pq.tb.tokenSpent += tokenForPacket
 		qp.Act.action = PASS
-		qp.Act.reason = None
+		qp.Act.Reason = None
 	} else {
 		qp.Act.action = DROP
-		qp.Act.reason = BandWidthExceeded
+		qp.Act.Reason = BandWidthExceeded
 	}
 
 	if shouldLog {
@@ -154,4 +161,16 @@ func (pq *packetSliceQueue) GetMinBandwidth() int {
 
 func (pq *packetSliceQueue) GetPriority() int {
 	return pq.pktQue.priority
+}
+
+func (pq *packetSliceQueue) GetTokenBucket() *tokenBucket {
+	return &pq.tb
+}
+
+func (pq *packetSliceQueue) GetCongestionWarning() *CongestionWarning {
+	return &pq.pktQue.congWarning
+}
+
+func (pq *packetSliceQueue) GetPID() *scmp.PID {
+	return &pq.pid
 }

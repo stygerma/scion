@@ -22,6 +22,7 @@ import (
 
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/ringbuf"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type packetBufQueue struct {
@@ -32,6 +33,7 @@ type packetBufQueue struct {
 	bufQueue *ringbuf.Ring
 	length   int
 	tb       tokenBucket
+	pid      scmp.PID
 }
 
 // type QPktList []QPkt
@@ -52,6 +54,12 @@ func (pq *packetBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *
 	pq.bufQueue = ringbuf.New(pq.pktQue.MaxLength, func() interface{} {
 		return &QPkt{}
 	}, pq.pktQue.Name)
+
+	//if pq.pktQue.congWarning.Approach == 2 { //TODO: uncomment when congestionWarning is correctly assigned in pktQue
+	pq.pid = scmp.PID{FactorProportional: .1, FactorIntegral: .5,
+		FactorDerivative: .1, LastUpdate: time.Now(), SetPoint: 70,
+		Min: 60, Max: 90}
+	//}
 
 }
 
@@ -152,10 +160,10 @@ func (pq *packetBufQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 		pq.tb.tokens = pq.tb.tokens - tokenForPacket
 		pq.tb.tokenSpent += tokenForPacket
 		qp.Act.action = PASS
-		qp.Act.reason = None
+		qp.Act.Reason = None
 	} else {
 		qp.Act.action = DROP
-		qp.Act.reason = BandWidthExceeded
+		qp.Act.Reason = BandWidthExceeded
 	}
 
 	if shouldLog {
@@ -171,4 +179,16 @@ func (pq *packetBufQueue) GetMinBandwidth() int {
 
 func (pq *packetBufQueue) GetPriority() int {
 	return pq.pktQue.priority
+}
+
+func (pq *packetBufQueue) GetTokenBucket() *tokenBucket {
+	return &pq.tb
+}
+
+func (pq *packetBufQueue) GetCongestionWarning() *CongestionWarning {
+	return &pq.pktQue.congWarning
+}
+
+func (pq *packetBufQueue) GetPID() *scmp.PID {
+	return &pq.pid
 }
