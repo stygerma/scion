@@ -255,6 +255,65 @@ func (r *InfoRevocation) String() string {
 	return fmt.Sprintf("%s SRev=%s", revStr, sRevInfo)
 }
 
+var _ Info = (*InfoPath)(nil)
+
+type InfoPath struct {
+	*InfoPathOffsets
+	RawPath common.RawBytes
+}
+
+func NewInfoPath(infoF, hopF uint8, ifID common.IFIDType, ingress bool,
+	rawPath common.RawBytes) *InfoPath {
+	return &InfoPath{
+		InfoPathOffsets: &InfoPathOffsets{InfoF: infoF, HopF: hopF, IfID: ifID, Ingress: ingress},
+		RawPath:         rawPath,
+	}
+}
+
+func InfoPathFromRaw(b common.RawBytes) (*InfoPath, error) {
+	var err error
+	p := &InfoPath{}
+	p.InfoPathOffsets, err = InfoPathOffsetsFromRaw(b)
+	if err != nil {
+		return nil, common.NewBasicError("Unable to parse path offsets", err)
+	}
+	p.RawPath = b[p.InfoPathOffsets.Len():]
+	return p, nil
+}
+func (r *InfoPath) Copy() Info {
+	if r == nil {
+		return nil
+	}
+	return &InfoPath{
+		r.InfoPathOffsets.Copy().(*InfoPathOffsets),
+		append(common.RawBytes(nil), r.RawPath...),
+	}
+}
+
+func (r *InfoPath) Len() int {
+	l := r.InfoPathOffsets.Len() + len(r.RawPath)
+	return l + util.CalcPadding(l, common.LineLen)
+}
+
+func (r *InfoPath) Write(b common.RawBytes) (int, error) {
+	count, err := r.InfoPathOffsets.Write(b)
+	if err != nil {
+		return 0, err
+	}
+	count += copy(b[count:], r.RawPath)
+	return util.FillPadding(b, count, common.LineLen), nil
+}
+
+func (r *InfoPath) String() string { //TODO: not sure if this works correctly
+	revStr := fmt.Sprintf("InfoF=%d HopF=%d IfID=%d Ingress=%v",
+		r.InfoF, r.HopF, r.IfID, r.Ingress)
+	sRevInfo, err := path_mgmt.NewSignedRevInfoFromRaw(r.RawPath)
+	if err != nil {
+		return fmt.Sprintf("%s RawSRev=%v", revStr, r.RawPath)
+	}
+	return fmt.Sprintf("%s SRev=%s", revStr, sRevInfo)
+}
+
 var _ Info = (*InfoExtIdx)(nil)
 
 type InfoExtIdx struct {

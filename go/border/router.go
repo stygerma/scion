@@ -38,8 +38,7 @@ const processBufCnt = 128
 
 const maxNotificationCount = 512
 
-const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/sample-config.yaml"
-
+const configFileLocation = "/home/marc/go/src/github.com/scionproto/scion/go/border/sample-config.yaml"
 const noWorker = 1
 const workLength = 32
 
@@ -124,6 +123,10 @@ func (r *Router) Start() {
 	go func() {
 		defer log.HandlePanic()
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
+	}()
+	go func() {
+		defer log.HandlePanic()
+		r.bscNotify()
 	}()
 }
 
@@ -297,6 +300,7 @@ func putOnQueue(queueNo int, qp *qosqueues.QPkt) {
 
 	if act == qosqueues.PASS {
 		r.config.Queues[queueNo].Enqueue(qp)
+		r.sendNotification(qp) //MS: Used for testing
 	} else if act == qosqueues.NOTIFY {
 		r.config.Queues[queueNo].Enqueue(qp)
 		r.sendNotification(qp)
@@ -314,6 +318,10 @@ func putOnQueue(queueNo int, qp *qosqueues.QPkt) {
 func (r *Router) sendNotification(qp *qosqueues.QPkt) {
 
 	np := qosqueues.NPkt{Rule: qosqueues.GetRuleWithHashFor(&r.config, qp.Rp), Qpkt: qp}
+
+	restriction := r.config.Queues[np.Qpkt.QueueNo].GetCongestionWarning().InfoContent
+	log.Debug("restrictions on information content", "restriction", restriction)
+	np.Qpkt.Rp.RefInc(1) //should avoid the packet being dropped before we can create the scmp notification
 
 	select {
 	case r.notifications <- &np:

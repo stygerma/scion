@@ -29,7 +29,7 @@ type tokenBucket struct {
 	timerGranularity int
 	lastRefill       time.Time
 	mutex            *sync.Mutex
-	CurrBW			uint64
+	CurrBW           uint64
 }
 
 func (tb *tokenBucket) refill(shouldLog bool) {
@@ -43,9 +43,8 @@ func (tb *tokenBucket) refill(shouldLog bool) {
 	}
 
 	if timeSinceLastUpdate > 100 {
-
 		newTokens := ((tb.MaxBandWidth) * int(timeSinceLastUpdate)) / (1000)
-		tb.lastRefill = now
+		tb.CurrBW = uint64(tb.tokenSpent * 1000 / int(timeSinceLastUpdate))
 
 		if shouldLog {
 			log.Debug("Add new tokens", "#tokens", newTokens)
@@ -53,7 +52,7 @@ func (tb *tokenBucket) refill(shouldLog bool) {
 		}
 
 		tb.CurrBW = uint64(tb.tokenSpent/int(timeSinceLastUpdate)) * 1000
-		
+
 		tb.tokenSpent = 0
 
 		if tb.tokens+newTokens > tb.MaxBandWidth {

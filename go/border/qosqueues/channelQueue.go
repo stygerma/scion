@@ -158,10 +158,10 @@ func (pq *ChannelPacketQueue) Police(qp *QPkt, shouldLog bool) PoliceAction {
 		pq.tb.tokens = pq.tb.tokens - tokenForPacket
 		pq.tb.tokenSpent += tokenForPacket
 		qp.Act.action = PASS
-		qp.Act.reason = None
+		qp.Act.Reason = None
 	} else {
 		qp.Act.action = DROP
-		qp.Act.reason = BandWidthExceeded
+		qp.Act.Reason = BandWidthExceeded
 	}
 
 	if shouldLog {
@@ -177,4 +177,12 @@ func (pq *ChannelPacketQueue) GetMinBandwidth() int {
 
 func (pq *ChannelPacketQueue) GetPriority() int {
 	return pq.pktQue.priority
+}
+
+func (pq *ChannelPacketQueue) GetTokenBucket() *tokenBucket {
+	return &pq.tb
+}
+
+func (pq *ChannelPacketQueue) GetCongestionWarning() *CongestionWarning {
+	return &pq.pktQue.congWarning
 }
