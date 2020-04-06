@@ -76,7 +76,15 @@ func (pq *ChannelPacketQueue) peek() *QPkt {
 
 func (pq *ChannelPacketQueue) Pop() *QPkt {
 
-	return <-pq.queue
+	var pkt *QPkt
+
+	select {
+	case pkt = <-pq.queue:
+	default:
+		pkt = nil
+	}
+
+	return pkt
 }
 
 func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
