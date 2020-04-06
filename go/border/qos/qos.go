@@ -118,8 +118,8 @@ func InitClassification(qConfig *QosConfiguration) error {
 func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
-	// qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
-	qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
+	qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
+	// qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
@@ -156,7 +156,7 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	//log.Trace("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
 	//log.Trace("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
 
-	log.Debug("Put packet on queue", "queueNo", queueNo)
+	// log.Debug("Put packet on queue", "queueNo", queueNo)
 
 	select {
 	case *qosConfig.schedul.GetMessages() <- true:
