@@ -207,9 +207,6 @@ var returnRule *InternalClassRule
 var exactAndRangeSourceMatches, exactAndRangeDestinationMatches, sourceAnyDestinationMatches, destinationAnySourceRules, asOnlySourceRules, asOnlyDestinationRules []*InternalClassRule
 var isdOnlySourceRules, isdOnlyDestinationRules, matched []*InternalClassRule
 
-var sources [3][]*InternalClassRule
-var destinations [3][]*InternalClassRule
-
 var emptyRule = &InternalClassRule{
 	Name:        "default",
 	Priority:    0,
@@ -217,6 +214,9 @@ var emptyRule = &InternalClassRule{
 }
 
 func (*RegularClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
+
+	var sources [3][]*InternalClassRule
+	var destinations [3][]*InternalClassRule
 
 	srcAddr, _ := rp.SrcIA()
 	dstAddr, _ := rp.DstIA()
@@ -328,12 +328,24 @@ func intersectListsRules(a [3][]*InternalClassRule, b [3][]*InternalClassRule) [
 	}
 	k := 0
 
+	// log.Debug("A", "a", a)
+	// log.Debug("b", "b", b) // I have a nil pointer dereference here
+
 	for l := 0; l < 3; l++ {
 		for m := 0; m < 3; m++ {
 			lb := len(b[m])
 			la := len(a[l])
 			for i := 0; i < la; i++ {
 				for j := 0; j < lb; j++ {
+
+					// This should not be necessary
+					if a[l] == nil {
+						break
+					}
+					if b[m] == nil {
+						break
+					}
+
 					if a[l][i] == b[m][j] {
 						matches[k] = a[l][i]
 						k++
