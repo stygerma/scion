@@ -19,7 +19,7 @@ const (
 )
 
 func (r *Router) stochNotify() {
-	for np := range r.notifications {
+	for np := range r.notifications { //TODO: if we don't include the classrule we could just use QPkt instead of NPkt
 		//if r.config.Queues[np.Qpkt.QueueNo].GetCongestionWarning().Approach == 2 { //TODO: remove when congestionWarning fields are read out correctly
 		queueFullness := float64((r.config.Queues[np.Qpkt.QueueNo]).GetFillLevel())
 		switchingPoint, output := (r.config.Queues[np.Qpkt.QueueNo].GetPID()).NewControlUpdate(queueFullness)
@@ -143,7 +143,7 @@ func (r *Router) createStochCongWarn(np *qosqueues.NPkt) *scmp.InfoStochCW {
 	}
 	if restriction > 2 {
 		stochCW.Violation = uint64(np.Qpkt.Act.Reason)
-		stochCW.ClassRule = np.Qpkt.Act.Rule
+		//stochCW.ClassRule = np.Qpkt.Act.Rule
 	}
 	return stochCW
 }

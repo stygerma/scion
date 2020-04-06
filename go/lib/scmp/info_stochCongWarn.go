@@ -13,23 +13,18 @@ import (
 var _ Info = (*InfoStochCW)(nil) //Interface assertion
 
 const (
-	stochCWLen = 48
+	stochCWLen = 40 //all the fixed length fields together
 )
 
 type InfoStochCW struct {
-	//EndHost addr.HostAddr MS: Router can just forward the package, i.e. does not need this info
-	CurrBW uint64 /*TODO: find way to calculate this, has to be approximated over time interval, just calculate it in the refill function.
-	Add field to the tokenBucket struct that shows the latest approximation of the BW*/
+	CurrBW        uint64
 	QueueLength   uint64
 	QueueFullness uint64
-	QueueNo       uint64          //MS: used for debugging
-	ConsIngress   common.IFIDType /*Q: Joel's policies should enforce some contracts between ISP and also be inmplemented such BRs are not overwhelmed, this means that we should
-	somehow add all the IFs of this BR to this field or find a way to identify this BR such that path segments over this BR will be avoided in
-	the future*/
-	/*MS: just add the ingress interface that the packet took, this should enable an end host to find the path segments which use this interface. */
-	Violation uint64 /*classRules as defined by Joel, this would introduce big space overhead, however, there are no real incentives for an ISP to share this.*/
-	//ClassRule *qosqueues.InternalClassRule TODO: include this in the read from raw thingy and also the constant above
-	ClassRule interface{}
+	ConsIngress   common.IFIDType
+	Violation     uint64
+	Path          *InfoPath
+	//QueueNo       uint64          //MS: used for debugging
+	//ClassRule interface{}
 }
 
 func InfoStochCWFromRaw(b common.RawBytes) (*InfoStochCW, error) {
@@ -40,9 +35,11 @@ func InfoStochCWFromRaw(b common.RawBytes) (*InfoStochCW, error) {
 	i.CurrBW = common.Order.Uint64(b)
 	i.QueueLength = common.Order.Uint64(b[8:])
 	i.QueueFullness = common.Order.Uint64(b[16:])
-	i.QueueNo = common.Order.Uint64((b[24:]))
-	i.ConsIngress = common.IFIDType(common.Order.Uint64(b[32:]))
-	i.Violation = common.Order.Uint64(b[40:])
+	i.ConsIngress = common.IFIDType(common.Order.Uint64(b[24:]))
+	i.Violation = common.Order.Uint64(b[32:])
+	i.Path, _ = InfoPathFromRaw(b[40:])
+	//i.QueueNo = common.Order.Uint64((b[24:]))
+
 	return i, nil
 }
 
@@ -51,25 +48,28 @@ func (i *InfoStochCW) Copy() Info {
 		return nil
 	}
 	return &InfoStochCW{CurrBW: i.CurrBW, QueueLength: i.QueueLength,
-		QueueFullness: i.QueueFullness, QueueNo: i.QueueNo, ConsIngress: i.ConsIngress,
-		Violation: i.Violation}
+		QueueFullness: i.QueueFullness, ConsIngress: i.ConsIngress,
+		Violation: i.Violation, Path: i.Path} //, QueueNo: i.QueueNo
 }
 
 func (i *InfoStochCW) Len() int {
-	return stochCWLen + util.CalcPadding(stochCWLen, common.LineLen)
+	return stochCWLen + i.Path.Len() + util.CalcPadding(stochCWLen+i.Path.Len(), common.LineLen)
 }
 
 func (i *InfoStochCW) Write(b common.RawBytes) (int, error) {
 	common.Order.PutUint64(b, i.CurrBW)
 	common.Order.PutUint64(b[8:], i.QueueLength)
 	common.Order.PutUint64(b[16:], i.QueueFullness)
-	common.Order.PutUint64(b[24:], i.QueueNo)
-	common.Order.PutUint64(b[32:], uint64(i.ConsIngress))
-	common.Order.PutUint64(b[40:], i.Violation)
-	return util.FillPadding(b, bscCWLen, common.LineLen), nil
+	common.Order.PutUint64(b[24:], uint64(i.ConsIngress))
+	common.Order.PutUint64(b[32:], i.Violation)
+	_, _ = i.Path.Write(b[40:])
+
+	//	common.Order.PutUint64(b[24:], i.QueueNo)
+
+	return util.FillPadding(b, bscCWLen+i.Path.Len(), common.LineLen), nil
 }
 
 func (i *InfoStochCW) String() string {
-	return fmt.Sprintf("CurrBW=%d QueueLength=%d QueueFullness=%d QueueNo=%d ConsIngress=%d Violation=%d",
-		i.CurrBW, i.QueueLength, i.QueueFullness, i.QueueNo, i.ConsIngress, i.Violation)
+	return fmt.Sprintf("CurrBW=%d QueueLength=%d QueueFullness=%d ConsIngress=%d Violation=%d Path=%s", //QueueNo=%d
+		i.CurrBW, i.QueueLength, i.QueueFullness, i.ConsIngress, i.Violation, i.Path.String()) //, i.QueueNo
 }

@@ -30,10 +30,11 @@ type packetBufQueue struct {
 
 	mutex *sync.Mutex
 
-	bufQueue *ringbuf.Ring
-	length   int
-	tb       tokenBucket
-	pid      scmp.PID
+	bufQueue     *ringbuf.Ring
+	length       int
+	tb           tokenBucket
+	pid          scmp.PID
+	hbhSelection scmp.HbhSelection
 }
 
 // type QPktList []QPkt

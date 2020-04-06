@@ -126,13 +126,18 @@ func (r *Router) Start() {
 		defer log.HandlePanic()
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
 	}()
+	//MS: check what types of queues are initialized and only run the go functions for these queues
 	// go func() {
 	// 	defer log.HandlePanic()
 	// 	r.bscNotify()
 	// }()
+	// go func() {
+	// 	defer log.HandlePanic()
+	// 	r.stochNotify()
+	// }()
 	go func() {
 		defer log.HandlePanic()
-		r.stochNotify()
+		r.hbhNotify()
 	}()
 }
 

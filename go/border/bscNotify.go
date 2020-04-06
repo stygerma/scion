@@ -37,7 +37,7 @@ func (r *Router) bscNotify() {
 
 }
 
-func (r *Router) sendBscNotificationSCMP(qp *qosqueues.QPkt, info scmp.Info) {
+func (r *Router) sendBscNotificationSCMP(qp *qosqueues.QPkt, info *scmp.InfoBscCW) {
 	if logEnabledBsc {
 		srcIA, _ := qp.Rp.SrcIA()
 		srcHost, _ := qp.Rp.SrcHost()

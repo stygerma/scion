@@ -78,22 +78,14 @@ func (rp *RtrPkt) processSCMP() (HookResult, error) { //IMP: implement the behav
 				return HookError, err
 			}
 		}
-	/*case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_BasicCongWarn: //IMPL: should not be necessary, as the router can just forward the packet like it's normally done
-		if err := rp.processSCMPBasicCongWarn(); err != nil {
-			return HookError, err
-		}
-	case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_HBHCongWarn: //IMPL:
-		if err := rp.processSCMPHBHCongWarn(); err != nil {
-			return HookError, err
-		}
-	case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_StochasticCongWarn: //IMPL:
-		if err := rp.processSCMPStochasticCongWarn(); err != nil {
-			return HookError, err
-		}
-	case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_CombiCongWarn: //IMPL:
-		if err := rp.processSCMPCombiCongWarn(); err != nil {
-			return HookError, err
-		}*/
+	// case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_HBHCongWarn: //IMPL:
+	// 	if err := rp.processSCMPHBHCongWarn(); err != nil {
+	// 		return HookError, err
+	// 	}
+	// case hdr.Class == scmp.C_Path && hdr.Type == scmp.T_G_CombiCongWarn: //IMPL:
+	// 	if err := rp.processSCMPCombiCongWarn(); err != nil {
+	// 		return HookError, err
+	// 	}
 	default:
 		return HookError, common.NewBasicError("Unsupported destination SCMP payload", nil,
 			"class", hdr.Class, "type", hdr.Type.Name(hdr.Class))
@@ -173,23 +165,15 @@ func (rp *RtrPkt) processSCMPRecordPath() error {
 	return nil
 }
 
-/*func (rp *RtrPkt) processSCMPBasicCongWarn() error { //IMPL: processing of Basic congestion warning at intermediate BR
-	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host : further disseminate
-}
+// func (rp *RtrPkt) processSCMPHBHCongWarn() error { //IMPL: processing of HBH congestion warning at intermediate BR
+// 	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host(s) : remove block for this AS
+// 	//and further disseminate message if necessary
+// }
 
-func (rp *RtrPkt) processSCMPHBHCongWarn() error { //IMPL: processing of HBH congestion warning at intermediate BR
-	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host(s) : remove block for this AS
-	//and further disseminate message if necessary
-}
-
-func (rp *RtrPkt) processSCMPStochasticCongWarn() error { //IMPL: processing of Stochastic congestion warning at intermediate BR
-	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host : further disseminate
-}
-
-func (rp *RtrPkt) processSCMPCombiCongWarn() error { //IMPL: processing of Combi congestion warning at intermediate BR
-	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host(s) : remove block for this AS
-	//and further disseminate message if necessary
-}*/
+// func (rp *RtrPkt) processSCMPCombiCongWarn() error { //IMPL: processing of Combi congestion warning at intermediate BR
+// 	//TODO: check if the packet destination is this AS? create SCMP congestion warning for the right end host(s) : remove block for this AS
+// 	//and further disseminate message if necessary
+// }
 
 // processSCMPRevocation handles SCMP revocations.
 // There are 3 cases where the router does more than just forward an SCMP revocation message.

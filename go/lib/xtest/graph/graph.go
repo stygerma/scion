@@ -50,7 +50,7 @@ type Graph struct {
 	// specifies whether an IFID is on a peering link
 	isPeer map[common.IFIDType]bool
 	// maps IFIDs to the AS they belong to
-	parents map[common.IFIDType]addr.IA
+	parents map[common.IFIDType]addr.IA //IMP: mapping from IF to AS
 	// maps ASes to a structure containing a slice of their IFIDs
 	ases map[addr.IA]*AS
 

@@ -28,6 +28,8 @@ import (
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/l4"
 	"github.com/scionproto/scion/go/lib/log"
+	"github.com/scionproto/scion/go/lib/scmp"
+	"github.com/scionproto/scion/go/lib/spath"
 	"github.com/scionproto/scion/go/lib/spkt"
 )
 
@@ -287,4 +289,18 @@ func (rp *RtrPkt) replyEgress(dir rcmn.Dir, dst *net.UDPAddr, ifid common.IFIDTy
 	// Write to local socket
 	rp.Egress = append(rp.Egress, EgressPair{S: rp.Ctx.LocSockOut, Dst: dst})
 	return nil
+}
+
+//IMPL:
+func (rpkt *RtrPkt) CreateHbhPktInfo(info *scmp.InfoHbhCW) *scmp.PktInfoHbhCW {
+	srcIA, _ := rpkt.SrcIA()
+	srcHost, _ := rpkt.SrcHost()
+	path := &spath.Path{
+		Raw:    rpkt.Raw[rpkt.idxs.path:rpkt.CmnHdr.HdrLenBytes()],
+		InfOff: rpkt.CmnHdr.InfoFOffBytes() - rpkt.idxs.path,
+		HopOff: rpkt.CmnHdr.HopFOffBytes() - rpkt.idxs.path}
+
+	_ = path.Reverse()
+	pktInfo := &scmp.PktInfoHbhCW{RevPath: path, SrcIA: srcIA, SrcHost: srcHost, InfoHbhCW: info}
+	return pktInfo
 }
