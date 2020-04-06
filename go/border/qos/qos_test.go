@@ -1,17 +1,25 @@
 package qos
 
 import (
-	"fmt"
 	"io/ioutil"
+<<<<<<< ea68ea1a78c46fe5b893e5764b4f05d8e74e1769
 	"math/rand"
+=======
+>>>>>>> fix UT/benchmark
 	"testing"
 	"time"
 
 	"github.com/inconshreveable/log15"
+<<<<<<< ea68ea1a78c46fe5b893e5764b4f05d8e74e1769
+=======
+	"github.com/stretchr/testify/require"
+
+>>>>>>> fix UT/benchmark
 	"github.com/scionproto/scion/go/border/qos/qosconf"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
+<<<<<<< ea68ea1a78c46fe5b893e5764b4f05d8e74e1769
 func getPackets(numberOfPackets int) []*rpkt.RtrPkt {
 
 	pkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
@@ -35,16 +43,14 @@ func getPackets(numberOfPackets int) []*rpkt.RtrPkt {
 	return arr
 }
 
+=======
+>>>>>>> fix UT/benchmark
 var blocks chan bool
 
-func BenchmarkQueueSinglePacket(b *testing.B) {
-
+func bBenchmarkQueueSinglePacket(b *testing.B) {
 	root := log15.Root()
-
 	file, err := ioutil.TempFile("", "benchmark-log")
-	if err != nil {
-		b.Fatalf("Unexpected error: %v", err)
-	}
+	require.NoError(b, err)
 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 
 	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
