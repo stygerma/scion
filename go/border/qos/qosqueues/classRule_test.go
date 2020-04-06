@@ -160,12 +160,46 @@ func BenchmarkSingleMatchParallel(b *testing.B) {
 	}
 }
 
+// func BenchmarkSingleMatchSemiParallel(b *testing.B) {
+// 	disableLog(b)
+// 	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
+// 	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
+// 	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
+
+// 	qConfig := qos.QosConfiguration{}
+
+// 	var err error
+// 	if err = qos.ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
+// 		log.Error("Initialising the classification data structures has failed", "error", err)
+// 	}
+// 	if err = qos.InitClassification(&qConfig); err != nil {
+// 		log.Error("Initialising the classification data structures has failed", "error", err)
+// 	}
+
+// 	qosConfig := qConfig
+
+// 	rc := qosqueues.SemiParallelClassRule{}
+
+// 	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
+
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		rul := rc.GetRuleForPacket(qosConfig.GetConfig(), pkt)
+// 		_ = rul
+// 		// fmt.Println("Iteration", i)
+// 	}
+// }
+
 func TestRuleMatchModes(t *testing.T) {
 
 	extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
 	rc := qosqueues.RegularClassRule{}
+	rcp := qosqueues.ParallelClassRule{}
+	rcsp := qosqueues.SemiParallelClassRule{}
+
+	classifiers := [3]qosqueues.ClassRuleInterface{&rc, &rcp, &rcsp}
 
 	tables := []struct {
 		srcIA       string
@@ -192,24 +226,26 @@ func TestRuleMatchModes(t *testing.T) {
 		{"2-ff00:0:011", "123-ff00:344:222", "Exact - ANY", 5, true},
 	}
 
-	for k, tab := range tables {
-		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
+	for _, classifier := range classifiers {
+		for k, tab := range tables {
+			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
-		rul := rc.GetRuleForPacket(qosConfig.GetConfig(), pkt)
-		// queue := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
+			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
+			// queue := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
 
-		if rul == nil {
-			fmt.Println("Rule was nil")
+			if rul == nil {
+				fmt.Println("Rule was nil")
+			}
+
+			if (rul.Name == tab.ruleName) != tab.shouldMatch {
+				t.Errorf("%d should match rule %v %v but matches rule %v", k, tab.shouldMatch, tab.ruleName, rul.Name)
+			}
+
+			// if (queue == tab.queueNumber) != tab.shouldMatch {
+			// 	t.Errorf("%d should match queue %v but matches queue %v", k, tab.queueNumber, queue)
+			// }
+
 		}
-
-		if (rul.Name == tab.ruleName) != tab.shouldMatch {
-			t.Errorf("%d should match rule %v %v but matches rule %v", k, tab.shouldMatch, tab.ruleName, rul.Name)
-		}
-
-		// if (queue == tab.queueNumber) != tab.shouldMatch {
-		// 	t.Errorf("%d should match queue %v but matches queue %v", k, tab.queueNumber, queue)
-		// }
-
 	}
 
 }

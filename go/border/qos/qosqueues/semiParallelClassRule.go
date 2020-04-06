@@ -7,20 +7,16 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
-type ClassRuleInterface interface {
-	GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule
-}
-
-type ParallelClassRule struct {
+type SemiParallelClassRule struct {
 	result []*InternalClassRule
 
 	sources      [4][]*InternalClassRule
 	destinations [4][]*InternalClassRule
 }
 
-var _ ClassRuleInterface = (*ParallelClassRule)(nil)
+var _ ClassRuleInterface = (*SemiParallelClassRule)(nil)
 
-func (pcr *ParallelClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
+func (pcr *SemiParallelClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
 
 	done := make(chan bool, 3)
 
@@ -122,62 +118,67 @@ func (pcr *ParallelClassRule) GetRuleForPacket(config *InternalRouterConfig, rp 
 	return returnRule
 }
 
-func (pcr *ParallelClassRule) getMatchISDFromMap(config *InternalRouterConfig, m *map[addr.ISD][]*InternalClassRule, address addr.ISD, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
+func (pcr *SemiParallelClassRule) getMatchISDFromMap(config *InternalRouterConfig, m *map[addr.ISD][]*InternalClassRule, address addr.ISD, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
 	returnRule = emptyRule
 	exactAndRangeSourceMatches = (*m)[address]
 	result[resultSpot] = exactAndRangeSourceMatches
 	done <- true
 }
 
-func (pcr *ParallelClassRule) getMatchASFromMap(config *InternalRouterConfig, m *map[addr.AS][]*InternalClassRule, address addr.AS, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
+func (pcr *SemiParallelClassRule) getMatchASFromMap(config *InternalRouterConfig, m *map[addr.AS][]*InternalClassRule, address addr.AS, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
 	returnRule = emptyRule
 	exactAndRangeSourceMatches = (*m)[address]
 	result[resultSpot] = exactAndRangeSourceMatches
 	done <- true
 }
 
-func (pcr *ParallelClassRule) getMatchFromMap(config *InternalRouterConfig, m *map[addr.IA][]*InternalClassRule, address addr.IA, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
+func (pcr *SemiParallelClassRule) getMatchFromMap(config *InternalRouterConfig, m *map[addr.IA][]*InternalClassRule, address addr.IA, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
 	returnRule = emptyRule
 	exactAndRangeSourceMatches = (*m)[address]
 	result[resultSpot] = exactAndRangeSourceMatches
+	// fmt.Println("From map", *m)
 	done <- true
 }
 
-func intersectLongListsRules(a [4][]*InternalClassRule, b [4][]*InternalClassRule) []*InternalClassRule {
-	for i := 0; i < len(matches); i++ {
-		matches[i] = nil
-	}
-	k := 0
+// func intersectLongListsRules(a [4][]*InternalClassRule, b [4][]*InternalClassRule) []*InternalClassRule {
+// 	for i := 0; i < len(matches); i++ {
+// 		matches[i] = nil
+// 	}
+// 	k := 0
 
-	for l := 0; l < 3; l++ {
-		for m := 0; m < 3; m++ {
-			lb := len(b[m])
-			la := len(a[l])
-			for i := 0; i < la; i++ {
-				for j := 0; j < lb; j++ {
-					if a[l][i] == b[m][j] {
-						matches[k] = a[l][i]
-						k++
-					}
-				}
-			}
-		}
-	}
-	return matches
-}
+// 	for l := 0; l < 3; l++ {
+// 		for m := 0; m < 3; m++ {
+// 			lb := len(b[m])
+// 			la := len(a[l])
+// 			for i := 0; i < la; i++ {
+// 				for j := 0; j < lb; j++ {
+// 					fmt.Println("compare", i, "and", j)
+// 					if a[l][i] == b[m][j] {
+// 						matches[k] = a[l][i]
+// 						k++
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return matches
+// }
 
-func getRuleWithMaxFrom(result *InternalClassRule, list []*InternalClassRule, done *chan bool) {
+// func getRuleWithMaxFrom(result *InternalClassRule, list []*InternalClassRule, done *chan bool) {
 
-	prevMax := -1
-	for i := 0; i < len(list); i++ {
-		if list[i] != nil {
-			if list[i].Priority > prevMax {
-				returnRule = list[i]
-				prevMax = list[i].Priority
-			}
-		} else {
-			break
-		}
-	}
-	*done <- true
-}
+// 	prevMax := -1
+// 	fmt.Println("List is", list)
+// 	for i := 0; i < len(list); i++ {
+// 		if list[i] != nil {
+// 			fmt.Println(list[i].Priority)
+// 			fmt.Println(prevMax)
+// 			if list[i].Priority > prevMax {
+// 				returnRule = list[i]
+// 				prevMax = list[i].Priority
+// 			}
+// 		} else {
+// 			break
+// 		}
+// 	}
+// 	*done <- true
+// }
