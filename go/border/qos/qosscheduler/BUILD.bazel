@@ -13,7 +13,6 @@ go_library(
     deps = [
         "//go/border/qos/qosqueues:go_default_library",
         "//go/border/rpkt:go_default_library",
-        "//go/lib/log:go_default_library",
     ],
 )
 
