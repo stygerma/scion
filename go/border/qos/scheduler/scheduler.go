@@ -19,9 +19,15 @@ import (
 )
 
 type SchedulerInterface interface {
+<<<<<<< HEAD:go/border/qos/scheduler/scheduler.go
 	Init(routerConfig qosqueues.InternalRouterConfig)
 	Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt))
 	Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int)
+=======
+	Init(routerConfig queues.InternalRouterConfig)
+	Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt))
+	dequeue(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int)
+>>>>>>> 00e2ea31c... refactor.:go/border/qos/scheduler/scheduler.go
 	GetMessages() *chan bool
 }
 
