@@ -22,7 +22,7 @@ type InfoStochCW struct {
 	QueueFullness uint64
 	ConsIngress   common.IFIDType
 	Violation     uint64
-	Path          *InfoPath
+	//Path          *InfoPath
 	//QueueNo       uint64          //MS: used for debugging
 	//ClassRule interface{}
 }
@@ -37,7 +37,7 @@ func InfoStochCWFromRaw(b common.RawBytes) (*InfoStochCW, error) {
 	i.QueueFullness = common.Order.Uint64(b[16:])
 	i.ConsIngress = common.IFIDType(common.Order.Uint64(b[24:]))
 	i.Violation = common.Order.Uint64(b[32:])
-	i.Path, _ = InfoPathFromRaw(b[40:])
+	//i.Path, _ = InfoPathFromRaw(b[40:])
 	//i.QueueNo = common.Order.Uint64((b[24:]))
 
 	return i, nil
@@ -49,11 +49,11 @@ func (i *InfoStochCW) Copy() Info {
 	}
 	return &InfoStochCW{CurrBW: i.CurrBW, QueueLength: i.QueueLength,
 		QueueFullness: i.QueueFullness, ConsIngress: i.ConsIngress,
-		Violation: i.Violation, Path: i.Path} //, QueueNo: i.QueueNo
+		Violation: i.Violation} //, Path: i.Path	, QueueNo: i.QueueNo
 }
 
 func (i *InfoStochCW) Len() int {
-	return stochCWLen + i.Path.Len() + util.CalcPadding(stochCWLen+i.Path.Len(), common.LineLen)
+	return stochCWLen + util.CalcPadding(stochCWLen, common.LineLen) //+ i.Path.Len() 	+i.Path.Len()
 }
 
 func (i *InfoStochCW) Write(b common.RawBytes) (int, error) {
@@ -62,14 +62,14 @@ func (i *InfoStochCW) Write(b common.RawBytes) (int, error) {
 	common.Order.PutUint64(b[16:], i.QueueFullness)
 	common.Order.PutUint64(b[24:], uint64(i.ConsIngress))
 	common.Order.PutUint64(b[32:], i.Violation)
-	_, _ = i.Path.Write(b[40:])
+	// _, _ = i.Path.Write(b[40:])
 
 	//	common.Order.PutUint64(b[24:], i.QueueNo)
 
-	return util.FillPadding(b, stochCWLen+i.Path.Len(), common.LineLen), nil
+	return util.FillPadding(b, stochCWLen, common.LineLen), nil //+i.Path.Len()
 }
 
 func (i *InfoStochCW) String() string {
-	return fmt.Sprintf("CurrBW=%d QueueLength=%d QueueFullness=%d ConsIngress=%d Violation=%d Path=%s", //QueueNo=%d
-		i.CurrBW, i.QueueLength, i.QueueFullness, i.ConsIngress, i.Violation, i.Path.String()) //, i.QueueNo
+	return fmt.Sprintf("CurrBW=%d QueueLength=%d QueueFullness=%d ConsIngress=%d Violation=%d", // Path=%s	QueueNo=%d
+		i.CurrBW, i.QueueLength, i.QueueFullness, i.ConsIngress, i.Violation) //, i.Path.String()	, i.QueueNo
 }
