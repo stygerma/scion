@@ -1,4 +1,5 @@
 // Copyright 2020 ETH Zurich
+// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +20,6 @@ import (
 	"sync"
 
 	"github.com/scionproto/scion/go/border/qos/conf"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 type ChannelPacketQueue struct {
@@ -28,45 +28,56 @@ type ChannelPacketQueue struct {
 	mutex *sync.Mutex
 
 	queue chan *QPkt
-	tb    TokenBucket
+	tb    tokenBucket
 }
 
 var _ PacketQueueInterface = (*ChannelPacketQueue)(nil)
 
 func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
+
 	pq.pktQue = que
 	pq.mutex = mutQue
 	// pq.length = 0
-	pq.tb = TokenBucket{}
+	pq.tb = tokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
-	pq.queue = make(chan *QPkt, pq.pktQue.MaxLength+100)
+	pq.queue = make(chan *QPkt, pq.pktQue.MaxLength)
 }
 
 func (pq *ChannelPacketQueue) Enqueue(rp *QPkt) {
+
 	pq.queue <- rp
+
+	// atomic.AddUint64(&pq.length, 1)
+
 }
 
 func (pq *ChannelPacketQueue) canEnqueue() bool {
+
 	return int(len(pq.queue)) < pq.pktQue.MaxLength
 }
 
 func (pq *ChannelPacketQueue) canDequeue() bool {
+
 	return true
 }
 
 func (pq *ChannelPacketQueue) GetFillLevel() int {
+
 	return int(len(pq.queue)) / int(pq.pktQue.MaxLength)
 }
 
 func (pq *ChannelPacketQueue) GetLength() int {
+
 	return int(len(pq.queue))
 }
 
 func (pq *ChannelPacketQueue) peek() *QPkt {
+
 	return nil
 }
 
 func (pq *ChannelPacketQueue) Pop() *QPkt {
+
 	var pkt *QPkt
 
 	select {
@@ -74,33 +85,39 @@ func (pq *ChannelPacketQueue) Pop() *QPkt {
 	default:
 		pkt = nil
 	}
+
 	return pkt
 }
 
 func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
+
 	pkts := make([]*QPkt, number)
+
 	for i := 0; i < number; i++ {
 		pkts[i] = <-pq.queue
 	}
+
 	return pkts
 }
 
 func (pq *ChannelPacketQueue) CheckAction() conf.PoliceAction {
 
-	if pq.pktQue.MaxLength-100 <= pq.GetLength() {
-		log.Debug("Queue is at max capacity", "queueNo", pq.pktQue.ID)
-		return conf.DROPNOTIFY
+	if pq.pktQue.MaxLength == pq.GetLength() {
+		return DROPNOTIFY
 	}
 
 	level := pq.GetFillLevel()
 
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
-			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
+			rand := rand.Intn(100)
+			if rand < (pq.pktQue.Profile[j].Prob) {
 				return pq.pktQue.Profile[j].Action
 			}
+
 		}
 	}
+
 	return conf.PASS
 }
 

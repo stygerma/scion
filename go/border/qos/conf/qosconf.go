@@ -40,41 +40,40 @@ type ExternalPacketQueue struct {
 	Profile           []ActionProfile   `yaml:"profile"`
 }
 
-type ExternalProtocolMatchType struct {
-	BaseProtocol int `yaml:"Protocol"`
-	Extension    int `yaml:"Extension"`
-}
-
 // ExternalClassRule contains a rule for matching packets
 type ExternalClassRule struct {
 	// This is currently means the ID of the sending border router
-	Name                 string                      `yaml:"name"`
-	Priority             int                         `yaml:"priority"`
-	SourceAs             string                      `yaml:"sourceAs"`
-	SourceMatchMode      int                         `yaml:"sourceMatchMode"`
-	DestinationAs        string                      `yaml:"destinationAs"`
-	DestinationMatchMode int                         `yaml:"destinationMatchMode"`
-	L4Type               []ExternalProtocolMatchType `yaml:"L4Type"`
-	QueueNumber          int                         `yaml:"queueNumber"`
-}
-
-type SchedulerConfig struct {
-	Latency   int    `yaml:"Latency"`
-	Bandwidth string `yaml:"Bandwidth"`
+	Name                 string `yaml:"name"`
+	Priority             int    `yaml:"priority"`
+	SourceAs             string `yaml:"sourceAs"`
+	SourceMatchMode      int    `yaml:"sourceMatchMode"`
+	DestinationAs        string `yaml:"destinationAs"`
+	DestinationMatchMode int    `yaml:"destinationMatchMode"`
+	L4Type               []int  `yaml:"L4Type"`
+	QueueNumber          int    `yaml:"queueNumber"`
 }
 
 // ExternalConfig is what I am loading from the config file
 type ExternalConfig struct {
-	SchedulerConfig SchedulerConfig       `yaml:"Scheduler"`
-	ExternalQueues  []ExternalPacketQueue `yaml:"Queues"`
-	ExternalRules   []ExternalClassRule   `yaml:"Rules"`
+	ExternalQueues []ExternalPacketQueue `yaml:"Queues"`
+	ExternalRules  []ExternalClassRule   `yaml:"Rules"`
 }
 
 func LoadConfig(path string) (ExternalConfig, error) {
 	var ec ExternalConfig
+	var yamlFile []byte
+	var err error
+
+	// yamlFile, err = ioutil.ReadFile(configFileLocation)
+	yamlFile, err = ioutil.ReadFile(path)
 
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
+		yamlFile, err = ioutil.ReadFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml")
+	}
+
+	if err != nil {
+		log.Error("Loading the config file has failed", "error", err)
 		return ExternalConfig{}, err
 	}
 	err = yaml.Unmarshal(yamlFile, &ec)
