@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qosqueues
+package queues
 
 import (
 	"math/rand"
 	"sync"
 
-	"github.com/scionproto/scion/go/border/qos/qosconf"
+	"github.com/scionproto/scion/go/border/qos/conf"
 )
 
 type ChannelPacketQueue struct {
@@ -100,7 +100,7 @@ func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
 	return pkts
 }
 
-func (pq *ChannelPacketQueue) CheckAction() qosconf.PoliceAction {
+func (pq *ChannelPacketQueue) CheckAction() conf.PoliceAction {
 
 	if pq.pktQue.MaxLength == pq.GetLength() {
 		return DROPNOTIFY
@@ -118,10 +118,10 @@ func (pq *ChannelPacketQueue) CheckAction() qosconf.PoliceAction {
 		}
 	}
 
-	return qosconf.PASS
+	return conf.PASS
 }
 
-func (pq *ChannelPacketQueue) Police(qp *QPkt) qosconf.PoliceAction {
+func (pq *ChannelPacketQueue) Police(qp *QPkt) conf.PoliceAction {
 	return pq.tb.PoliceBucket(qp)
 }
 

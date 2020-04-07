@@ -1,4 +1,4 @@
-package qosqueues
+package queues
 
 import (
 	"github.com/scionproto/scion/go/lib/addr"

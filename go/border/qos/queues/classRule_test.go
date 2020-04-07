@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qosqueues_test
+package queues_test
 
 import (
 	"fmt"
@@ -24,8 +24,8 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 
 	"github.com/scionproto/scion/go/border/qos"
-	"github.com/scionproto/scion/go/border/qos/qosconf"
-	"github.com/scionproto/scion/go/border/qos/qosqueues"
+	"github.com/scionproto/scion/go/border/qos/conf"
+	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
@@ -102,6 +102,7 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 	arr := make([]rpkt.RtrPkt, len(tables))
 
 	for k, tab := range tables {
+<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3:go/border/qos/qosqueues/classRule_test.go
 		arr[k] = *rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 	}
 
@@ -142,6 +143,17 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		rul := rc.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 		_ = rul
+=======
+		extConfig, err := conf.LoadConfig(tab.configFile)
+		require.NoError(t, err, "Failed at case %d", k)
+		qosConfig, err := qos.InitQos(extConfig, forwardPacketByDrop)
+		require.NoError(t, err, "Failed at case %d", k)
+		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
+
+		queueNo := queues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), pkt)
+		require.Equal(t, queueNo, tab.goldenQueueNo, "%d Queue number should be %d but is %d",
+			k, tab.goldenQueueNo, queueNo)
+>>>>>>> refactor.:go/border/qos/queues/classRule_test.go
 	}
 }
 
@@ -240,6 +252,7 @@ func TestRuleMatchModes(t *testing.T) {
 		{"2-ff00:0:011", "22-344:0:222", "Exact - ANY", 5, true},
 		{"2-ff00:0:011", "123-ff00:344:222", "Exact - ANY", 5, true},
 	}
+<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3:go/border/qos/qosqueues/classRule_test.go
 	for k, tab := range tables {
 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
@@ -259,6 +272,13 @@ func TestRuleMatchModes(t *testing.T) {
 			// }
 
 		}
+=======
+	for i, c := range cases {
+		r := queues.CompareIAs(xtest.MustParseIA(c.a), xtest.MustParseIA(c.b))
+		require.Equal(t, r, c.r, "Failure at case %d", i)
+		r = queues.CompareIAs(xtest.MustParseIA(c.b), xtest.MustParseIA(c.a))
+		require.Equal(t, r, -1*c.r, "Failure (reverse) at case %d", i)
+>>>>>>> refactor.:go/border/qos/queues/classRule_test.go
 	}
 
 }

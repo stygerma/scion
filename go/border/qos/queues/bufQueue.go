@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qosqueues
+package queues
 
 import (
 	"math/rand"
 	"sync"
 
-	"github.com/scionproto/scion/go/border/qos/qosconf"
+	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/lib/ringbuf"
 )
 
@@ -94,7 +94,7 @@ func (pq *PacketBufQueue) PopMultiple(number int) []*QPkt {
 }
 
 // TODO: I suspect that rand.Intn isn't very fast. We can probably get by with worse random numbers
-func (pq *PacketBufQueue) CheckAction() qosconf.PoliceAction {
+func (pq *PacketBufQueue) CheckAction() conf.PoliceAction {
 
 	level := pq.GetFillLevel()
 
@@ -114,10 +114,10 @@ func (pq *PacketBufQueue) CheckAction() qosconf.PoliceAction {
 		}
 	}
 
-	return qosconf.PASS
+	return conf.PASS
 }
 
-func (pq *PacketBufQueue) Police(qp *QPkt) qosconf.PoliceAction {
+func (pq *PacketBufQueue) Police(qp *QPkt) conf.PoliceAction {
 	return pq.tb.PoliceBucket(qp)
 }
 
