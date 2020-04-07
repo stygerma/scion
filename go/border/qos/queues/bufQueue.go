@@ -65,8 +65,7 @@ func (pq *PacketBufQueue) GetFillLevel() int {
 }
 
 func (pq *PacketBufQueue) GetLength() int {
-
-	return pq.bufQueue.Length()
+	return pq.bufQueue.Readable()
 }
 
 func (pq *PacketBufQueue) Pop() *QPkt {
