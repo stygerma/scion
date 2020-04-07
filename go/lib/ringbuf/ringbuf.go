@@ -99,7 +99,8 @@ func (r *Ring) Write(entries EntryList, block bool) (int, bool) {
 	return n, blocked
 }
 
-func (r *Ring) Length() int {
+// Readable returns the number of ready to be read packets.
+func (r *Ring) Readable() int {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
