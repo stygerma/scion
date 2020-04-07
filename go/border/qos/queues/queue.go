@@ -97,20 +97,14 @@ func ReturnActionOld(polAction qosconf.PoliceAction, profAction qosconf.PoliceAc
 	return qosconf.PASS
 }
 
-func ReturnAction(polAction qosconf.PoliceAction, profAction qosconf.PoliceAction) qosconf.PoliceAction {
-
-	pol, prof := 3-polAction, 3-profAction
-	if pol*prof == 0 {
+// ReturnAction merges both PoliceAction together and returns the merged result.
+func ReturnAction(pol qosconf.PoliceAction, prof qosconf.PoliceAction) qosconf.PoliceAction {
+	// check if any of pol or prof actions are DROPNOTIFY, DROP, NOTIFY OR PASS, in this order
+	if pol == qosconf.DROPNOTIFY || prof == qosconf.DROPNOTIFY {
 		return qosconf.DROPNOTIFY
-	}
-	pol--
-	prof--
-	if pol*prof == 0 {
+	} else if pol == qosconf.DROP || prof == qosconf.DROP {
 		return qosconf.DROP
-	}
-	pol--
-	prof--
-	if pol*prof == 0 {
+	} else if pol == qosconf.NOTIFY || prof == qosconf.NOTIFY {
 		return qosconf.NOTIFY
 	}
 	return qosconf.PASS
