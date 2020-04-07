@@ -18,6 +18,8 @@ package qosqueues
 import (
 	"math/rand"
 	"sync"
+
+	"github.com/scionproto/scion/go/border/qos/qosconf"
 )
 
 type CustomPacketQueue struct {
@@ -130,7 +132,7 @@ func (pq *CustomPacketQueue) PopMultiple(number int) []*QPkt {
 	return pkt
 }
 
-func (pq *CustomPacketQueue) CheckAction() PoliceAction {
+func (pq *CustomPacketQueue) CheckAction() qosconf.PoliceAction {
 
 	level := pq.GetFillLevel()
 
@@ -150,10 +152,10 @@ func (pq *CustomPacketQueue) CheckAction() PoliceAction {
 		}
 	}
 
-	return PASS
+	return qosconf.PASS
 }
 
-func (pq *CustomPacketQueue) Police(qp *QPkt) PoliceAction {
+func (pq *CustomPacketQueue) Police(qp *QPkt) qosconf.PoliceAction {
 	return pq.tb.PoliceBucket(qp)
 }
 

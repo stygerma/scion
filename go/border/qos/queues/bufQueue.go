@@ -19,6 +19,7 @@ import (
 	"math/rand"
 	"sync"
 
+	"github.com/scionproto/scion/go/border/qos/qosconf"
 	"github.com/scionproto/scion/go/lib/ringbuf"
 )
 
@@ -109,10 +110,10 @@ func (pq *PacketBufQueue) CheckAction() PoliceAction {
 		}
 	}
 
-	return PASS
+	return qosconf.PASS
 }
 
-func (pq *PacketBufQueue) Police(qp *QPkt) PoliceAction {
+func (pq *PacketBufQueue) Police(qp *QPkt) qosconf.PoliceAction {
 	return pq.tb.PoliceBucket(qp)
 }
 
