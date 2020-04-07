@@ -28,7 +28,6 @@ import (
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/l4"
 	"github.com/scionproto/scion/go/lib/log"
-	"github.com/scionproto/scion/go/lib/scmp"
 	"github.com/scionproto/scion/go/lib/spkt"
 )
 
@@ -159,7 +158,6 @@ func (rp *RtrPkt) SetPld(pld common.Payload) error {
 		if plen, err = rp.pld.WritePld(rp.Raw[rp.idxs.pld:]); err != nil {
 			return err
 		}
-		log.Debug("WE Getting here??????", " RP.IDXS.PLD", rp.Hooks().Payload)
 	}
 	// Trim buffer to the end of the payload.
 	rp.Raw = rp.Raw[:rp.idxs.pld+plen]
@@ -293,16 +291,16 @@ func (rp *RtrPkt) replyEgress(dir rcmn.Dir, dst *net.UDPAddr, ifid common.IFIDTy
 	return nil
 }
 
-//IMPL:
-func (rpkt *RtrPkt) CreateHbhPktInfo(info *scmp.InfoHbhCW) *scmp.PktInfoHbhCW {
-	srcIA, _ := rpkt.SrcIA()
-	srcHost, _ := rpkt.SrcHost()
-	// path := &spath.Path{
-	// 	Raw:    rpkt.Raw[rpkt.idxs.path:rpkt.CmnHdr.HdrLenBytes()],
-	// 	InfOff: rpkt.CmnHdr.InfoFOffBytes() - rpkt.idxs.path,
-	// 	HopOff: rpkt.CmnHdr.HopFOffBytes() - rpkt.idxs.path}
+//TODO: adjust to changes in info_hbhCongWarn
+// func (rpkt *RtrPkt) CreateHbhPktInfo(info *scmp.InfoHbhCW) *scmp.PktInfoHbhCW {
+// 	srcIA, _ := rpkt.SrcIA()
+// 	srcHost, _ := rpkt.SrcHost()
+// 	// path := &spath.Path{
+// 	// 	Raw:    rpkt.Raw[rpkt.idxs.path:rpkt.CmnHdr.HdrLenBytes()],
+// 	// 	InfOff: rpkt.CmnHdr.InfoFOffBytes() - rpkt.idxs.path,
+// 	// 	HopOff: rpkt.CmnHdr.HopFOffBytes() - rpkt.idxs.path}
 
-	// _ = path.Reverse()
-	pktInfo := &scmp.PktInfoHbhCW{SrcIA: srcIA, SrcHost: srcHost, InfoHbhCW: info} //RevPath: path
-	return pktInfo
-}
+// 	// _ = path.Reverse()
+// 	pktInfo := &scmp.PktInfoHbhCW{SrcIA: srcIA, SrcHost: srcHost, InfoHbhCW: info} //RevPath: path
+// 	return pktInfo
+// }

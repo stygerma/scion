@@ -34,7 +34,7 @@ type packetBufQueue struct {
 	length       int
 	tb           tokenBucket
 	pid          scmp.PID
-	hbhSelection scmp.HbhSelection
+	//hbhSelection scmp.HbhSelection
 }
 
 // type QPktList []QPkt

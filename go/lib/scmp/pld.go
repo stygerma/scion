@@ -84,25 +84,6 @@ func PldFromQuotes(ct ClassType, info Info, l4 common.L4ProtocolType, f QuoteFun
 	return p
 }
 
-/*TODO: MS: implement this similarly to the PldFromQuotes function but instead
-of deciding which headers to quote, restrict the information content*/
-func NotifyPld(info Info) *Payload {
-	p := &Payload{Info: info}
-
-	p.Meta = &Meta{
-		CmnHdrLen:  uint8(len(p.CmnHdr) / common.LineLen),
-		AddrHdrLen: uint8(len(p.AddrHdr) / common.LineLen),
-		PathHdrLen: uint8(len(p.PathHdr) / common.LineLen),
-		ExtHdrsLen: uint8(len(p.ExtHdrs) / common.LineLen),
-		L4HdrLen:   uint8(len(p.L4Hdr) / common.LineLen),
-		L4Proto:    1,
-	}
-	if info != nil {
-		p.Meta.InfoLen = uint8(p.Info.Len() / common.LineLen)
-	}
-	return p
-}
-
 func (p *Payload) Copy() (common.Payload, error) {
 	if p == nil {
 		return nil, nil

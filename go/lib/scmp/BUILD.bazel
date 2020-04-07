@@ -4,6 +4,8 @@ go_library(
     name = "go_default_library",
     srcs = [
         "congWarn.go",
+        "cwMeta.go",
+        "cwPld.go",
         "error.go",
         "hdr.go",
         "info_bscCongWarn.go",
