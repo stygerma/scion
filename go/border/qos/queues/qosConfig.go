@@ -1,26 +1,19 @@
-package qosqueues
+package queues
 
 import (
 	"github.com/scionproto/scion/go/lib/addr"
 )
 
 // InternalRouterConfig is what I am loading from the config file
-// type InternalRouterConfig struct {
-// 	Queues           []PacketQueueInterface
-// 	Rules            []InternalClassRule
-// 	SourceRules      map[addr.IA][]*InternalClassRule
-// 	DestinationRules map[addr.IA][]*InternalClassRule
-// }
-
-type SchedulerConfig struct {
-	Latency   int
-	Bandwidth int
-}
-
 type InternalRouterConfig struct {
 	Scheduler SchedulerConfig
 	Queues    []PacketQueueInterface
 	Rules     MapRules
+}
+
+type SchedulerConfig struct {
+	Latency   int
+	Bandwidth int
 }
 
 type MapRules struct {

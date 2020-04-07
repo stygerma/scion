@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -143,7 +142,8 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 			for i := lowLimI; i <= upLimI; i++ {
 				for j := lowLimA; j <= upLimA; j++ {
 					//log.Debug("Adding", "I", i, "AS", j)
-					destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[k])
+					addr := addr.IA{I: addr.ISD(i), A: addr.AS(j)}
+					destinationRules[addr] = append(destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[k])
 				}
 			}
 		case ASONLY:

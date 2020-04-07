@@ -1,10 +1,10 @@
-package qosqueues
+package queues
 
 import (
 	"math/rand"
 	"sync"
 
-	"github.com/scionproto/scion/go/border/qos/qosconf"
+	"github.com/scionproto/scion/go/border/qos/conf"
 )
 
 type PacketSliceQueue struct {
@@ -82,7 +82,7 @@ func (pq *PacketSliceQueue) PopMultiple(number int) []*QPkt {
 	return pkt
 }
 
-func (pq *PacketSliceQueue) CheckAction() qosconf.PoliceAction {
+func (pq *PacketSliceQueue) CheckAction() conf.PoliceAction {
 
 	level := pq.GetFillLevel()
 
@@ -102,10 +102,10 @@ func (pq *PacketSliceQueue) CheckAction() qosconf.PoliceAction {
 		}
 	}
 
-	return qosconf.PASS
+	return conf.PASS
 }
 
-func (pq *PacketSliceQueue) Police(qp *QPkt) qosconf.PoliceAction {
+func (pq *PacketSliceQueue) Police(qp *QPkt) conf.PoliceAction {
 	return pq.tb.PoliceBucket(qp)
 }
 
