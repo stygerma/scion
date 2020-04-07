@@ -134,7 +134,8 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 			for i := lowLimI; i <= upLimI; i++ {
 				for j := lowLimA; j <= upLimA; j++ {
 					//log.Debug("Adding", "I", i, "AS", j)
-					destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[k])
+					addr := addr.IA{I: addr.ISD(i), A: addr.AS(j)}
+					destinationRules[addr] = append(destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[k])
 				}
 			}
 		case ASONLY:
