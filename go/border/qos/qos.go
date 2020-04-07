@@ -24,12 +24,10 @@ import (
 
 	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/qos/qosconf"
-	"github.com/scionproto/scion/go/border/qos/queues"
-
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/qos/qosscheduler"
+	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
-
 	"github.com/scionproto/scion/go/lib/log"
 )
 
@@ -191,16 +189,16 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *qosqueues.QPkt) {
 	act := qosqueues.ReturnAction(polAct, profAct)
 
 	switch act {
-	case qosqueues.PASS:
+	case qosconf.PASS:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 		qosConfig.SendNotification(qp) //MS: Used for testing
 	case conf.NOTIFY:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 		qosConfig.SendNotification(qp)
-	case qosqueues.DROPNOTIFY:
+	case qosconf.DROPNOTIFY:
 		qosConfig.dropPacket(qp.Rp)
 		qosConfig.SendNotification(qp)
-	case qosqueues.DROP:
+	case qosconf.DROP:
 		qosConfig.dropPacket(qp.Rp)
 	default:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
@@ -320,8 +318,8 @@ func convertActionProfile(externalActionProfile qosconf.ActionProfile) qosqueues
 	return ap
 }
 
-func convertPoliceAction(externalPoliceAction qosconf.PoliceAction) qosqueues.PoliceAction {
-	return qosqueues.PoliceAction(externalPoliceAction)
+func convertPoliceAction(externalPoliceAction qosconf.PoliceAction) qosconf.PoliceAction {
+	return qosconf.PoliceAction(externalPoliceAction)
 }
 
 func convStringToNumber(bandwidthstring string) int {

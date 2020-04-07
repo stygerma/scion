@@ -9,14 +9,11 @@ import (
 
 type PoliceAction uint8
 
+// Actions to execute on packets in queues.
 const (
-	// PASS Pass the packet
 	PASS PoliceAction = iota
-	// NOTIFY Notify the sending host of the packet
 	NOTIFY
-	// DROP Drop the packet
 	DROP
-	// DROPNOTIFY Drop and then notify someone
 	DROPNOTIFY
 )
 

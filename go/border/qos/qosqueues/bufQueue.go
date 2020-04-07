@@ -19,6 +19,7 @@ import (
 	"math/rand"
 	"sync"
 
+	"github.com/scionproto/scion/go/border/qos/qosconf"
 	"github.com/scionproto/scion/go/lib/ringbuf"
 )
 
@@ -93,7 +94,7 @@ func (pq *PacketBufQueue) PopMultiple(number int) []*QPkt {
 }
 
 // TODO: I suspect that rand.Intn isn't very fast. We can probably get by with worse random numbers
-func (pq *PacketBufQueue) CheckAction() PoliceAction {
+func (pq *PacketBufQueue) CheckAction() qosconf.PoliceAction {
 
 	level := pq.GetFillLevel()
 
@@ -113,10 +114,10 @@ func (pq *PacketBufQueue) CheckAction() PoliceAction {
 		}
 	}
 
-	return PASS
+	return qosconf.PASS
 }
 
-func (pq *PacketBufQueue) Police(qp *QPkt) PoliceAction {
+func (pq *PacketBufQueue) Police(qp *QPkt) qosconf.PoliceAction {
 	return pq.tb.PoliceBucket(qp)
 }
 
