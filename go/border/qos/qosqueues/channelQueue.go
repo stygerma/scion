@@ -18,6 +18,8 @@ package qosqueues
 import (
 	"math/rand"
 	"sync"
+
+	"github.com/scionproto/scion/go/border/qos/qosconf"
 )
 
 type ChannelPacketQueue struct {
@@ -98,7 +100,7 @@ func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
 	return pkts
 }
 
-func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
+func (pq *ChannelPacketQueue) CheckAction() qosconf.PoliceAction {
 
 	if pq.pktQue.MaxLength == pq.GetLength() {
 		return DROPNOTIFY
@@ -116,10 +118,10 @@ func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
 		}
 	}
 
-	return PASS
+	return qosconf.PASS
 }
 
-func (pq *ChannelPacketQueue) Police(qp *QPkt) PoliceAction {
+func (pq *ChannelPacketQueue) Police(qp *QPkt) qosconf.PoliceAction {
 	return pq.tb.PoliceBucket(qp)
 }
 
