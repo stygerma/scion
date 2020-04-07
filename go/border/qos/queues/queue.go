@@ -18,20 +18,8 @@ package qosqueues
 import (
 	"sync"
 
+	"github.com/scionproto/scion/go/border/qos/qosconf"
 	"github.com/scionproto/scion/go/border/rpkt"
-)
-
-type PoliceAction uint8
-
-const (
-	// PASS Pass the packet
-	PASS PoliceAction = iota
-	// NOTIFY Notify the sending host of the packet
-	NOTIFY
-	// DROP Drop the packet
-	DROP
-	// DROPNOTIFY Drop and then notify someone
-	DROPNOTIFY
 )
 
 type PrimePoliceAction uint8
@@ -69,13 +57,13 @@ const (
 type Action struct {
 	rule   *InternalClassRule
 	reason Violation
-	action PoliceAction
+	action qosconf.PoliceAction
 }
 
 type ActionProfile struct {
-	FillLevel int          `yaml:"fill-level"`
-	Prob      int          `yaml:"prob"`
-	Action    PoliceAction `yaml:"action"`
+	FillLevel int                  `yaml:"fill-level"`
+	Prob      int                  `yaml:"prob"`
+	Action    qosconf.PoliceAction `yaml:"action"`
 }
 
 type PacketQueue struct {
@@ -96,48 +84,48 @@ type PacketQueueInterface interface {
 	PopMultiple(number int) []*QPkt
 	GetFillLevel() int
 	GetLength() int
-	CheckAction() PoliceAction
-	Police(qp *QPkt) PoliceAction
+	CheckAction() qosconf.PoliceAction
+	Police(qp *QPkt) qosconf.PoliceAction
 	GetPriority() int
 	GetMinBandwidth() int
 	GetMaxBandwidth() int
 	GetPacketQueue() PacketQueue
 }
 
-func ReturnActionOld(polAction PoliceAction, profAction PoliceAction) PoliceAction {
+func ReturnActionOld(polAction qosconf.PoliceAction, profAction qosconf.PoliceAction) qosconf.PoliceAction {
 
-	if polAction == DROPNOTIFY || profAction == DROPNOTIFY {
-		return DROPNOTIFY
+	if polAction == qosconf.DROPNOTIFY || profAction == qosconf.DROPNOTIFY {
+		return qosconf.DROPNOTIFY
 	}
 
-	if polAction == DROP || profAction == DROP {
-		return DROP
+	if polAction == qosconf.DROP || profAction == qosconf.DROP {
+		return qosconf.DROP
 	}
 
-	if polAction == NOTIFY || profAction == NOTIFY {
-		return NOTIFY
+	if polAction == qosconf.NOTIFY || profAction == qosconf.NOTIFY {
+		return qosconf.NOTIFY
 	}
 
-	return PASS
+	return qosconf.PASS
 }
 
-func ReturnAction(polAction PoliceAction, profAction PoliceAction) PoliceAction {
+func ReturnAction(polAction qosconf.PoliceAction, profAction qosconf.PoliceAction) qosconf.PoliceAction {
 
 	pol, prof := 3-polAction, 3-profAction
 	if pol*prof == 0 {
-		return DROPNOTIFY
+		return qosconf.DROPNOTIFY
 	}
 	pol--
 	prof--
 	if pol*prof == 0 {
-		return DROP
+		return qosconf.DROP
 	}
 	pol--
 	prof--
 	if pol*prof == 0 {
-		return NOTIFY
+		return qosconf.NOTIFY
 	}
-	return PASS
+	return qosconf.PASS
 }
 
 func ReturnActionPrime(polAction PrimePoliceAction, profAction PrimePoliceAction) PrimePoliceAction {
