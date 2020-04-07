@@ -59,12 +59,10 @@ type Router struct {
 // NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
 	r := &Router{Id: id, confDir: confDir}
-	var err error
-	if err = r.setup(); err != nil {
+	if err := r.setup(); err != nil {
 		return nil, err
 	}
-
-	return r, err
+	return r, nil
 }
 
 // Start sets up networking, and starts go routines for handling the main packet
@@ -176,7 +174,8 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-	// Enqueue the packet. Packets will be classified, put on different queues, scheduled and forwarded by forwardPacket
+	// Enqueue the packet. Packets will be classified, put on different queues,
+	// scheduled and forwarded by forwardPacket
 	r.qosConfig.QueuePacket(rp)
 }
 
