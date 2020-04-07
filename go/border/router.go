@@ -52,19 +52,17 @@ type Router struct {
 	// can be caused by a SIGHUP reload.
 	setCtxMtx sync.Mutex
 	// qosConfig holds all data structures and state required for the quality of service
-	// measures in the router
+	// subsystem in the router
 	qosConfig qos.QosConfiguration
 }
 
 // NewRouter returns a new router
 func NewRouter(id, confDir string) (*Router, error) {
 	r := &Router{Id: id, confDir: confDir}
-	var err error
-	if err = r.setup(); err != nil {
+	if err := r.setup(); err != nil {
 		return nil, err
 	}
-
-	return r, err
+	return r, nil
 }
 
 // Start sets up networking, and starts go routines for handling the main packet
@@ -209,6 +207,13 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
+	// Enqueue the packet. Packets will be classified, put on different queues,
+	// scheduled and forwarded by forwardPacket
+	r.qosConfig.QueuePacket(rp)
+}
+
+func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
+	defer rp.Release()
 
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
