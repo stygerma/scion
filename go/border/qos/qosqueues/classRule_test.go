@@ -23,6 +23,7 @@ import (
 	"github.com/scionproto/scion/go/border/qos/qosconf"
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/xtest"
 )
 
 // TODO: Add tests for MatchModes as soon as you have decided which thing
@@ -56,12 +57,45 @@ func TestRulesWithPriority(t *testing.T) {
 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
 		queueNo := qosqueues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), pkt)
-		if queueNo != tab.goldenQueueNo {
-			require.Equal(t, queueNo, tab.goldenQueueNo, "%d Queue number should be %d but is %d",
-				k, tab.goldenQueueNo, queueNo)
-		}
+		require.Equal(t, queueNo, tab.goldenQueueNo, "%d Queue number should be %d but is %d",
+			k, tab.goldenQueueNo, queueNo)
 	}
+}
 
+func TestCompareIAs(t *testing.T) {
+	cases := []struct {
+		a string
+		b string
+		r int
+	}{
+		// fully determined
+		{a: "1-ff00:0:1", b: "1-ff00:0:2", r: -1},
+		{a: "1-ff00:0:2", b: "1-ff00:0:2", r: 0},
+		{a: "1-ff00:0:3", b: "1-ff00:0:2", r: +1},
+		{a: "1-ff00:0:2", b: "2-ff00:0:3", r: -1},
+		{a: "2-ff00:0:1", b: "1-ff00:0:2", r: +1},
+		// indetermined at I or A, -1 result
+		{a: "0-ff00:0:1", b: "1-ff00:0:2", r: -1},
+		{a: "2-ff00:0:1", b: "0-ff00:0:2", r: -1},
+		{a: "1-ff00:0:2", b: "2-0", r: -1},
+		{a: "1-0", b: "2-ff00:0:2", r: -1},
+		// 0 result
+		{a: "1-0", b: "1-ff00:0:2", r: 0},
+		{a: "0-ff00:0:1", b: "1-ff00:0:1", r: 0},
+		// +1 result
+		{a: "0-ff00:0:2", b: "1-ff00:0:1", r: +1},
+		{a: "2-ff00:0:2", b: "0-ff00:0:1", r: +1},
+		{a: "2-ff00:0:2", b: "1-0", r: +1},
+		{a: "2-0", b: "1-ff00:0:2", r: +1},
+		// special case
+		{a: "0-0", b: "1-ff00:0:2", r: 0}, // one operand fully indetermined
+	}
+	for i, c := range cases {
+		r := qosqueues.CompareIAs(xtest.MustParseIA(c.a), xtest.MustParseIA(c.b))
+		require.Equal(t, r, c.r, "Failure at case %d", i)
+		r = qosqueues.CompareIAs(xtest.MustParseIA(c.b), xtest.MustParseIA(c.a))
+		require.Equal(t, r, -1*c.r, "Failure (reverse) at case %d", i)
+	}
 }
 
 func forwardPacketByDrop(rp *rpkt.RtrPkt) {
