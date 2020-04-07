@@ -80,23 +80,6 @@ type PacketQueueInterface interface {
 	GetPacketQueue() PacketQueue
 }
 
-func ReturnActionOld(polAction conf.PoliceAction, profAction conf.PoliceAction) conf.PoliceAction {
-
-	if polAction == conf.DROPNOTIFY || profAction == conf.DROPNOTIFY {
-		return conf.DROPNOTIFY
-	}
-
-	if polAction == conf.DROP || profAction == conf.DROP {
-		return conf.DROP
-	}
-
-	if polAction == conf.NOTIFY || profAction == conf.NOTIFY {
-		return conf.NOTIFY
-	}
-
-	return conf.PASS
-}
-
 // ReturnAction merges both PoliceAction together and returns the merged result.
 func ReturnAction(pol conf.PoliceAction, prof conf.PoliceAction) conf.PoliceAction {
 	// check if any of pol or prof actions are DROPNOTIFY, DROP, NOTIFY OR PASS, in this order
