@@ -2,15 +2,18 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_test(
     name = "go_default_test",
-    srcs = ["classRule_test.go"],
+    srcs = [
+        "classRule_test.go",
+        "queue_test.go",
+    ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
     deps = [
         "//go/border/qos:go_default_library",
         "//go/border/qos/conf:go_default_library",
         "//go/border/rpkt:go_default_library",
-        "//go/lib/log:go_default_library",
-        "@com_github_inconshreveable_log15//:go_default_library",
+        "//go/lib/xtest:go_default_library",
+        "@com_github_stretchr_testify//require:go_default_library",
     ],
 )
 
@@ -40,3 +43,27 @@ go_library(
         "//go/lib/ringbuf:go_default_library",
     ],
 )
+<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3:go/border/qos/qosqueues/BUILD.bazel
+
+go_test(
+    name = "go_default_test",
+    srcs = [
+        "bufQueue_test.go",
+        "channelQueue_test.go",
+        "classRule_test.go",
+        "customQueue_test.go",
+        "policer_test.go",
+        "queue_test.go",
+        "sliceQueue_test.go",
+    ],
+    data = glob(["testdata/**"]),
+    embed = [":go_default_library"],
+    deps = [
+        "//go/border/qos:go_default_library",
+        "//go/border/qos/qosconf:go_default_library",
+        "//go/border/rpkt:go_default_library",
+        "@com_github_stretchr_testify//require:go_default_library",
+    ],
+)
+=======
+>>>>>>> refactor.:go/border/qos/queues/BUILD.bazel

@@ -14,8 +14,12 @@ import (
 =======
 	"github.com/stretchr/testify/require"
 
+<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3
 >>>>>>> fix UT/benchmark
 	"github.com/scionproto/scion/go/border/qos/qosconf"
+=======
+	"github.com/scionproto/scion/go/border/qos/conf"
+>>>>>>> refactor.
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
@@ -53,8 +57,14 @@ func bBenchmarkQueueSinglePacket(b *testing.B) {
 	require.NoError(b, err)
 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 
+<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3
 	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
 	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
+=======
+	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
+	require.NoError(b, err)
+	qosConfig, _ := InitQos(extConfig, forwardPacketByDrop)
+>>>>>>> refactor.
 	singlePkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
 
 	b.ResetTimer()
@@ -88,7 +98,14 @@ func forwardPacketByDrop(rp *rpkt.RtrPkt) {
 	rp.Release()
 }
 
+<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3
 func TestEnqueueWithProfile(t *testing.T) {
+=======
+	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
+	require.NoError(t, err)
+	qosConfig, _ := InitQos(extConfig, forwardPacketByDrop)
+	arr := getPackets(1)
+>>>>>>> refactor.
 
 	start := time.Now()
 
