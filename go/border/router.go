@@ -218,14 +218,8 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 
 }
 
-// var ticker = time.NewTicker(400 * time.Microsecond)
-
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
-
-	// if r.Id == "br1-ff00_0_110-1" {
-	// 	<-ticker.C
-	// }
 
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
