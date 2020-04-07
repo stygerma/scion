@@ -69,8 +69,8 @@ func (r *Router) drrDequeue(queueNo int, qsum int) {
 	length := r.config.Queues[queueNo].GetLength()
 	pktToDequeue := min(64*(r.config.Queues[queueNo].GetPriority()/qsum), 1)
 
-	log.Debug("The queue has length", "length", length)
-	log.Debug("Dequeueing packets", "quantum", pktToDequeue)
+	//log.Debug("The queue has length", "length", length)
+	//log.Debug("Dequeueing packets", "quantum", pktToDequeue)
 
 	if length > 0 {
 		qps := r.config.Queues[queueNo].PopMultiple(max(length, pktToDequeue))

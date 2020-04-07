@@ -22,7 +22,7 @@ type InfoBscCW struct {
 	QueueFullness uint64
 	ConsIngress   common.IFIDType
 	Violation     uint64
-	Path          *InfoPath
+	//Path          *InfoPath
 
 	//QueueNo       uint64 //MS: used for debugging //TODO: either fully include or remove
 	//ClassRule     interface{} //TODO: include if we can limit its length
@@ -39,7 +39,7 @@ func InfoBscCWFromRaw(b common.RawBytes) (*InfoBscCW, error) {
 	i.QueueFullness = common.Order.Uint64(b[16:])
 	i.ConsIngress = common.IFIDType(common.Order.Uint64(b[24:]))
 	i.Violation = common.Order.Uint64(b[32:])
-	i.Path, _ = InfoPathFromRaw(b[40:])
+	//i.Path, _ = InfoPathFromRaw(b[40:])
 	//i.QueueNo = common.Order.Uint64((b[24:]))
 	return i, nil
 }
@@ -49,12 +49,12 @@ func (i *InfoBscCW) Copy() Info {
 		return nil
 	}
 	return &InfoBscCW{CurrBW: i.CurrBW, QueueLength: i.QueueLength, QueueFullness: i.QueueFullness,
-		ConsIngress: i.ConsIngress, Violation: i.Violation, Path: i.Path} //, QueueNo: i.QueueNo
+		ConsIngress: i.ConsIngress, Violation: i.Violation} //, Path: i.Path		, QueueNo: i.QueueNo
 
 }
 
 func (i *InfoBscCW) Len() int {
-	return bscCWLen + i.Path.Len() + util.CalcPadding(bscCWLen+i.Path.Len(), common.LineLen)
+	return bscCWLen + util.CalcPadding(bscCWLen, common.LineLen) // + i.Path.Len()	+i.Path.Len()
 }
 
 func (i *InfoBscCW) Write(b common.RawBytes) (int, error) {
@@ -64,12 +64,12 @@ func (i *InfoBscCW) Write(b common.RawBytes) (int, error) {
 	common.Order.PutUint64(b[24:], uint64(i.ConsIngress))
 	common.Order.PutUint64(b[32:], i.Violation)
 	//common.Order.PutUint64(b[24:], i.QueueNo)
-	_, _ = i.Path.Write(b[40:])
+	//_, _ = i.Path.Write(b[40:])
 
-	return util.FillPadding(b, bscCWLen+i.Path.Len(), common.LineLen), nil
+	return util.FillPadding(b, bscCWLen, common.LineLen), nil //+i.Path.Len()
 }
 
 func (i *InfoBscCW) String() string {
-	return fmt.Sprintf("CurrBW=%d QueueLength=%d QueueFullness=%d  ConsIngress=%d Violation=%d Path=%s", //QueueNo=%d
-		i.CurrBW, i.QueueLength, i.QueueFullness, i.ConsIngress, i.Violation, i.Path.String()) //, i.QueueNo
+	return fmt.Sprintf("CurrBW=%d QueueLength=%d QueueFullness=%d  ConsIngress=%d Violation=%d ", //Path=%s	QueueNo=%d
+		i.CurrBW, i.QueueLength, i.QueueFullness, i.ConsIngress, i.Violation) //, i.Path.String()	, i.QueueNo
 }
