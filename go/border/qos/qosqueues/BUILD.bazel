@@ -44,11 +44,6 @@ go_test(
         "//go/border/qos:go_default_library",
         "//go/border/qos/qosconf:go_default_library",
         "//go/border/rpkt:go_default_library",
-<<<<<<< 1978f3251cf6de94642435384217d428b32397fe
         "@com_github_stretchr_testify//require:go_default_library",
-=======
-        "//go/lib/log:go_default_library",
-        "@com_github_inconshreveable_log15//:go_default_library",
->>>>>>> Tried to parallelise the class rule stuff. It is very slow now
     ],
 )

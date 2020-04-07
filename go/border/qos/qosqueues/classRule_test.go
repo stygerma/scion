@@ -240,15 +240,8 @@ func TestRuleMatchModes(t *testing.T) {
 		{"2-ff00:0:011", "22-344:0:222", "Exact - ANY", 5, true},
 		{"2-ff00:0:011", "123-ff00:344:222", "Exact - ANY", 5, true},
 	}
-<<<<<<< 1978f3251cf6de94642435384217d428b32397fe
 	for k, tab := range tables {
 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
-=======
-
-	for _, classifier := range classifiers {
-		for k, tab := range tables {
-			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
->>>>>>> Tried to parallelise the class rule stuff. It is very slow now
 
 			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 			// queue := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
