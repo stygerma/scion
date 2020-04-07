@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qosqueues
+package queues
 
 import (
 	"sync"
 
-	"github.com/scionproto/scion/go/border/qos/qosconf"
+	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
@@ -45,13 +45,13 @@ const (
 type Action struct {
 	rule   *InternalClassRule
 	reason Violation
-	action qosconf.PoliceAction
+	action conf.PoliceAction
 }
 
 type ActionProfile struct {
-	FillLevel int                  `yaml:"fill-level"`
-	Prob      int                  `yaml:"prob"`
-	Action    qosconf.PoliceAction `yaml:"action"`
+	FillLevel int               `yaml:"fill-level"`
+	Prob      int               `yaml:"prob"`
+	Action    conf.PoliceAction `yaml:"action"`
 }
 
 type PacketQueue struct {
@@ -72,40 +72,40 @@ type PacketQueueInterface interface {
 	PopMultiple(number int) []*QPkt
 	GetFillLevel() int
 	GetLength() int
-	CheckAction() qosconf.PoliceAction
-	Police(qp *QPkt) qosconf.PoliceAction
+	CheckAction() conf.PoliceAction
+	Police(qp *QPkt) conf.PoliceAction
 	GetPriority() int
 	GetMinBandwidth() int
 	GetMaxBandwidth() int
 	GetPacketQueue() PacketQueue
 }
 
-func ReturnActionOld(polAction qosconf.PoliceAction, profAction qosconf.PoliceAction) qosconf.PoliceAction {
+func ReturnActionOld(polAction conf.PoliceAction, profAction conf.PoliceAction) conf.PoliceAction {
 
-	if polAction == qosconf.DROPNOTIFY || profAction == qosconf.DROPNOTIFY {
-		return qosconf.DROPNOTIFY
+	if polAction == conf.DROPNOTIFY || profAction == conf.DROPNOTIFY {
+		return conf.DROPNOTIFY
 	}
 
-	if polAction == qosconf.DROP || profAction == qosconf.DROP {
-		return qosconf.DROP
+	if polAction == conf.DROP || profAction == conf.DROP {
+		return conf.DROP
 	}
 
-	if polAction == qosconf.NOTIFY || profAction == qosconf.NOTIFY {
-		return qosconf.NOTIFY
+	if polAction == conf.NOTIFY || profAction == conf.NOTIFY {
+		return conf.NOTIFY
 	}
 
-	return qosconf.PASS
+	return conf.PASS
 }
 
 // ReturnAction merges both PoliceAction together and returns the merged result.
-func ReturnAction(pol qosconf.PoliceAction, prof qosconf.PoliceAction) qosconf.PoliceAction {
+func ReturnAction(pol conf.PoliceAction, prof conf.PoliceAction) conf.PoliceAction {
 	// check if any of pol or prof actions are DROPNOTIFY, DROP, NOTIFY OR PASS, in this order
-	if pol == qosconf.DROPNOTIFY || prof == qosconf.DROPNOTIFY {
-		return qosconf.DROPNOTIFY
-	} else if pol == qosconf.DROP || prof == qosconf.DROP {
-		return qosconf.DROP
-	} else if pol == qosconf.NOTIFY || prof == qosconf.NOTIFY {
-		return qosconf.NOTIFY
+	if pol == conf.DROPNOTIFY || prof == conf.DROPNOTIFY {
+		return conf.DROPNOTIFY
+	} else if pol == conf.DROP || prof == conf.DROP {
+		return conf.DROP
+	} else if pol == conf.NOTIFY || prof == conf.NOTIFY {
+		return conf.NOTIFY
 	}
-	return qosconf.PASS
+	return conf.PASS
 }
