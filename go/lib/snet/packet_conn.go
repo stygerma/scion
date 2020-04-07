@@ -288,10 +288,10 @@ func StableSortExtensions(data []common.Extension) {
 }
 
 func compareExtensions(x, y common.Extension) bool {
-	return GetPriority(x) < GetPriority(y)
+	return getPriority(x) < getPriority(y)
 }
 
-func GetPriority(x common.Extension) int {
+func getPriority(x common.Extension) int {
 	switch x.Class() {
 	case common.HopByHopClass:
 		if x.Type() == common.ExtnSCMPType {
