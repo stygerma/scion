@@ -18,6 +18,8 @@ package qosqueues
 import (
 	"sync"
 	"time"
+
+	"github.com/scionproto/scion/go/border/qos/qosconf"
 )
 
 type tokenBucket struct {
@@ -53,7 +55,7 @@ func (tb *tokenBucket) refill() {
 	}
 }
 
-func (tb *tokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
+func (tb *tokenBucket) PoliceBucket(qp *QPkt) qosconf.PoliceAction {
 
 	tb.mutex.Lock()
 	defer tb.mutex.Unlock()
@@ -64,10 +66,10 @@ func (tb *tokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
 
 	if tb.tokens-tokenForPacket > 0 {
 		tb.tokens = tb.tokens - tokenForPacket
-		qp.Act.action = PASS
+		qp.Act.action = qosconf.PASS
 		qp.Act.reason = None
 	} else {
-		qp.Act.action = DROP
+		qp.Act.action = qosconf.DROP
 		qp.Act.reason = BandWidthExceeded
 	}
 

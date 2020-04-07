@@ -19,6 +19,8 @@ import (
 	"math/rand"
 	"sync"
 	"sync/atomic"
+
+	"github.com/scionproto/scion/go/border/qos/qosconf"
 )
 
 type ChannelPacketQueue struct {
@@ -104,7 +106,7 @@ func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
 	return pkts
 }
 
-func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
+func (pq *ChannelPacketQueue) CheckAction() qosconf.PoliceAction {
 
 	level := pq.GetFillLevel()
 
@@ -123,10 +125,10 @@ func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
 		}
 	}
 
-	return PASS
+	return qosconf.PASS
 }
 
-func (pq *ChannelPacketQueue) Police(qp *QPkt) PoliceAction {
+func (pq *ChannelPacketQueue) Police(qp *QPkt) qosconf.PoliceAction {
 	return pq.tb.PoliceBucket(qp)
 }
 
