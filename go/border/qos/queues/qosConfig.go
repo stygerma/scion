@@ -5,15 +5,16 @@ import (
 )
 
 // InternalRouterConfig is what I am loading from the config file
-type InternalRouterConfig struct {
-	Scheduler SchedulerConfig
-	Queues    []PacketQueueInterface
-	Rules     MapRules
-}
+// type InternalRouterConfig struct {
+// 	Queues           []PacketQueueInterface
+// 	Rules            []InternalClassRule
+// 	SourceRules      map[addr.IA][]*InternalClassRule
+// 	DestinationRules map[addr.IA][]*InternalClassRule
+// }
 
-type SchedulerConfig struct {
-	Latency   int
-	Bandwidth int
+type InternalRouterConfig struct {
+	Queues []PacketQueueInterface
+	Rules  MapRules
 }
 
 type MapRules struct {
