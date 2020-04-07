@@ -32,6 +32,8 @@ type RoundRobinScheduler struct {
 
 var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
 
+// This is a standard round robin dequeue ignoring things like priority
+
 func (sched *RoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
 	sched.totalLength = len(routerConfig.Queues)
 	sched.messages = make(chan bool)
