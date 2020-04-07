@@ -128,6 +128,10 @@ func (r *Router) createBscCongWarn(np *qosqueues.NPkt) *scmp.InfoBscCW {
 	}
 	bscCW := &scmp.InfoBscCW{}
 	bscCW.ConsIngress = common.IFIDType(np.Qpkt.Rp.Ingress.IfID)
+	// bscCW.Path = &spath.Path{
+	// 	Raw:    np.Qpkt.Rp.Raw[(np.Qpkt.Rp).GetPathIdx():np.Qpkt.Rp.CmnHdr.HdrLenBytes()],
+	// 	InfOff: np.Qpkt.Rp.CmnHdr.InfoFOffBytes() - (np.Qpkt.Rp).GetPathIdx(),
+	// 	HopOff: np.Qpkt.Rp.CmnHdr.HopFOffBytes() - (np.Qpkt.Rp).GetPathIdx()}
 	if logEnabledBsc {
 		log.Debug("InfoBscCW", "ConsIngress", common.IFIDType(np.Qpkt.Rp.Ingress.IfID),
 			"QueueLength", (r.config.Queues[np.Qpkt.QueueNo]).GetLength(), "CurrBW",

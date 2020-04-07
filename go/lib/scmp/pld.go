@@ -129,6 +129,7 @@ func (p *Payload) WritePld(b common.RawBytes) (int, error) {
 	}
 	offset += MetaLen
 	if p.Info != nil {
+
 		if count, err := p.Info.Write(b[offset:]); err != nil {
 			return 0, err
 		} else {

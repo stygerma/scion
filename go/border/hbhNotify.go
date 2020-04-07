@@ -7,6 +7,7 @@ import (
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/scmp"
+	"github.com/scionproto/scion/go/lib/spath"
 )
 
 const (
@@ -24,18 +25,19 @@ func (r *Router) hbhNotify() {
 		// }
 		hbhCW := r.createHbhCongWarn(np)
 		hbhPktInfo := np.Qpkt.Rp.CreateHbhPktInfo(hbhCW)
+		hbhPktInfo.InfoHbhCW.CurrBW = hbhPktInfo.InfoHbhCW.CurrBW + 1 //dummy assignment
 		if logEnabledHbh {
-			revPath := hbhPktInfo.RevPath
-			infoField, _ := hbhPktInfo.RevPath.GetInfoField(hbhPktInfo.RevPath.InfOff)
-			hopField, _ := hbhPktInfo.RevPath.GetHopField(hbhPktInfo.RevPath.HopOff)
-			_ = hbhPktInfo.RevPath.IncOffsets()
-			newRevPath := hbhPktInfo
-			nextinfoField, _ := hbhPktInfo.RevPath.GetInfoField(hbhPktInfo.RevPath.InfOff)
-			nextHopField, _ := hbhPktInfo.RevPath.GetHopField(hbhPktInfo.RevPath.HopOff)
-			log.Debug("Reversed path", "RevPath", revPath,
-				"\n InfoField", infoField, "\n HopField", hopField, "\n newRevPath", newRevPath,
-				"\n nextInfoField",
-				nextinfoField, "\n nextHopField", nextHopField)
+			//revPath := hbhPktInfo.RevPath
+			// infoField, _ := hbhPktInfo.RevPath.GetInfoField(hbhPktInfo.RevPath.InfOff)
+			// hopField, _ := hbhPktInfo.RevPath.GetHopField(hbhPktInfo.RevPath.HopOff)
+			// _ = hbhPktInfo.RevPath.IncOffsets()
+			// newRevPath := hbhPktInfo
+			// nextinfoField, _ := hbhPktInfo.RevPath.GetInfoField(hbhPktInfo.RevPath.InfOff)
+			// nextHopField, _ := hbhPktInfo.RevPath.GetHopField(hbhPktInfo.RevPath.HopOff)
+			// log.Debug("Reversed path", "RevPath", revPath,
+			// 	"\n InfoField", infoField, "\n HopField", hopField, "\n newRevPath", newRevPath,
+			// 	"\n nextInfoField",
+			// 	nextinfoField, "\n nextHopField", nextHopField)
 		}
 		np.Qpkt.Rp.RefInc(-1)
 		//}
@@ -57,6 +59,10 @@ func (r *Router) createHbhCongWarn(np *qosqueues.NPkt) *scmp.InfoHbhCW {
 	}
 	hbhCW := &scmp.InfoHbhCW{}
 	hbhCW.ConsIngress = common.IFIDType(np.Qpkt.Rp.Ingress.IfID)
+	hbhCW.Path = &spath.Path{
+		Raw:    np.Qpkt.Rp.Raw[(np.Qpkt.Rp).GetPathIdx():np.Qpkt.Rp.CmnHdr.HdrLenBytes()],
+		InfOff: np.Qpkt.Rp.CmnHdr.InfoFOffBytes() - (np.Qpkt.Rp).GetPathIdx(),
+		HopOff: np.Qpkt.Rp.CmnHdr.HopFOffBytes() - (np.Qpkt.Rp).GetPathIdx()}
 	if logEnabledHbh {
 		log.Debug("InfoBscCW", "ConsIngress", common.IFIDType(np.Qpkt.Rp.Ingress.IfID),
 			"QueueLength", (r.config.Queues[np.Qpkt.QueueNo]).GetLength(), "CurrBW",
