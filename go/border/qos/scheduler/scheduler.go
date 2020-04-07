@@ -13,17 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qosscheduler
+package scheduler
 
 import (
-	"github.com/scionproto/scion/go/border/qos/qosqueues"
+	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
 type SchedulerInterface interface {
-	Init(routerConfig qosqueues.InternalRouterConfig)
-	Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt))
-	dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int)
+	Init(routerConfig queues.InternalRouterConfig)
+	Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt))
+	dequeue(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int)
 	GetMessages() *chan bool
 }
 

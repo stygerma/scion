@@ -1,9 +1,9 @@
-package qosscheduler
+package scheduler
 
 import (
 	"sync"
 
-	"github.com/scionproto/scion/go/border/qos/qosqueues"
+	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/log"
 )
@@ -25,7 +25,7 @@ type surplus struct {
 
 var _ SchedulerInterface = (*MinMaxDeficitRoundRobinScheduler)(nil)
 
-func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConfig) {
+func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
 
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
@@ -39,7 +39,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig qosqueues.Inter
 
 }
 
-func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
+func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
@@ -50,7 +50,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.I
 	}
 }
 
-func (sched *MinMaxDeficitRoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
+func (sched *MinMaxDeficitRoundRobinScheduler) dequeue(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	length := routerConfig.Queues[queueNo].GetLength()
 	pktToDequeue := min(64*(routerConfig.Queues[queueNo].GetMinBandwidth()/sched.quantumSum), 1)
@@ -80,7 +80,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) dequeue(routerConfig qosqueues.In
 	}
 }
 
-func (sched *MinMaxDeficitRoundRobinScheduler) getFromSurplus(routerConfig qosqueues.InternalRouterConfig, queueNo int, request int) int {
+func (sched *MinMaxDeficitRoundRobinScheduler) getFromSurplus(routerConfig queues.InternalRouterConfig, queueNo int, request int) int {
 
 	sched.schedulerSurplusMtx.Lock()
 	defer sched.schedulerSurplusMtx.Unlock()
@@ -98,7 +98,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) getFromSurplus(routerConfig qosqu
 
 }
 
-func (sched *MinMaxDeficitRoundRobinScheduler) payIntoSurplus(routerConfig qosqueues.InternalRouterConfig, queueNo int, payment int) {
+func (sched *MinMaxDeficitRoundRobinScheduler) payIntoSurplus(routerConfig queues.InternalRouterConfig, queueNo int, payment int) {
 
 	sched.schedulerSurplusMtx.Lock()
 	defer sched.schedulerSurplusMtx.Unlock()

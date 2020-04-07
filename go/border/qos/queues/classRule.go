@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qosqueues
+package queues
 
 import (
 	"strings"
 
-	"github.com/scionproto/scion/go/border/qos/qosconf"
+	"github.com/scionproto/scion/go/border/qos/conf"
 
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
@@ -73,7 +73,7 @@ const (
 	ANY matchMode = 4
 )
 
-func ConvClassRuleToInternal(cr qosconf.ExternalClassRule) (InternalClassRule, error) {
+func ConvClassRuleToInternal(cr conf.ExternalClassRule) (InternalClassRule, error) {
 
 	sourceMatch, err := getMatchFromRule(cr, cr.SourceMatchMode, cr.SourceAs)
 	if err != nil {
@@ -144,7 +144,7 @@ func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[
 
 }
 
-func getMatchFromRule(cr qosconf.ExternalClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
+func getMatchFromRule(cr conf.ExternalClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
 	switch matchMode(matchModeField) {
 	case EXACT, ASONLY, ISDONLY, ANY:
 		IA, err := addr.IAFromString(matchRuleField)
@@ -236,10 +236,10 @@ func getQueueNumberIterativeForInternal(config *InternalRouterConfig, rp *rpkt.R
 	return queueNo
 }
 
-func getQueueNumberIterativeFor(legacyConfig *qosconf.ExternalConfig, rp *rpkt.RtrPkt) int {
+func getQueueNumberIterativeFor(legacyConfig *conf.ExternalConfig, rp *rpkt.RtrPkt) int {
 	queueNo := 0
 
-	matches := make([]qosconf.ExternalClassRule, 0)
+	matches := make([]conf.ExternalClassRule, 0)
 
 	for _, cr := range legacyConfig.ExternalRules {
 		if matchRuleFromConfig(&cr, rp) {
@@ -288,7 +288,7 @@ func (cr *InternalClassRule) matchInternalRule(rp *rpkt.RtrPkt) bool {
 	return sourceMatches && destinationMatches
 }
 
-func matchRuleFromConfig(cr *qosconf.ExternalClassRule, rp *rpkt.RtrPkt) bool {
+func matchRuleFromConfig(cr *conf.ExternalClassRule, rp *rpkt.RtrPkt) bool {
 
 	match := true
 

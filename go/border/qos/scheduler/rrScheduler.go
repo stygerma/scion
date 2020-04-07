@@ -1,9 +1,9 @@
-package qosscheduler
+package scheduler
 
 import (
 	"time"
 
-	"github.com/scionproto/scion/go/border/qos/qosqueues"
+	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
@@ -16,12 +16,12 @@ var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
 
 // This is a standard round robin dequeue ignoring things like priority
 
-func (sched *RoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConfig) {
+func (sched *RoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
 	sched.totalLength = len(routerConfig.Queues)
 	sched.messages = make(chan bool)
 }
 
-func (sched *RoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
+func (sched *RoundRobinScheduler) dequeue(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	length := routerConfig.Queues[queueNo].GetLength()
 
@@ -33,7 +33,7 @@ func (sched *RoundRobinScheduler) dequeue(routerConfig qosqueues.InternalRouterC
 	}
 }
 
-func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
+func (sched *RoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}

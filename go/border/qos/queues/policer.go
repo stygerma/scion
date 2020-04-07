@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qosqueues
+package queues
 
 import (
 	"sync"
 	"time"
 
-	"github.com/scionproto/scion/go/border/qos/qosconf"
+	"github.com/scionproto/scion/go/border/qos/conf"
 )
 
 type tokenBucket struct {
@@ -55,7 +55,7 @@ func (tb *tokenBucket) refill() {
 	}
 }
 
-func (tb *tokenBucket) PoliceBucket(qp *QPkt) qosconf.PoliceAction {
+func (tb *tokenBucket) PoliceBucket(qp *QPkt) conf.PoliceAction {
 
 	tb.mutex.Lock()
 	defer tb.mutex.Unlock()
@@ -66,10 +66,10 @@ func (tb *tokenBucket) PoliceBucket(qp *QPkt) qosconf.PoliceAction {
 
 	if tb.tokens-tokenForPacket > 0 {
 		tb.tokens = tb.tokens - tokenForPacket
-		qp.Act.action = qosconf.PASS
+		qp.Act.action = conf.PASS
 		qp.Act.reason = None
 	} else {
-		qp.Act.action = qosconf.DROP
+		qp.Act.action = conf.DROP
 		qp.Act.reason = BandWidthExceeded
 	}
 

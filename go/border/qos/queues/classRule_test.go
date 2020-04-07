@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qosqueues_test
+package queues_test
 
 import (
 	"testing"
@@ -20,8 +20,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/scionproto/scion/go/border/qos"
-	"github.com/scionproto/scion/go/border/qos/qosconf"
-	"github.com/scionproto/scion/go/border/qos/qosqueues"
+	"github.com/scionproto/scion/go/border/qos/conf"
+	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/xtest"
 )
@@ -50,13 +50,13 @@ func TestRulesWithPriority(t *testing.T) {
 		{"1-ff00:0:110", "1-ff00:0:110", "testdata/priority2-config.yaml", 0},
 	}
 	for k, tab := range tables {
-		extConfig, err := qosconf.LoadConfig(tab.configFile)
+		extConfig, err := conf.LoadConfig(tab.configFile)
 		require.NoError(t, err, "Failed at case %d", k)
 		qosConfig, err := qos.InitQos(extConfig, forwardPacketByDrop)
 		require.NoError(t, err, "Failed at case %d", k)
 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
-		queueNo := qosqueues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), pkt)
+		queueNo := queues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), pkt)
 		require.Equal(t, queueNo, tab.goldenQueueNo, "%d Queue number should be %d but is %d",
 			k, tab.goldenQueueNo, queueNo)
 	}
@@ -91,9 +91,9 @@ func TestCompareIAs(t *testing.T) {
 		{a: "0-0", b: "1-ff00:0:2", r: 0}, // one operand fully indetermined
 	}
 	for i, c := range cases {
-		r := qosqueues.CompareIAs(xtest.MustParseIA(c.a), xtest.MustParseIA(c.b))
+		r := queues.CompareIAs(xtest.MustParseIA(c.a), xtest.MustParseIA(c.b))
 		require.Equal(t, r, c.r, "Failure at case %d", i)
-		r = qosqueues.CompareIAs(xtest.MustParseIA(c.b), xtest.MustParseIA(c.a))
+		r = queues.CompareIAs(xtest.MustParseIA(c.b), xtest.MustParseIA(c.a))
 		require.Equal(t, r, -1*c.r, "Failure (reverse) at case %d", i)
 	}
 }
