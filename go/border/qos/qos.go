@@ -21,9 +21,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/scionproto/scion/go/border/qos/qosconf"
-	"github.com/scionproto/scion/go/border/qos/qosqueues"
-	"github.com/scionproto/scion/go/border/qos/qosscheduler"
+	"github.com/scionproto/scion/go/border/qos/conf"
+	"github.com/scionproto/scion/go/border/qos/queues"
+	"github.com/scionproto/scion/go/border/qos/scheduler"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/log"
 )
@@ -33,11 +33,11 @@ const maxNotificationCount = 1024
 type QosConfiguration struct {
 	worker workerConfiguration
 
-	config         qosqueues.InternalRouterConfig
-	schedul        qosscheduler.SchedulerInterface
-	legacyConfig   qosconf.ExternalConfig
-	notifications  chan *qosqueues.NPkt
-	workerChannels [](chan *qosqueues.QPkt)
+	config         queues.InternalRouterConfig
+	schedul        scheduler.SchedulerInterface
+	legacyConfig   conf.ExternalConfig
+	notifications  chan *queues.NPkt
+	workerChannels [](chan *queues.QPkt)
 	Forwarder      func(rp *rpkt.RtrPkt)
 
 	droppedPackets int
@@ -48,37 +48,37 @@ type workerConfiguration struct {
 	workLength int
 }
 
-func (qosConfig *QosConfiguration) SendToWorker(i int, qpkt *qosqueues.QPkt) {
+func (qosConfig *QosConfiguration) SendToWorker(i int, qpkt *queues.QPkt) {
 	qosConfig.workerChannels[i] <- qpkt
 }
 
-func (qosConfig *QosConfiguration) GetWorkerChannels() *[](chan *qosqueues.QPkt) {
+func (qosConfig *QosConfiguration) GetWorkerChannels() *[](chan *queues.QPkt) {
 	return &qosConfig.workerChannels
 }
 
-func (qosConfig *QosConfiguration) GetQueues() *[]qosqueues.PacketQueueInterface {
+func (qosConfig *QosConfiguration) GetQueues() *[]queues.PacketQueueInterface {
 	return &qosConfig.config.Queues
 }
 
-func (qosConfig *QosConfiguration) GetQueue(ind int) *qosqueues.PacketQueueInterface {
+func (qosConfig *QosConfiguration) GetQueue(ind int) *queues.PacketQueueInterface {
 	return &qosConfig.config.Queues[ind]
 }
 
-func (qosConfig *QosConfiguration) GetConfig() *qosqueues.InternalRouterConfig {
+func (qosConfig *QosConfiguration) GetConfig() *queues.InternalRouterConfig {
 	return &qosConfig.config
 }
 
-func (qosConfig *QosConfiguration) GetLegacyConfig() *qosconf.ExternalConfig {
+func (qosConfig *QosConfiguration) GetLegacyConfig() *conf.ExternalConfig {
 	return &qosConfig.legacyConfig
 }
 
 // SetAndInitSchedul is necessary to set up a mock scheduler for testing. Do not use for anything else.
-func (qosConfig *QosConfiguration) SetAndInitSchedul(sched qosscheduler.SchedulerInterface) {
+func (qosConfig *QosConfiguration) SetAndInitSchedul(sched scheduler.SchedulerInterface) {
 	qosConfig.schedul = sched
 	qosConfig.schedul.Init(qosConfig.config)
 }
 
-func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {
+func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {
 
 	qConfig := QosConfiguration{}
 
@@ -99,7 +99,7 @@ func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (Q
 	return qConfig, nil
 }
 
-func ConvertExternalToInternalConfig(qConfig *QosConfiguration, extConf qosconf.ExternalConfig) error {
+func ConvertExternalToInternalConfig(qConfig *QosConfiguration, extConf conf.ExternalConfig) error {
 	var err error
 	qConfig.config, err = convertExternalToInteral(extConf)
 	qConfig.legacyConfig = extConf
@@ -107,19 +107,19 @@ func ConvertExternalToInternalConfig(qConfig *QosConfiguration, extConf qosconf.
 }
 
 func InitClassification(qConfig *QosConfiguration) error {
-	qConfig.config.Rules = *qosqueues.RulesToMap(qConfig.config.Rules.RulesList)
+	qConfig.config.Rules = *queues.RulesToMap(qConfig.config.Rules.RulesList)
 	qConfig.config.Rules.CrCache.Init(256)
 
 	return nil
 }
 
 func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
-	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
+	qConfig.notifications = make(chan *queues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
-	// qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
-	qConfig.schedul = &qosscheduler.DeficitRoundRobinScheduler{}
-	// qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
-	// qConfig.schedul = &qosscheduler.RateRoundRobinScheduler{}
+	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
+	qConfig.schedul = &scheduler.DeficitRoundRobinScheduler{}
+	// qConfig.schedul = &scheduler.MinMaxDeficitRoundRobinScheduler{}
+	// qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
@@ -129,10 +129,10 @@ func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) e
 func InitWorkers(qConfig *QosConfiguration) error {
 	noWorkers := len(qConfig.config.Queues)
 	qConfig.worker = workerConfiguration{noWorkers, 256}
-	qConfig.workerChannels = make([]chan *qosqueues.QPkt, qConfig.worker.noWorker)
+	qConfig.workerChannels = make([]chan *queues.QPkt, qConfig.worker.noWorker)
 
 	for i := range qConfig.workerChannels {
-		qConfig.workerChannels[i] = make(chan *qosqueues.QPkt, qConfig.worker.workLength)
+		qConfig.workerChannels[i] = make(chan *queues.QPkt, qConfig.worker.workLength)
 
 		go worker(qConfig, &qConfig.workerChannels[i])
 	}
@@ -145,9 +145,9 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	//log.Trace("preRouteStep")
 	//log.Trace("We have rules: ", "len(Rules)", len(qosConfig.GetConfig().Rules))
 
-	rc := qosqueues.RegularClassRule{}
+	rc := queues.RegularClassRule{}
 
-	// queueNo := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), rp)
+	// queueNo := queues.GetQueueNumberForPacket(qosConfig.GetConfig(), rp)
 	config := qosConfig.GetConfig()
 	// queueNo := rc.GetRuleForPacket(config, rp).QueueNumber
 
@@ -158,7 +158,7 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 		queueNo = rule.QueueNumber
 	}
 
-	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
+	qp := queues.QPkt{Rp: rp, QueueNo: queueNo}
 
 	//log.Trace("Our packet is", "QPkt", qp)
 	//log.Trace("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
@@ -173,7 +173,7 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 		//log.Trace("no message sent")
 	}
 
-	// sch := qosConfig.schedul.(*qosscheduler.DeficitRoundRobinScheduler)
+	// sch := qosConfig.schedul.(*scheduler.DeficitRoundRobinScheduler)
 	// sch.UpdateIncoming(queueNo)
 	qosConfig.SendToWorker(queueNo, &qp)
 
@@ -183,7 +183,7 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 
 }
 
-func worker(qosConfig *QosConfiguration, workChannel *chan *qosqueues.QPkt) {
+func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
 	for {
 		qp := <-*workChannel
 		queueNo := qp.QueueNo
@@ -191,22 +191,22 @@ func worker(qosConfig *QosConfiguration, workChannel *chan *qosqueues.QPkt) {
 	}
 }
 
-func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *qosqueues.QPkt) {
+func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 	polAct := qosConfig.config.Queues[queueNo].Police(qp)
 	profAct := qosConfig.config.Queues[queueNo].CheckAction()
 
-	act := qosqueues.ReturnAction(polAct, profAct)
+	act := queues.ReturnAction(polAct, profAct)
 
 	switch act {
-	case qosconf.PASS:
+	case conf.PASS:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
-	case qosconf.NOTIFY:
+	case conf.NOTIFY:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 		qosConfig.SendNotification(qp)
-	case qosconf.DROPNOTIFY:
+	case conf.DROPNOTIFY:
 		qosConfig.dropPacket(qp.Rp)
 		qosConfig.SendNotification(qp)
-	case qosconf.DROP:
+	case conf.DROP:
 		qosConfig.dropPacket(qp.Rp)
 	default:
 		qosConfig.dropPacket(qp.Rp)
@@ -215,27 +215,27 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *qosqueues.QPkt) {
 }
 
 // SendNotification might be needed for the part of @stygerma
-func (qosConfig *QosConfiguration) SendNotification(qp *qosqueues.QPkt) {
+func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 }
 
 func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
-	// qosConfig.notifications <- &qosqueues.NPkt{}
+	// qosConfig.notifications <- &queues.NPkt{}
 	qosConfig.droppedPackets++
 	log.Debug("Dropping packet", "qosConfig.droppedPackets", qosConfig.droppedPackets)
 	// panic("Do not drop packets")
 
 }
 
-func convertExternalToInteral(extConf qosconf.ExternalConfig) (qosqueues.InternalRouterConfig, error) {
+func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRouterConfig, error) {
 
-	var internalRules []qosqueues.InternalClassRule
-	var internalQueues []qosqueues.PacketQueueInterface
+	var internalRules []queues.InternalClassRule
+	var internalQueues []queues.PacketQueueInterface
 
 	rc := extConf
 
 	for _, rule := range rc.ExternalRules {
-		intRule, err := qosqueues.ConvClassRuleToInternal(rule)
+		intRule, err := queues.ConvClassRuleToInternal(rule)
 		if err != nil {
 			log.Error("Error reading config file", "error", err)
 		}
@@ -247,13 +247,13 @@ func convertExternalToInteral(extConf qosconf.ExternalConfig) (qosqueues.Interna
 		log.Trace("We have gotten the rule", "rule", iq)
 	}
 
-	var intQue qosqueues.PacketQueue
+	var intQue queues.PacketQueue
 	for _, extQue := range rc.ExternalQueues {
 
 		muta := &sync.Mutex{}
 		mutb := &sync.Mutex{}
 
-		queueToUse := &qosqueues.ChannelPacketQueue{}
+		queueToUse := &queues.ChannelPacketQueue{}
 
 		intQue = convertExternalToInteralQueue(extQue)
 		queueToUse.InitQueue(intQue, muta, mutb)
@@ -267,15 +267,15 @@ func convertExternalToInteral(extConf qosconf.ExternalConfig) (qosqueues.Interna
 
 	bw := convStringToNumber(rc.SchedulerConfig.Bandwidth)
 
-	sc := qosqueues.SchedulerConfig{Latency: rc.SchedulerConfig.Latency, Bandwidth: bw}
+	sc := queues.SchedulerConfig{Latency: rc.SchedulerConfig.Latency, Bandwidth: bw}
 
-	return qosqueues.InternalRouterConfig{Scheduler: sc, Queues: internalQueues, Rules: qosqueues.MapRules{RulesList: internalRules}}, nil
+	return queues.InternalRouterConfig{Scheduler: sc, Queues: internalQueues, Rules: queues.MapRules{RulesList: internalRules}}, nil
 
 }
 
-func convertExternalToInteralQueue(extQueue qosconf.ExternalPacketQueue) qosqueues.PacketQueue {
+func convertExternalToInteralQueue(extQueue conf.ExternalPacketQueue) queues.PacketQueue {
 
-	pq := qosqueues.PacketQueue{
+	pq := queues.PacketQueue{
 		Name:         extQueue.Name,
 		ID:           extQueue.ID,
 		MinBandwidth: extQueue.MinBandwidth,
@@ -288,9 +288,9 @@ func convertExternalToInteralQueue(extQueue qosconf.ExternalPacketQueue) qosqueu
 
 	return pq
 }
-func convertActionProfiles(externalActionProfile []qosconf.ActionProfile) []qosqueues.ActionProfile {
+func convertActionProfiles(externalActionProfile []conf.ActionProfile) []queues.ActionProfile {
 
-	ret := make([]qosqueues.ActionProfile, 0)
+	ret := make([]queues.ActionProfile, 0)
 
 	for _, prof := range externalActionProfile {
 		ret = append(ret, convertActionProfile(prof))
@@ -298,9 +298,9 @@ func convertActionProfiles(externalActionProfile []qosconf.ActionProfile) []qosq
 	return ret
 }
 
-func convertActionProfile(externalActionProfile qosconf.ActionProfile) qosqueues.ActionProfile {
+func convertActionProfile(externalActionProfile conf.ActionProfile) queues.ActionProfile {
 
-	ap := qosqueues.ActionProfile{
+	ap := queues.ActionProfile{
 		FillLevel: externalActionProfile.FillLevel,
 		Prob:      externalActionProfile.Prob,
 		Action:    convertPoliceAction(externalActionProfile.Action),
@@ -309,8 +309,8 @@ func convertActionProfile(externalActionProfile qosconf.ActionProfile) qosqueues
 	return ap
 }
 
-func convertPoliceAction(externalPoliceAction qosconf.PoliceAction) qosconf.PoliceAction {
-	return qosconf.PoliceAction(externalPoliceAction)
+func convertPoliceAction(externalPoliceAction conf.PoliceAction) conf.PoliceAction {
+	return conf.PoliceAction(externalPoliceAction)
 }
 
 func convStringToNumber(bandwidthstring string) int {

@@ -1,4 +1,4 @@
-package qosconf
+package conf
 
 import (
 	"io/ioutil"

@@ -7,7 +7,7 @@ import (
 	"github.com/inconshreveable/log15"
 	"github.com/stretchr/testify/require"
 
-	"github.com/scionproto/scion/go/border/qos/qosconf"
+	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
@@ -19,7 +19,7 @@ func bBenchmarkQueueSinglePacket(b *testing.B) {
 	require.NoError(b, err)
 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 
-	extConfig, err := qosconf.LoadConfig("testdata/sample-config.yaml")
+	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
 	require.NoError(b, err)
 	qosConfig, _ := InitQos(extConfig, forwardPacketByDrop)
 	singlePkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
@@ -39,7 +39,7 @@ func BenchmarkQueueSinglePacket(t *testing.B) {
 	require.NoError(t, err)
 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 
-	extConfig, err := qosconf.LoadConfig("testdata/sample-config.yaml")
+	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
 	require.NoError(t, err)
 	qosConfig, _ := InitQos(extConfig, forwardPacketByDrop)
 	arr := getPackets(1)
