@@ -22,18 +22,6 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
-type PrimePoliceAction uint8
-
-const (
-	PrimePASS PrimePoliceAction = 3
-	// NOTIFY Notify the sending host of the packet
-	PrimeNOTIFY PrimePoliceAction = 5
-	// DROP Drop the packet
-	PrimeDROP PrimePoliceAction = 11
-	// DROPNOTIFY Drop and then notify someone
-	PrimeDROPNOTIFY PrimePoliceAction = 13
-)
-
 type QPkt struct {
 	QueueNo int
 	Act     Action
@@ -126,18 +114,4 @@ func ReturnAction(polAction qosconf.PoliceAction, profAction qosconf.PoliceActio
 		return qosconf.NOTIFY
 	}
 	return qosconf.PASS
-}
-
-func ReturnActionPrime(polAction PrimePoliceAction, profAction PrimePoliceAction) PrimePoliceAction {
-
-	if polAction*profAction%PrimeDROPNOTIFY == 0 {
-		return PrimeDROPNOTIFY
-	}
-	if polAction*profAction%PrimeDROP == 0 {
-		return PrimeDROPNOTIFY
-	}
-	if polAction*profAction%PrimeDROPNOTIFY == 0 {
-		return PrimePASS
-	}
-	return PrimePASS
 }
