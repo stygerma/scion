@@ -5,6 +5,7 @@ import (
 
 	"github.com/scionproto/scion/go/lib/common"
 	"github.com/scionproto/scion/go/lib/serrors"
+	"github.com/scionproto/scion/go/lib/spath"
 	"github.com/scionproto/scion/go/lib/util"
 )
 
@@ -13,7 +14,7 @@ import (
 var _ Info = (*InfoBscCW)(nil) //Interface assertion
 
 const (
-	bscCWLen = 40
+	bscCWLen = 56
 )
 
 type InfoBscCW struct {
@@ -22,8 +23,7 @@ type InfoBscCW struct {
 	QueueFullness uint64
 	ConsIngress   common.IFIDType
 	Violation     uint64
-	//Path          *InfoPath
-
+	Path          *spath.Path
 	//QueueNo       uint64 //MS: used for debugging //TODO: either fully include or remove
 	//ClassRule     interface{} //TODO: include if we can limit its length
 }
@@ -39,7 +39,7 @@ func InfoBscCWFromRaw(b common.RawBytes) (*InfoBscCW, error) {
 	i.QueueFullness = common.Order.Uint64(b[16:])
 	i.ConsIngress = common.IFIDType(common.Order.Uint64(b[24:]))
 	i.Violation = common.Order.Uint64(b[32:])
-	//i.Path, _ = InfoPathFromRaw(b[40:])
+	i.Path = spath.New(b[40:])
 	//i.QueueNo = common.Order.Uint64((b[24:]))
 	return i, nil
 }
@@ -49,12 +49,12 @@ func (i *InfoBscCW) Copy() Info {
 		return nil
 	}
 	return &InfoBscCW{CurrBW: i.CurrBW, QueueLength: i.QueueLength, QueueFullness: i.QueueFullness,
-		ConsIngress: i.ConsIngress, Violation: i.Violation} //, Path: i.Path		, QueueNo: i.QueueNo
+		ConsIngress: i.ConsIngress, Violation: i.Violation, Path: i.Path} //		, QueueNo: i.QueueNo
 
 }
 
 func (i *InfoBscCW) Len() int {
-	return bscCWLen + util.CalcPadding(bscCWLen, common.LineLen) // + i.Path.Len()	+i.Path.Len()
+	return bscCWLen + i.Path.Raw.Len() + util.CalcPadding(bscCWLen+i.Path.Raw.Len(), common.LineLen) //
 }
 
 func (i *InfoBscCW) Write(b common.RawBytes) (int, error) {
@@ -63,13 +63,25 @@ func (i *InfoBscCW) Write(b common.RawBytes) (int, error) {
 	common.Order.PutUint64(b[16:], i.QueueFullness)
 	common.Order.PutUint64(b[24:], uint64(i.ConsIngress))
 	common.Order.PutUint64(b[32:], i.Violation)
+	if _, err := (i.Path.Raw).WritePld(b[40:i.Path.Raw.Len()]); err != nil {
+		return 0, err
+	}
+	if i.Path.InfOff < 0 {
+		return 0, common.NewBasicError("Negative InfOff", nil, "cannot convert to uint64")
+	}
+	common.Order.PutUint64(b[i.Path.Raw.Len()+40:], uint64(i.Path.InfOff))
+	if i.Path.HopOff < 0 {
+		return 0, common.NewBasicError("Negative HopOff", nil, "cannot convert to uint64")
+	}
+	common.Order.PutUint64(b[i.Path.Raw.Len()+48:], uint64(i.Path.HopOff))
+	//_, _ = i.Path.Write(b[40:])
 	//common.Order.PutUint64(b[24:], i.QueueNo)
 	//_, _ = i.Path.Write(b[40:])
 
-	return util.FillPadding(b, bscCWLen, common.LineLen), nil //+i.Path.Len()
+	return util.FillPadding(b, bscCWLen+i.Path.Raw.Len(), common.LineLen), nil //+i.Path.Len()
 }
 
 func (i *InfoBscCW) String() string {
-	return fmt.Sprintf("CurrBW=%d QueueLength=%d QueueFullness=%d  ConsIngress=%d Violation=%d ", //Path=%s	QueueNo=%d
-		i.CurrBW, i.QueueLength, i.QueueFullness, i.ConsIngress, i.Violation) //, i.Path.String()	, i.QueueNo
+	return fmt.Sprintf("CurrBW=%d QueueLength=%d QueueFullness=%d  ConsIngress=%d Violation=%d Path: Raw=%s InfOff=%d HopOff=%d", //Path=%s	QueueNo=%d
+		i.CurrBW, i.QueueLength, i.QueueFullness, i.ConsIngress, i.Violation, i.Path.Raw.String(), i.Path.InfOff, i.Path.HopOff) //, i.Path.String()	, i.QueueNo
 }
