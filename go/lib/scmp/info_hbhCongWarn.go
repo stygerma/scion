@@ -83,7 +83,7 @@ package scmp
 // 	common.Order.PutUint64(b[32:], i.Violation)
 // 	//common.Order.PutUint64(b[24:], i.QueueNo)
 
-// 	// if _, err := (i.Path.Raw).WritePld(b[40:i.Path.Raw.Len()]); err != nil {
+// 	// if _, err := (i.Path.Raw).WritePld(b[40:]); err != nil {
 // 	// 	return 0, err
 // 	// }
 // 	// if i.Path.InfOff < 0 {

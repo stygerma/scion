@@ -390,3 +390,7 @@ func (rp *RtrPkt) ErrStrf(desc string) func() string {
 func (rp *RtrPkt) GetPathIdx() int {
 	return rp.idxs.path
 }
+
+func (rp *RtrPkt) GetIdxs() *packetIdxs {
+	return &rp.idxs
+}

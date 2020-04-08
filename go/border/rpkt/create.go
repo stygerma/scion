@@ -18,6 +18,7 @@
 package rpkt
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -86,10 +87,12 @@ func RtrPktFromScnPkt(sp *spkt.ScnPkt, ctx *rctx.Ctx) (*RtrPkt, error) {
 	}
 	// Fill in L4 Header
 	rp.idxs.pld = int(hdrLen) * common.LineLen // Will be updated as necessary by addL4
+	log.Debug("indexes", "l4", rp.GetIdxs())
 	if sp.L4 != nil {
 		if err := rp.addL4(sp.L4); err != nil {
 			return nil, err
 		}
+		log.Debug("Paload type", "type", fmt.Sprintf("%T", sp.Pld))
 		// Fill in payload
 		if err := rp.SetPld(sp.Pld); err != nil {
 			return nil, err
@@ -147,6 +150,8 @@ func (rp *RtrPkt) addL4(l4h l4.L4Header) error {
 // SetPld updates/sets the payload of an RtrPkt.
 func (rp *RtrPkt) SetPld(pld common.Payload) error {
 	rp.pld = pld
+	log.Debug("Paload types", "rp type", fmt.Sprintf("%T", rp.pld), "sp type", fmt.Sprintf("%T", pld))
+
 	var plen int
 	if rp.pld != nil {
 		// Reset buffer to full size
@@ -154,7 +159,6 @@ func (rp *RtrPkt) SetPld(pld common.Payload) error {
 		rp.Raw = rp.Raw[:cap(rp.Raw)]
 		// Write payload into buffer
 		var err error
-
 		if plen, err = rp.pld.WritePld(rp.Raw[rp.idxs.pld:]); err != nil {
 			return err
 		}

@@ -50,6 +50,7 @@ func (p *CWPayload) Copy() (common.Payload, error) {
 }
 
 func (p *CWPayload) WritePld(b common.RawBytes) (int, error) {
+
 	if p.Len() > len(b) {
 		return 0, common.NewBasicError("Not engough space in buffer", nil,
 			"actual", len(b), "expected", p.Len())

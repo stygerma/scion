@@ -10,6 +10,7 @@ import (
 	"github.com/scionproto/scion/go/lib/layers"
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/scmp"
+	"github.com/scionproto/scion/go/lib/spath"
 )
 
 const logEnabledBsc = true
@@ -24,7 +25,7 @@ func (r *Router) bscNotify() {
 			DstHost, _ := np.Qpkt.Rp.DstHost()
 			log.Debug("New notification packet", "SrcIA", srcIA, "SrcHost",
 			srcHost, "DstIA", DstIA, "DstHost", DstHost)*/
-			log.Debug("New notification packet", "NPkt", np, "Pkt ID", np.Qpkt.Rp.Id)
+			log.Debug("New notification packet", "NPkt", np, "Pkt ID", np.Qpkt.Rp.Id, "idxs", np.Qpkt.Rp.GetIdxs())
 		}
 		bscCW := r.createBscCongWarn(np)
 		if logEnabledBsc {
@@ -99,8 +100,9 @@ func (r *Router) createBscSCMPNotification(qp *qosqueues.QPkt,
 	}
 	if err := drkeyExt.SetMAC()
 	*/
-
-	sp.Pld = scmp.NotifyPld(info)
+	pld := scmp.NotifyPld(info)
+	sp.Pld = &scmp.CWPayload{Meta: pld.Meta, Info: pld.Info}
+	//log.Debug("Paload type", "type", fmt.Sprintf("%T", sp.Pld))
 	sp.L4 = scmp.NewHdr(scmp.ClassType{Class: scmp.C_General, Type: scmp.T_G_BasicCongWarn}, sp.Pld.Len())
 	log.Debug("Created SPkt reply", "sp", sp, "Pkt ID", id)
 	reply, err := qp.Rp.CreateReply(sp)
@@ -128,10 +130,10 @@ func (r *Router) createBscCongWarn(np *qosqueues.NPkt) *scmp.InfoBscCW {
 	}
 	bscCW := &scmp.InfoBscCW{}
 	bscCW.ConsIngress = common.IFIDType(np.Qpkt.Rp.Ingress.IfID)
-	// bscCW.Path = &spath.Path{
-	// 	Raw:    np.Qpkt.Rp.Raw[(np.Qpkt.Rp).GetPathIdx():np.Qpkt.Rp.CmnHdr.HdrLenBytes()],
-	// 	InfOff: np.Qpkt.Rp.CmnHdr.InfoFOffBytes() - (np.Qpkt.Rp).GetPathIdx(),
-	// 	HopOff: np.Qpkt.Rp.CmnHdr.HopFOffBytes() - (np.Qpkt.Rp).GetPathIdx()}
+	bscCW.Path = &spath.Path{
+		Raw:    np.Qpkt.Rp.Raw[(np.Qpkt.Rp).GetPathIdx():np.Qpkt.Rp.CmnHdr.HdrLenBytes()],
+		InfOff: np.Qpkt.Rp.CmnHdr.InfoFOffBytes() - (np.Qpkt.Rp).GetPathIdx(),
+		HopOff: np.Qpkt.Rp.CmnHdr.HopFOffBytes() - (np.Qpkt.Rp).GetPathIdx()}
 	if logEnabledBsc {
 		log.Debug("InfoBscCW", "ConsIngress", common.IFIDType(np.Qpkt.Rp.Ingress.IfID),
 			"QueueLength", (r.config.Queues[np.Qpkt.QueueNo]).GetLength(), "CurrBW",
