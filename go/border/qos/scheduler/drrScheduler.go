@@ -6,6 +6,7 @@ import (
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 // This is a deficit round robin dequeuer. Queues with higher priority will have more packets dequeued at the same time.
@@ -30,23 +31,32 @@ func (sched *deficitRoundRobinScheduler) Init(routerConfig queues.InternalRouter
 }
 
 func getNoPacketsToDequeue(totalLength int, priority int, totalPriority int) int {
-	return int(100.0 / float64(totalPriority) * float64(priority))
+	// return int(5.0 / float64(totalPriority) * float64(priority))
+	return priority
 }
+
+var lastRound [3]int
+var attempted [3]int
+
+// var t0 time.Time
 
 func (sched *DeficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	// length := queue.GetLength()
 	// nopkts := 64 * (queue.GetPriority() / sched.quantumSum)
 	nopkts := getNoPacketsToDequeue(-1, queue.GetPriority(), sched.quantumSum)
-	pktToDequeue := min(1, nopkts)
+	pktToDequeue := max(1, nopkts)
 
 	var qp *qosqueues.QPkt
+
+	attempted[queueNo] += pktToDequeue
 
 	for i := 0; i < pktToDequeue; i++ {
 		qp = queue.Pop()
 		if qp == nil {
 			break
 		}
+		lastRound[queueNo]++
 		forwarder(qp.Rp)
 	}
 }
@@ -59,11 +69,25 @@ func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.Interna
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
+	if len(routerConfig.Queues) == 3 {
+		log.Debug("Priorities", "0", routerConfig.Queues[0].GetPriority(), "1", routerConfig.Queues[1].GetPriority(), "2", routerConfig.Queues[2].GetPriority())
+	}
 	for {
 		for i := 0; i < sched.totalLength; i++ {
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
-		time.Sleep(500 * time.Nanosecond)
+		if time.Now().Sub(t0) > time.Duration(5*time.Second) {
+
+			log.Debug("Last Round was", "lastRound", lastRound, "attempted", attempted)
+			for i := 0; i < len(lastRound); i++ {
+				lastRound[i] = 0
+			}
+			for i := 0; i < len(lastRound); i++ {
+				attempted[i] = 0
+			}
+			t0 = time.Now()
+		}
+		time.Sleep(100 * time.Nanosecond)
 	}
 }
 
