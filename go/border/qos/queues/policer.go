@@ -37,9 +37,7 @@ func (tb *tokenBucket) Init(maxBandwidth int) {
 }
 
 func (tb *tokenBucket) refill() {
-
 	now := time.Now()
-
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
 	if timeSinceLastUpdate > 100 {

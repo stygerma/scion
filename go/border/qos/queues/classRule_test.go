@@ -29,8 +29,9 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
-// TODO: Add tests for MatchModes as soon as you have decided which thing
+// TODO(joelfischerr): Add tests for MatchModes as soon as you have decided which thing
 
+<<<<<<< 9d5f2f0f6d398c50e0c1a8f2f4792143952eb69b
 // func TestRulesWithPriority(t *testing.T) {
 
 // 	tables := []struct {
@@ -74,6 +75,9 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 
 	rc := qosqueues.RegularClassRule{}
 
+=======
+func TestRulesWithPriority(t *testing.T) {
+>>>>>>> cleanup
 	tables := []struct {
 		srcIA       string
 		dstIA       string
