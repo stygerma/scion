@@ -1,54 +1,30 @@
+// Copyright 2020 ETH Zurich
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package qos
 
 import (
 	"io/ioutil"
-<<<<<<< ea68ea1a78c46fe5b893e5764b4f05d8e74e1769
-	"math/rand"
-=======
->>>>>>> fix UT/benchmark
 	"testing"
-	"time"
 
 	"github.com/inconshreveable/log15"
-<<<<<<< ea68ea1a78c46fe5b893e5764b4f05d8e74e1769
-=======
 	"github.com/stretchr/testify/require"
 
-<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3
->>>>>>> fix UT/benchmark
-	"github.com/scionproto/scion/go/border/qos/qosconf"
-=======
 	"github.com/scionproto/scion/go/border/qos/conf"
->>>>>>> refactor.
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
-<<<<<<< ea68ea1a78c46fe5b893e5764b4f05d8e74e1769
-func getPackets(numberOfPackets int) []*rpkt.RtrPkt {
-
-	pkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
-	pkt1 := rpkt.PrepareRtrPacketWithStrings("2-ff00:0:212", "1-ff00:0:111", 1)
-	pkt2 := rpkt.PrepareRtrPacketWithStrings("3-ff00:0:212", "1-ff00:0:111", 1)
-	pkt3 := rpkt.PrepareRtrPacketWithStrings("4-ff00:0:212", "1-ff00:0:111", 1)
-	pkt4 := rpkt.PrepareRtrPacketWithStrings("5-ff00:0:212", "1-ff00:0:111", 1)
-	pkt5 := rpkt.PrepareRtrPacketWithStrings("6-ff00:0:212", "1-ff00:0:111", 1)
-
-	arr := make([]*rpkt.RtrPkt, numberOfPackets)
-
-	for i := 0; i < numberOfPackets-5; i++ {
-		arr[i+0] = pkt
-		arr[i+1] = pkt1
-		arr[i+2] = pkt2
-		arr[i+3] = pkt3
-		arr[i+4] = pkt4
-		arr[i+5] = pkt5
-	}
-
-	return arr
-}
-
-=======
->>>>>>> fix UT/benchmark
 var blocks chan bool
 
 func bBenchmarkQueueSinglePacket(b *testing.B) {
@@ -57,14 +33,9 @@ func bBenchmarkQueueSinglePacket(b *testing.B) {
 	require.NoError(b, err)
 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 
-<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3
-	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
-	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
-=======
 	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
 	require.NoError(b, err)
 	qosConfig, _ := InitQos(extConfig, forwardPacketByDrop)
->>>>>>> refactor.
 	singlePkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
 
 	b.ResetTimer()
@@ -73,114 +44,44 @@ func bBenchmarkQueueSinglePacket(b *testing.B) {
 	}
 }
 
-func TestSingleEnqueue(t *testing.T) {
+// BenchmarkQueueSinglePacket measures the performance of the queue. Run with
+// go test -v -run=^$ -bench=BenchmarkQueueSinglePacket ./go/border/qos/ \
+//    -benchtime=20s -cpuprofile=newprofile.pprof
+func BenchmarkQueueSinglePacket(t *testing.B) {
+	root := log15.Root()
+	file, err := ioutil.TempFile("", "benchmark-log")
+	require.NoError(t, err)
+	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 
-	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
-	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
-	pkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
-
-	qosConfig.QueuePacket(pkt)
-
-}
-
-func BenchmarkGolangRandom(b *testing.B) {
-
-	for n := 0; n < b.N; n++ {
-		_ = rand.Intn(100)
-	}
-
-}
-
-var testQueue = make(chan int, 1000)
-
-func forwardPacketByDrop(rp *rpkt.RtrPkt) {
-	testQueue <- 0
-	rp.Release()
-}
-
-<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3
-func TestEnqueueWithProfile(t *testing.T) {
-=======
 	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
 	require.NoError(t, err)
 	qosConfig, _ := InitQos(extConfig, forwardPacketByDrop)
 	arr := getPackets(1)
->>>>>>> refactor.
 
-	start := time.Now()
-
-	runs := 6 * 1000
-	singleRun := 1000 // Should not exceed maximum queue length + capacity of notification
-
-	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
-	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
-
-	arr := getPackets(singleRun)
-
-	fmt.Println("Array is", len(arr))
-
-	for j := 0; j < runs; j++ {
+	t.ResetTimer()
+	for n := 0; n < t.N; n++ {
 		for _, pkt := range arr {
-			// fmt.Println("Enqueue", k)
 			qosConfig.QueuePacket(pkt)
 		}
-		for i := 0; i < len(arr); i++ {
-			// fmt.Println("Dequeue", i)
-			select {
-			case <-testQueue:
-			case <-qosConfig.notifications:
-			}
-		}
-		if j < 11 || j%20 == 0 {
-			printLog("Runs", j, runs, start)
-		}
-	}
-
-}
-
-func printLog(leading string, j int, runs int, start time.Time) {
-	if j > 0 {
-		ts := time.Since(start)
-		et := time.Since(start) * time.Duration(runs) / time.Duration(j)
-		_ = et - ts
-		// fmt.Println("Run", j, "/", runs, "in", ts.Truncate(time.Second).String(), "estimated total time", et.Truncate(time.Second).String(), "remaining", (et - ts).Truncate(time.Second).String())
-
-		fmt.Printf("%v %06d / %06d in %v. Estimated total time %v. Remaining %v\n", leading, j, runs, ts.Truncate(time.Second).String(), et.Truncate(time.Second).String(), (et - ts).Truncate(time.Second).String())
 	}
 }
 
-func BenchmarkEnqueueForProfile(b *testing.B) {
-
-	disableLog(b)
-
-	singleRun := 1024 // Should not exceed maximum queue length + capacity of notification
-
-	extConf, _ := qosconf.LoadConfig("testdata/matchBenchmark-config.yaml")
-	qosConfig, _ := InitQos(extConf, forwardPacketByDrop)
-	arr := getPackets(singleRun)
-	la := len(arr)
-
-	b.ResetTimer()
-	for j := 0; j < b.N; j++ {
-		for k := 0; k < la; k++ {
-			qosConfig.QueuePacket(arr[k])
-		}
-
-		for i := 0; i < la; i++ {
-			select {
-			case <-testQueue:
-			case <-qosConfig.notifications:
-			}
-		}
-	}
+func forwardPacketByDrop(rp *rpkt.RtrPkt) {
+	rp.Release()
 }
 
-func disableLog(b *testing.B) {
-	root := log15.Root()
-
-	file, err := ioutil.TempFile("", "benchmark-log")
-	if err != nil {
-		b.Fatalf("Unexpected error: %v", err)
+func getPackets(numberOfPackets int) []*rpkt.RtrPkt {
+	pkts := []*rpkt.RtrPkt{
+		rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1),
+		rpkt.PrepareRtrPacketWithStrings("2-ff00:0:212", "1-ff00:0:111", 1),
+		rpkt.PrepareRtrPacketWithStrings("3-ff00:0:212", "1-ff00:0:111", 1),
+		rpkt.PrepareRtrPacketWithStrings("4-ff00:0:212", "1-ff00:0:111", 1),
+		rpkt.PrepareRtrPacketWithStrings("5-ff00:0:212", "1-ff00:0:111", 1),
+		rpkt.PrepareRtrPacketWithStrings("6-ff00:0:212", "1-ff00:0:111", 1),
 	}
-	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
+	arr := make([]*rpkt.RtrPkt, numberOfPackets*len(pkts))
+	for i := 0; i < numberOfPackets; i++ {
+		copy(arr[i*len(pkts):], pkts)
+	}
+	return arr
 }
