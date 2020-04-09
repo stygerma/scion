@@ -23,7 +23,7 @@ package qosqueues
 // )
 
 // func TestBasic(t *testing.T) {
-// 	bucket := tokenBucket{MaxBandWidth: 5 * 1024, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: 5 * 1024, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 
 // 	fmt.Println(bucket)
 // 	bucket.refill()
@@ -34,7 +34,7 @@ package qosqueues
 // }
 
 // func TestRefill(t *testing.T) {
-// 	bucket := tokenBucket{MaxBandWidth: 5 * 1024, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: 5 * 1024, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 
 // 	fmt.Println(bucket)
 // 	time.Sleep(time.Millisecond * 2000)
@@ -46,7 +46,7 @@ package qosqueues
 // }
 
 // func TestRefillTwice(t *testing.T) {
-// 	bucket := tokenBucket{MaxBandWidth: 5 * 1024, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: 5 * 1024, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 
 // 	fmt.Println(bucket)
 // 	time.Sleep(time.Millisecond * 2000)

@@ -70,6 +70,8 @@ func NewRouter(id, confDir string) (*Router, error) {
 // Start sets up networking, and starts go routines for handling the main packet
 // processing as well as various other router functions.
 func (r *Router) Start() {
+
+	log.Info("My id is", "r.Id", r.Id)
 	go func() {
 		defer log.HandlePanic()
 		r.PacketError()
@@ -175,13 +177,27 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-	// Enqueue the packet. Packets will be classified, put on different queues, scheduled and forwarded by forwardPacket
+
+	// log.Debug("Extensions", "rp.HBHExt", rp.HBHExt)
+	// log.Debug("Extensions", "rp.E2EExt", rp.E2EExt)
+
+	// host, _ := rp.SrcHost()
+	// log.Debug("Source host", "rp.SrcHost()", host, "rp.Type()", host.Type())
+
+	// Enqueue the packet. Packets will be classified, put on different queues,
+	// scheduled and forwarded by forwardPacket
 	r.qosConfig.QueuePacket(rp)
 }
+
+// var ticker = time.NewTicker(400 * time.Microsecond)
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 
 	defer rp.Release()
+
+	// if r.Id == "br1-ff00_0_110-1" {
+	// 	<-ticker.C
+	// }
 
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
@@ -190,6 +206,7 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 			IntfIn:  metrics.IntfToLabel(rp.Ingress.IfID),
 			IntfOut: metrics.Drop,
 		}
+		log.Debug("There was an error!!!!")
 		l.Result = metrics.ErrRoute
 		metrics.Process.Pkts(l).Inc()
 	}

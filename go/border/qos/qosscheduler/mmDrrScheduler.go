@@ -6,6 +6,7 @@ import (
 
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 // This is also a deficit round robin dequeuer. But instead of the priority field it uses the min-bandwidth field for the minimum number of packets to dequeue. If there are fewer than the minimal value of packets to dequeue, the remaining min-bandwidth will be put onto a surplus counter and another queue might use more than its min-bandwidth (but still less than its max-bandwidth).
@@ -55,16 +56,52 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.I
 	// t0 := time.Now()
 	for {
 		// t0 = time.Now()
+
 		for i := 0; i < sched.totalLength; i++ {
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
 		for i := 0; i < sched.totalLength; i++ {
 			_ = <-sched.jobs
-			// log.Debug("Dequed", "numberOfPackets", j)
+			// log.Debug("Dequed", "numberOfPackets", j, "queueNo", i)
 		}
-		time.Sleep(500 * time.Nanosecond)
+		LogUpdate(routerConfig)
+
+		if len(routerConfig.Queues) == 3 {
+			time.Sleep(400 * time.Microsecond)
+		} else {
+			time.Sleep(500 * time.Nanosecond)
+		}
+
+		// time.Sleep(1 * time.Millisecond)
 		// t1 := time.Now()
 		// log.Debug("One round dequeued in", "t1.Sub(t0)", t1.Sub(t0))
+	}
+}
+
+var attemptedToRoute [3]int
+var packets [3]int
+var surplusAdjustments [3]int
+var t0 time.Time
+
+func LogUpdate(routerConfig qosqueues.InternalRouterConfig) {
+	if time.Now().Sub(t0) > time.Duration(1*time.Second) {
+		if len(routerConfig.Queues) == 3 {
+			log.Debug("Queuelengths;NoDequeued", "0", routerConfig.Queues[0].GetLength(), "1", routerConfig.Queues[1].GetLength(), "2", routerConfig.Queues[2].GetLength(), "0", packets[0], "1", packets[1], "2", packets[2], "0", attemptedToRoute[0], "1", attemptedToRoute[1], "2", attemptedToRoute[2])
+		}
+		// log.Debug("Attempted packets w/o surplus", "attemptedToRoute", attemptedToRoute)
+		// log.Debug("Ratio queue 1 to queue 2", "", float64(attemptedToRoute[1])/float64(attemptedToRoute[2]))
+		// log.Debug("Deqeued packets w/o surplus", "packets", packets)
+		// log.Debug("Ratio queue 1 to queue 2", "", float64(packets[1])/float64(packets[2]))
+		// log.Debug("Surplus adjustments", "surplusAdjustments", surplusAdjustments)
+		// log.Debug("Ratio queue 1 to queue 2", "", float64(packets[1])/float64(packets[2]))
+		packets[0] = 0
+		packets[1] = 0
+		packets[2] = 0
+
+		surplusAdjustments[0] = 0
+		surplusAdjustments[1] = 0
+		surplusAdjustments[2] = 0
+		t0 = time.Now()
 	}
 }
 
@@ -75,19 +112,25 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQue
 
 	pktToDequeue := sched.adjustForQuantum(queue)
 
+	attemptedToRoute[queueNo] += pktToDequeue
+
 	// log.Debug("Dequeueing packets", "quantum", pktToDequeue)
 
-	pktToDequeue = sched.adjustForSurplus(queue, pktToDequeue, queueNo)
+	// spsAdjust := sched.adjustForSurplus(queue, pktToDequeue, queueNo)
+
+	// surplusAdjustments[queueNo] += spsAdjust
+
+	// pktToDequeue = spsAdjust
 
 	// log.Debug("Dequeue packets from queue", "queueNo", queueNo)
-	go sched.dequeuePackets(queue, pktToDequeue, forwarder)
+	go sched.dequeuePackets(queue, pktToDequeue, forwarder, queueNo)
 	// sched.dequeuePackets(queue, pktToDequeue, forwarder)
 
 	// log.Debug("Dequeued packets from queue", "queueNo", queueNo, "toDeqLength", pktToDequeue, "totalLength", length)
 
 }
 
-func (sched *MinMaxDeficitRoundRobinScheduler) dequeuePackets(queue qosqueues.PacketQueueInterface, pktToDequeue int, forwarder func(rp *rpkt.RtrPkt)) int {
+func (sched *MinMaxDeficitRoundRobinScheduler) dequeuePackets(queue qosqueues.PacketQueueInterface, pktToDequeue int, forwarder func(rp *rpkt.RtrPkt), queueNo int) int {
 	var qp *qosqueues.QPkt
 	j := 0
 	for i := 0; i < pktToDequeue; i++ {
@@ -99,6 +142,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) dequeuePackets(queue qosqueues.Pa
 		forwarder(qp.Rp)
 	}
 	// fmt.Println("before sending to jobs")
+	packets[queueNo] += j
 	sched.jobs <- j
 	// fmt.Println("after sending to jobs")
 	return j
@@ -131,6 +175,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) adjustForQuantum(queue qosqueues.
 	a := queue.GetMinBandwidth()
 	// fmt.Println("a is", a)
 	// TODO: We need the total queue length instead of 100 here
+
 	b := 100.0 / float64(sched.quantumSum)
 	// b := float64(sched.currLength) / float64(sched.quantumSum)
 	// fmt.Println("b is", b)

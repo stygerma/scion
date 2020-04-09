@@ -123,7 +123,7 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 		case ISDONLY:
 			isdOnlySourceRules[cr.SourceAs.IA.I] = append(isdOnlySourceRules[cr.SourceAs.IA.I], &crs[k])
 		case ANY:
-			destinationAnySourceRules[cr.SourceAs.IA] = append(destinationAnySourceRules[cr.SourceAs.IA], &crs[k])
+			destinationAnySourceRules[cr.DestinationAs.IA] = append(destinationAnySourceRules[cr.DestinationAs.IA], &crs[k])
 		}
 
 		switch cr.DestinationAs.matchMode {
@@ -244,13 +244,8 @@ func (*RegularClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt
 	exactAndRangeSourceMatches = config.Rules.SourceRules[srcAddr]
 	exactAndRangeDestinationMatches = config.Rules.DestinationRules[dstAddr]
 
-	// log.Debug("Map is", "config.Rules.SourceRules", config.Rules.SourceRules)
-
-	// log.Debug("Matches", "exactAndRangeSourceMatches", exactAndRangeSourceMatches)
-	// log.Debug("Matches", "exactAndRangeDestinationMatches", exactAndRangeDestinationMatches)
-
 	sourceAnyDestinationMatches = config.Rules.SourceAnyDestinationRules[srcAddr]
-	destinationAnySourceRules = config.Rules.DestinationAnySourceRules[srcAddr]
+	destinationAnySourceRules = config.Rules.DestinationAnySourceRules[dstAddr]
 
 	asOnlySourceRules = config.Rules.ASOnlySourceRules[srcAddr.A]
 	asOnlyDestinationRules = config.Rules.ASOnlyDestRules[dstAddr.A]
@@ -301,6 +296,10 @@ func matchL4Type(list *[]*InternalClassRule, l4t common.L4ProtocolType) {
 }
 
 func getRuleWithPrevMax(returnRule *InternalClassRule, list []*InternalClassRule, prevMax int) (int, *InternalClassRule) {
+
+	if list == nil {
+		return prevMax, returnRule
+	}
 
 	for i := 0; i < len(list); i++ {
 		if list[i] != nil {

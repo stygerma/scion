@@ -18,6 +18,8 @@ package qosqueues
 import (
 	"math/rand"
 	"sync"
+
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 type ChannelPacketQueue struct {
@@ -26,7 +28,7 @@ type ChannelPacketQueue struct {
 	mutex *sync.Mutex
 
 	queue chan *QPkt
-	tb    tokenBucket
+	tb    TokenBucket
 }
 
 var _ PacketQueueInterface = (*ChannelPacketQueue)(nil)
@@ -36,9 +38,9 @@ func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mut
 	pq.pktQue = que
 	pq.mutex = mutQue
 	// pq.length = 0
-	pq.tb = tokenBucket{}
+	pq.tb = TokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
-	pq.queue = make(chan *QPkt, pq.pktQue.MaxLength)
+	pq.queue = make(chan *QPkt, pq.pktQue.MaxLength+100)
 }
 
 func (pq *ChannelPacketQueue) Enqueue(rp *QPkt) {
@@ -84,6 +86,8 @@ func (pq *ChannelPacketQueue) Pop() *QPkt {
 		pkt = nil
 	}
 
+	// pkt = <-pq.queue
+
 	return pkt
 }
 
@@ -100,7 +104,8 @@ func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
 
 func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
 
-	if pq.pktQue.MaxLength == pq.GetLength() {
+	if pq.pktQue.MaxLength-100 <= pq.GetLength() {
+		log.Info("Queue is at max capacity")
 		return DROPNOTIFY
 	}
 
