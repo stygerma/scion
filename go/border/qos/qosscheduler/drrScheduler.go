@@ -15,6 +15,9 @@ type DeficitRoundRobinScheduler struct {
 	totalLength      int
 	messages         chan bool
 	totalQueueLength int
+
+	timeToSleep int
+	tb          qosqueues.TokenBucket
 }
 
 var _ SchedulerInterface = (*DeficitRoundRobinScheduler)(nil)
@@ -28,17 +31,27 @@ func (sched *DeficitRoundRobinScheduler) Init(routerConfig qosqueues.InternalRou
 		sched.quantumSum = sched.quantumSum + routerConfig.Queues[i].GetPriority()
 	}
 
+	sched.tb.Init(10000000)
+
+	if len(routerConfig.Queues) == 5 {
+		log.Debug("Priorities", "0", routerConfig.Queues[0].GetPriority(), "1", routerConfig.Queues[1].GetPriority(), "2", routerConfig.Queues[2].GetPriority())
+		sched.timeToSleep = 200
+	} else {
+		sched.timeToSleep = 1
+	}
+
 }
 
 func getNoPacketsToDequeue(totalLength int, priority int, totalPriority int) int {
 	// return int(math.Floor(float64(totalLength) / float64(totalPriority) * float64(priority)))
-	return totalLength / totalPriority * priority
-	// return priority
+	// return totalLength / totalPriority * priority
+	return priority
 }
 
-var lastRound [4]int
-var attempted [4]int
-var total [4]int
+var incoming [5]int
+var lastRound [5]int
+var attempted [5]int
+var total [5]int
 
 func (sched *DeficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
@@ -50,9 +63,12 @@ func (sched *DeficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInte
 	attempted[queueNo] += pktToDequeue
 
 	for i := 0; i < pktToDequeue; i++ {
+
+		time.Sleep(time.Duration(sched.timeToSleep) * time.Microsecond)
+
 		qp = queue.Pop()
 		if qp == nil {
-			break
+			continue
 		}
 		lastRound[queueNo]++
 		total[queueNo]++
@@ -64,39 +80,49 @@ func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.Interna
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
-	if len(routerConfig.Queues) == 3 {
-		log.Debug("Priorities", "0", routerConfig.Queues[0].GetPriority(), "1", routerConfig.Queues[1].GetPriority(), "2", routerConfig.Queues[2].GetPriority())
-	}
 	for {
 		sched.totalQueueLength = 0
 		for i := 0; i < sched.totalLength; i++ {
 			sched.totalQueueLength += routerConfig.Queues[i].GetLength()
 		}
+
 		for i := 0; i < sched.totalLength; i++ {
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
 
 		sched.showLog(routerConfig)
 
-		time.Sleep(80 * time.Microsecond)
 	}
 }
 
+func (sched *DeficitRoundRobinScheduler) UpdateIncoming(queueNo int) {
+	incoming[queueNo]++
+}
+
+var iterations int
+
 func (sched *DeficitRoundRobinScheduler) showLog(routerConfig qosqueues.InternalRouterConfig) {
+
+	iterations++
 	if time.Now().Sub(t0) > time.Duration(5*time.Second) {
 
-		var queLen [4]int
+		var queLen [5]int
 		for i := 0; i < sched.totalLength; i++ {
 			queLen[i] = routerConfig.Queues[i].GetLength()
 		}
-		log.Debug("Last Round was", "lastRound", lastRound, "attempted", attempted, "total", total, "queueLen", queLen)
+		log.Debug("STAT", "iterations", iterations, "incoming", incoming, "deqLastRound", lastRound, "deqAttempted", attempted, "deqTotal", total, "currQueueLen", queLen)
 		for i := 0; i < len(lastRound); i++ {
 			lastRound[i] = 0
 		}
 		for i := 0; i < len(attempted); i++ {
+
 			attempted[i] = 0
 		}
+		for i := 0; i < len(incoming); i++ {
+			incoming[i] = 0
+		}
 		t0 = time.Now()
+		iterations = 0
 	}
 
 }
