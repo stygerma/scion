@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,7 +81,6 @@ func (q *QosConfiguration) SetAndInitSchedul(sched qosscheduler.SchedulerInterfa
 func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {
 
 	qConfig := QosConfiguration{}
-
 	var err error
 	if err = ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
 		log.Error("Initialising the classification data structures has failed", "error", err)
@@ -159,17 +157,9 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 
 	select {
 	case *qosConfig.schedul.GetMessages() <- true:
-		//log.Trace("sent message")
 	default:
-		//log.Trace("no message sent")
 	}
-
-	// qosConfig.SendToWorker(queueNo%qosConfig.worker.noWorker, &qp)
-
 	putOnQueue(qosConfig, queueNo, &qp)
-
-	//log.Trace("Finished QueuePacket")
-
 }
 
 func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
@@ -239,7 +229,6 @@ func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
 }
 
 func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRouterConfig, error) {
-
 	var internalRules []queues.InternalClassRule
 	var internalQueues []queues.PacketQueueInterface
 
@@ -275,13 +264,10 @@ func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRoute
 	for _, iq := range internalQueues {
 		log.Trace("We have gotten the queue", "queue", iq.GetPacketQueue().Name)
 	}
-
 	return queues.InternalRouterConfig{Queues: internalQueues, Rules: internalRules}, nil
-
 }
 
 func convertExternalToInteralQueue(extQueue conf.ExternalPacketQueue) queues.PacketQueue {
-
 	pq := queues.PacketQueue{
 		Name:         extQueue.Name,
 		ID:           extQueue.ID,
@@ -296,9 +282,7 @@ func convertExternalToInteralQueue(extQueue conf.ExternalPacketQueue) queues.Pac
 	return pq
 }
 func convertActionProfiles(externalActionProfile []conf.ActionProfile) []queues.ActionProfile {
-
 	ret := make([]queues.ActionProfile, 0)
-
 	for _, prof := range externalActionProfile {
 		ret = append(ret, convertActionProfile(prof))
 	}
@@ -306,13 +290,11 @@ func convertActionProfiles(externalActionProfile []conf.ActionProfile) []queues.
 }
 
 func convertActionProfile(externalActionProfile conf.ActionProfile) queues.ActionProfile {
-
 	ap := queues.ActionProfile{
 		FillLevel: externalActionProfile.FillLevel,
 		Prob:      externalActionProfile.Prob,
 		Action:    convertPoliceAction(externalActionProfile.Action),
 	}
-
 	return ap
 }
 

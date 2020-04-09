@@ -29,9 +29,8 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
-// TODO(joelfischerr): Add tests for MatchModes as soon as you have decided which thing
+// TODO: Add tests for MatchModes as soon as you have decided which thing
 
-<<<<<<< 9d5f2f0f6d398c50e0c1a8f2f4792143952eb69b
 // func TestRulesWithPriority(t *testing.T) {
 
 // 	tables := []struct {
@@ -75,9 +74,6 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 
 	rc := qosqueues.RegularClassRule{}
 
-=======
-func TestRulesWithPriority(t *testing.T) {
->>>>>>> cleanup
 	tables := []struct {
 		srcIA       string
 		dstIA       string
@@ -106,7 +102,6 @@ func TestRulesWithPriority(t *testing.T) {
 	arr := make([]rpkt.RtrPkt, len(tables))
 
 	for k, tab := range tables {
-<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3:go/border/qos/qosqueues/classRule_test.go
 		arr[k] = *rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 	}
 
@@ -123,13 +118,8 @@ func TestRulesWithPriority(t *testing.T) {
 
 func BenchmarkSingleMatchSequential(b *testing.B) {
 	disableLog(b)
-<<<<<<< bb61592f5264414f50b4c19d465d340070302781
-	// extConf, _ := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
-	extConf, _ := conf.LoadConfig("../testdata/matchBenchmark-config.yaml")
-=======
 	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
 	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
->>>>>>> refactor.
 	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
 
 	qConfig := qos.QosConfiguration{}
@@ -152,29 +142,13 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		rul := rc.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 		_ = rul
-=======
-		extConfig, err := conf.LoadConfig(tab.configFile)
-		require.NoError(t, err, "Failed at case %d", k)
-		qosConfig, err := qos.InitQos(extConfig, forwardPacketByDrop)
-		require.NoError(t, err, "Failed at case %d", k)
-		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
-
-		queueNo := queues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), pkt)
-		require.Equal(t, queueNo, tab.goldenQueueNo, "%d Queue number should be %d but is %d",
-			k, tab.goldenQueueNo, queueNo)
->>>>>>> refactor.:go/border/qos/queues/classRule_test.go
 	}
 }
 
 func BenchmarkSingleMatchParallel(b *testing.B) {
 	disableLog(b)
-<<<<<<< bb61592f5264414f50b4c19d465d340070302781
-	// extConf, _ := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
-	extConf, _ := conf.LoadConfig("../testdata/matchBenchmark-config.yaml")
-=======
 	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
 	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
->>>>>>> refactor.
 	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
 
 	qConfig := qos.QosConfiguration{}
@@ -201,11 +175,6 @@ func BenchmarkSingleMatchParallel(b *testing.B) {
 	}
 }
 
-<<<<<<< bb61592f5264414f50b4c19d465d340070302781
-func TestRuleMatchModes(t *testing.T) {
-
-	extConf, _ := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
-=======
 // func BenchmarkSingleMatchSemiParallel(b *testing.B) {
 // 	disableLog(b)
 // 	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
@@ -239,7 +208,6 @@ func TestRuleMatchModes(t *testing.T) {
 func TestRuleMatchModes(t *testing.T) {
 
 	extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
->>>>>>> refactor.
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
 	rc := qosqueues.RegularClassRule{}
@@ -272,10 +240,13 @@ func TestRuleMatchModes(t *testing.T) {
 		{"2-ff00:0:011", "22-344:0:222", "Exact - ANY", 5, true},
 		{"2-ff00:0:011", "123-ff00:344:222", "Exact - ANY", 5, true},
 	}
+<<<<<<< bcd0a8bb081e989ca04a29c54a1583c2f546312d
 <<<<<<< bb61592f5264414f50b4c19d465d340070302781
 =======
 <<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3:go/border/qos/qosqueues/classRule_test.go
 >>>>>>> refactor.
+=======
+>>>>>>> cleanup
 	for k, tab := range tables {
 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
@@ -331,13 +302,6 @@ func TestRuleMatchModesForDemo(t *testing.T) {
 			// }
 
 		}
-=======
-	for i, c := range cases {
-		r := queues.CompareIAs(xtest.MustParseIA(c.a), xtest.MustParseIA(c.b))
-		require.Equal(t, r, c.r, "Failure at case %d", i)
-		r = queues.CompareIAs(xtest.MustParseIA(c.b), xtest.MustParseIA(c.a))
-		require.Equal(t, r, -1*c.r, "Failure (reverse) at case %d", i)
->>>>>>> refactor.:go/border/qos/queues/classRule_test.go
 	}
 
 }
