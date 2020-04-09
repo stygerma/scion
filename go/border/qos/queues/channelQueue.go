@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +33,6 @@ type ChannelPacketQueue struct {
 var _ PacketQueueInterface = (*ChannelPacketQueue)(nil)
 
 func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
-
 	pq.pktQue = que
 	pq.mutex = mutQue
 	// pq.length = 0
@@ -44,7 +42,6 @@ func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mut
 }
 
 func (pq *ChannelPacketQueue) Enqueue(rp *QPkt) {
-
 	pq.queue <- rp
 
 	// atomic.AddUint64(&pq.length, 1)
@@ -113,14 +110,11 @@ func (pq *ChannelPacketQueue) CheckAction() conf.PoliceAction {
 
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
-			rand := rand.Intn(100)
-			if rand < (pq.pktQue.Profile[j].Prob) {
+			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
 				return pq.pktQue.Profile[j].Action
 			}
-
 		}
 	}
-
 	return conf.PASS
 }
 
