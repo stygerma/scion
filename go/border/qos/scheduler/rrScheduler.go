@@ -32,8 +32,6 @@ type RoundRobinScheduler struct {
 
 var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
 
-// This is a standard round robin dequeue ignoring things like priority
-
 func (sched *RoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
 	sched.totalLength = len(routerConfig.Queues)
 	sched.messages = make(chan bool)
@@ -47,17 +45,13 @@ func (sched *RoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, 
 	length := queue.GetLength()
 	var qp *qosqueues.QPkt
 
-	for i := 0; i < length; i++ {
-		qp = queue.Pop()
-		if qp == nil {
-			continue
-		}
+	length := routerConfig.Queues[queueNo].GetLength()
 
-		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
-			time.Sleep(50 * time.Millisecond)
+	if length > 0 {
+		qps := routerConfig.Queues[queueNo].PopMultiple(length)
+		for _, qp := range qps {
+			forwarder(qp.Rp)
 		}
-
-		forwarder(qp.Rp)
 	}
 }
 
