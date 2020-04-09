@@ -108,11 +108,9 @@ func (pq *ChannelPacketQueue) CheckAction() conf.PoliceAction {
 
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
-			rand := rand.Intn(100)
-			if rand < (pq.pktQue.Profile[j].Prob) {
+			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
 				return pq.pktQue.Profile[j].Action
 			}
-
 		}
 	}
 	return conf.PASS

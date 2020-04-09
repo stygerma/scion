@@ -17,10 +17,7 @@ package queues
 import (
 	"strings"
 
-<<<<<<< 785c7ea9cc4514935f03d28b858388dc218217fb
-=======
 	"github.com/scionproto/scion/go/border/qos/conf"
->>>>>>> Deprecate mathing against external rule
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
