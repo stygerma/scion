@@ -87,7 +87,7 @@ func (tb *TokenBucket) Take(no int) bool {
 	return false
 }
 
-func (tb *TokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
+func (tb *TokenBucket) PoliceBucket(qp *QPkt) conf.PoliceAction {
 
 	tokenForPacket := (qp.Rp.Bytes().Len()) // In byte
 
