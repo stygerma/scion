@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,10 +23,8 @@ import (
 )
 
 type PacketBufQueue struct {
-	pktQue PacketQueue
-
-	mutex *sync.Mutex
-
+	pktQue   PacketQueue
+	mutex    *sync.Mutex
 	bufQueue *ringbuf.Ring
 	length   int
 	tb       tokenBucket
@@ -36,7 +33,6 @@ type PacketBufQueue struct {
 var _ PacketQueueInterface = (*PacketBufQueue)(nil)
 
 func (pq *PacketBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
-
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
@@ -45,22 +41,17 @@ func (pq *PacketBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *
 	pq.bufQueue = ringbuf.New(pq.pktQue.MaxLength, func() interface{} {
 		return &QPkt{}
 	}, pq.pktQue.Name)
-
 }
 
 func (pq *PacketBufQueue) Enqueue(rp *QPkt) {
-
 	pq.bufQueue.Write(ringbuf.EntryList{rp}, false)
-
 }
 
 func (pq *PacketBufQueue) canDequeue() bool {
-
 	return pq.GetLength() > 0
 }
 
 func (pq *PacketBufQueue) GetFillLevel() int {
-
 	return pq.GetLength() / pq.pktQue.MaxLength
 }
 
@@ -69,49 +60,31 @@ func (pq *PacketBufQueue) GetLength() int {
 }
 
 func (pq *PacketBufQueue) Pop() *QPkt {
-
 	pkts := make(ringbuf.EntryList, 1)
-
 	_, _ = pq.bufQueue.Read(pkts, false)
-
 	return pkts[0].(*QPkt)
 }
 
 func (pq *PacketBufQueue) PopMultiple(number int) []*QPkt {
-
 	pkts := make(ringbuf.EntryList, number)
-
 	_, _ = pq.bufQueue.Read(pkts, false)
-
 	retArr := make([]*QPkt, number)
-
 	for k, pkt := range pkts {
 		retArr[k] = pkt.(*QPkt)
 	}
-
 	return retArr
 }
 
 // TODO: I suspect that rand.Intn isn't very fast. We can probably get by with worse random numbers
 func (pq *PacketBufQueue) CheckAction() conf.PoliceAction {
-
 	level := pq.GetFillLevel()
-
-	//log.Trace("Current level is", "level", level)
-	//log.Trace("Profiles are", "profiles", pq.pktQue.Profile)
-
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
-			//log.Trace("Matched a rule!")
 			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
-				//log.Trace("Take Action!")
 				return pq.pktQue.Profile[j].Action
 			}
-			//log.Trace("Do not take Action")
-
 		}
 	}
-
 	return conf.PASS
 }
 
