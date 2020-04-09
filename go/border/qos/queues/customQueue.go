@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,9 +23,7 @@ import (
 
 type CustomPacketQueue struct {
 	pktQue PacketQueue
-
-	mutex *sync.Mutex
-
+	mutex  *sync.Mutex
 	queue  []*QPkt
 	length int
 	tb     TokenBucket
@@ -38,7 +35,6 @@ type CustomPacketQueue struct {
 var _ PacketQueueInterface = (*CustomPacketQueue)(nil)
 
 func (pq *CustomPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
-
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
@@ -48,8 +44,6 @@ func (pq *CustomPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutT
 	pq.head = 0
 	pq.tail = 0
 	pq.mask = pq.pktQue.MaxLength - 1
-
-	// fmt.Println("Finish init")
 }
 
 func (pq *CustomPacketQueue) Enqueue(rp *QPkt) {
@@ -64,36 +58,28 @@ func (pq *CustomPacketQueue) Enqueue(rp *QPkt) {
 }
 
 func (pq *CustomPacketQueue) canEnqueue() bool {
-
 	return pq.length < pq.pktQue.MaxLength
 }
 
 func (pq *CustomPacketQueue) canDequeue() bool {
-
 	return pq.head < pq.tail
 }
 
 func (pq *CustomPacketQueue) GetFillLevel() int {
-
 	return pq.length / pq.pktQue.MaxLength
 }
 
 func (pq *CustomPacketQueue) GetLength() int {
-
 	return pq.length
 }
 
 func (pq *CustomPacketQueue) peek() *QPkt {
-
 	return pq.queue[0]
 }
 
 func (pq *CustomPacketQueue) Pop() *QPkt {
-
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
-
-	// fmt.Println("Enqueue at", pq.tail, "Dequeue at", pq.head)
 
 	pkt := pq.queue[pq.head]
 	pq.head = (pq.head + pq.pktQue.MaxLength + 1) & pq.mask
@@ -107,7 +93,6 @@ func (pq *CustomPacketQueue) PopMultiple(number int) []*QPkt {
 	defer pq.mutex.Unlock()
 
 	var pkt []*QPkt
-
 	if pq.head+number < pq.pktQue.MaxLength {
 		pkt = pq.queue[pq.head : pq.head+number]
 		pq.head = (pq.head + number) & pq.mask
@@ -124,34 +109,20 @@ func (pq *CustomPacketQueue) PopMultiple(number int) []*QPkt {
 
 		pkt = append(pkt, pq.queue[pq.head:pq.head+number]...)
 		pq.head = (pq.head + number) & pq.mask
-
 	}
-
 	pq.length = pq.length - number
-
 	return pkt
 }
 
 func (pq *CustomPacketQueue) CheckAction() conf.PoliceAction {
-
 	level := pq.GetFillLevel()
-
-	//log.Trace("Current level is", "level", level)
-	//log.Trace("Profiles are", "profiles", pq.pktQue.Profile)
-
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
-			//log.Trace("Matched a rule!")
-			rand := rand.Intn(100)
-			if rand < (pq.pktQue.Profile[j].Prob) {
-				//log.Trace("Take Action!")
+			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
 				return pq.pktQue.Profile[j].Action
 			}
-			//log.Trace("Do not take Action")
-
 		}
 	}
-
 	return conf.PASS
 }
 
