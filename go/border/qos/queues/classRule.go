@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,26 +18,10 @@ import (
 	"strings"
 
 	"github.com/scionproto/scion/go/border/qos/conf"
-
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
 )
-
-// TODO: Matching rules is currently based on string comparisons
-
-// Rule contains a rule for matching packets
-// type classRule struct {
-// 	// This is currently means the ID of the sending border router
-// 	Name                 string `yaml:"name"`
-// 	Priority             int    `yaml:"priority"`
-// 	SourceAs             string `yaml:"sourceAs"`
-// 	SourceMatchMode      int    `yaml:"sourceMatchMode"`
-// 	DestinationAs        string `yaml:"destinationAs"`
-// 	DestinationMatchMode int    `yaml:"destinationMatchMode"`
-// 	L4Type               []int  `yaml:"L4Type"`
-// 	QueueNumber          int    `yaml:"queueNumber"`
-// }
 
 type InternalClassRule struct {
 	// This is currently means the ID of the sending border router
@@ -47,7 +30,7 @@ type InternalClassRule struct {
 	SourceAs      matchRule
 	NextHopAs     matchRule
 	DestinationAs matchRule
-	L4Type        []common.L4ProtocolType
+	L4Type        map[common.L4ProtocolType]struct{}
 	QueueNumber   int
 }
 
@@ -60,21 +43,16 @@ type matchRule struct {
 
 type matchMode int
 
+// modes on how to match the rules.
 const (
-	// EXACT match the exact ISD and AS
-	EXACT matchMode = 0
-	// ISDONLY match the ISD only
-	ISDONLY matchMode = 1
-	// ASONLY match the AS only
-	ASONLY matchMode = 2
-	// RANGE match AS and ISD in this range
-	RANGE matchMode = 3
-	// ANY match anything
-	ANY matchMode = 4
+	EXACT   matchMode = 0 // EXACT match the exact ISD and AS
+	ISDONLY matchMode = 1 // ISDONLY match the ISD only
+	ASONLY  matchMode = 2 // ASONLY match the AS only
+	RANGE   matchMode = 3 // RANGE match AS and ISD in this range
+	ANY     matchMode = 4 // ANY match anything
 )
 
 func ConvClassRuleToInternal(cr conf.ExternalClassRule) (InternalClassRule, error) {
-
 	sourceMatch, err := getMatchFromRule(cr, cr.SourceMatchMode, cr.SourceAs)
 	if err != nil {
 		return InternalClassRule{}, err
@@ -84,11 +62,9 @@ func ConvClassRuleToInternal(cr conf.ExternalClassRule) (InternalClassRule, erro
 		return InternalClassRule{}, err
 	}
 
-	l4t := make([]common.L4ProtocolType, 0)
-
+	l4t := make(map[common.L4ProtocolType]struct{}, len(cr.L4Type))
 	for _, l4pt := range cr.L4Type {
-		l4t = append(l4t, common.L4ProtocolType(l4pt))
-
+		l4t[common.L4ProtocolType(l4pt)] = struct{}{}
 	}
 
 	rule := InternalClassRule{
@@ -118,9 +94,7 @@ func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[
 					sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[i])
 				}
 			}
-
 		} else {
-
 			sourceRules[cr.SourceAs.IA] = append(sourceRules[cr.SourceAs.IA], &crs[i])
 		}
 		if cr.DestinationAs.matchMode == RANGE {
@@ -141,7 +115,6 @@ func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[
 	}
 
 	return sourceRules, destinationRules
-
 }
 
 func getMatchFromRule(cr conf.ExternalClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
@@ -236,28 +209,6 @@ func getQueueNumberIterativeForInternal(config *InternalRouterConfig, rp *rpkt.R
 	return queueNo
 }
 
-func getQueueNumberIterativeFor(legacyConfig *conf.ExternalConfig, rp *rpkt.RtrPkt) int {
-	queueNo := 0
-
-	matches := make([]conf.ExternalClassRule, 0)
-
-	for _, cr := range legacyConfig.ExternalRules {
-		if matchRuleFromConfig(&cr, rp) {
-			matches = append(matches, cr)
-		}
-	}
-
-	max := -1
-	for _, rul1 := range matches {
-		if rul1.Priority > max {
-			queueNo = rul1.QueueNumber
-			max = rul1.Priority
-		}
-	}
-
-	return queueNo
-}
-
 func (cr *InternalClassRule) matchSingleRule(rp *rpkt.RtrPkt, matchRuleField *matchRule, getIA func() (addr.IA, error)) bool {
 
 	switch matchRuleField.matchMode {
@@ -284,46 +235,17 @@ func (cr *InternalClassRule) matchInternalRule(rp *rpkt.RtrPkt) bool {
 
 	sourceMatches := cr.matchSingleRule(rp, &cr.SourceAs, rp.SrcIA)
 	destinationMatches := cr.matchSingleRule(rp, &cr.DestinationAs, rp.DstIA)
+	l4Matches := true
+	if len(cr.L4Type) != 0 {
+		contains(cr.L4Type, rp.CmnHdr.NextHdr)
+	}
 
-	return sourceMatches && destinationMatches
+	return sourceMatches && destinationMatches && l4Matches
 }
 
-func matchRuleFromConfig(cr *conf.ExternalClassRule, rp *rpkt.RtrPkt) bool {
-
-	match := true
-
-	srcAddr, _ := rp.SrcIA()
-	// log.Debug("Source Address is " + srcAddr.String())
-	// log.Debug("Comparing " + srcAddr.String() + " and " + cr.SourceAs)
-	if !strings.Contains(srcAddr.String(), cr.SourceAs) {
-		match = false
-	}
-
-	dstAddr, _ := rp.DstIA()
-	// log.Debug("Destination Address is " + dstAddr.String())
-	// log.Debug("Comparing " + dstAddr.String() + " and " + cr.DestinationAs)
-	if !strings.Contains(dstAddr.String(), cr.DestinationAs) {
-		match = false
-	}
-
-	// log.Debug("L4Type is", "L4Type", rp.CmnHdr.NextHdr)
-	// log.Debug("L4Type as int is", "L4TypeInt", int(rp.CmnHdr.NextHdr))
-	if !contains(cr.L4Type, int(rp.CmnHdr.NextHdr)) {
-		match = false
-	} else {
-		// log.Debug("Matched an L4Type!")
-	}
-
-	return match
-}
-
-func contains(slice []int, term int) bool {
-	for _, item := range slice {
-		if item == term {
-			return true
-		}
-	}
-	return false
+func contains(m map[common.L4ProtocolType]struct{}, term common.L4ProtocolType) bool {
+	_, found := m[term]
+	return found
 }
 
 func compareNumbers(a, b int64) int {
