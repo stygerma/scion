@@ -14,44 +14,6 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
-// TODO: Add tests for MatchModes as soon as you have decided which thing
-
-// func TestRulesWithPriority(t *testing.T) {
-
-// 	tables := []struct {
-// 		srcIA         string
-// 		dstIA         string
-// 		configFile    string
-// 		goldenQueueNo int
-// 	}{
-// 		{"2-ff00:0:212", "1-ff00:0:110", "../testdata/priority1-config.yaml", 1},
-// 		{"2-ff00:0:212", "1-ff00:0:111", "../testdata/priority1-config.yaml", 0},
-// 		{"1-ff00:0:110", "1-ff00:0:110", "../testdata/priority1-config.yaml", 0},
-// 		{"1-ff00:0:110", "1-ff00:0:110", "../testdata/priority1-config.yaml", 0},
-// 		{"1-ff00:0:110", "1-ff00:0:111", "../testdata/priority1-config.yaml", 2},
-// 		{"1-ff00:0:112", "1-ff00:0:111", "../testdata/priority1-config.yaml", 11},
-// 		{"1-ff00:0:112", "1-ff00:0:111", "../testdata/priority2-config.yaml", 22},
-// 		{"2-ff00:0:212", "1-ff00:0:110", "../testdata/priority2-config.yaml", 1},
-// 		{"1-ff00:0:110", "1-ff00:0:110", "../testdata/priority2-config.yaml", 0},
-// 		{"1-ff00:0:110", "1-ff00:0:111", "../testdata/priority2-config.yaml", 2},
-// 		{"2-ff00:0:212", "1-ff00:0:111", "../testdata/priority2-config.yaml", 0},
-// 		{"1-ff00:0:110", "1-ff00:0:110", "../testdata/priority2-config.yaml", 0},
-// 	}
-
-// 	for k, tab := range tables {
-// 		extConf, _ := qosconf.LoadConfig(tab.configFile)
-// 		qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
-// 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
-
-// 		queueNo := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
-// 		if queueNo != tab.goldenQueueNo {
-// 			fmt.Println(tab.srcIA, tab.dstIA)
-// 			t.Errorf("%d Queue number should be %d but is %d", k, tab.goldenQueueNo, queueNo)
-// 		}
-// 	}
-
-// }
-
 func BenchmarkRuleMatchModes(b *testing.B) {
 	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
 	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
@@ -224,6 +186,7 @@ func TestRuleMatchModes(t *testing.T) {
 		{"2-ff00:0:011", "344-ff00:0:222", "Exact - ANY", 5, true},
 		{"2-ff00:0:011", "22-344:0:222", "Exact - ANY", 5, true},
 		{"2-ff00:0:011", "123-ff00:344:222", "Exact - ANY", 5, true},
+		{"123-ff00:344:222", "2-ff00:0:011", "ANY - Exact", 6, true},
 	}
 
 	for _, classifier := range classifiers {
@@ -232,6 +195,57 @@ func TestRuleMatchModes(t *testing.T) {
 
 			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 			// queue := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
+
+			if rul == nil {
+				fmt.Println("Rule was nil")
+			}
+
+			if (rul.Name == tab.ruleName) != tab.shouldMatch {
+				t.Errorf("%d should match rule %v %v but matches rule %v", k, tab.shouldMatch, tab.ruleName, rul.Name)
+			}
+
+			// if (queue == tab.queueNumber) != tab.shouldMatch {
+			// 	t.Errorf("%d should match queue %v but matches queue %v", k, tab.queueNumber, queue)
+			// }
+
+		}
+	}
+
+	// t.Errorf("Show Logs")
+
+}
+
+func TestRuleMatchModesForDemo(t *testing.T) {
+
+	extConf, _ := qosconf.LoadConfig("../testdata/DemoConfig.yaml")
+	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
+
+	rc := qosqueues.RegularClassRule{}
+	// rcp := qosqueues.ParallelClassRule{}
+	// rcsp := qosqueues.SemiParallelClassRule{}
+
+	// classifiers := [3]qosqueues.ClassRuleInterface{&rc, &rcp, &rcsp}
+	classifiers := [1]qosqueues.ClassRuleInterface{&rc}
+
+	tables := []struct {
+		srcIA       string
+		dstIA       string
+		ruleName    string
+		queueNumber int
+		shouldMatch bool
+	}{
+		{"1-ff00:0:110", "111-ff00:0:999", "FROM AS110 TO ANY ON Queue=1", 1, true},
+		{"1-ff00:0:110", "1-ff00:0:111", "FROM AS110 TO ANY ON Queue=1", 1, true},
+		{"111-ff00:0:999", "1-ff00:0:110", "FROM ANY TO AS110 ON Queue=1", 1, true},
+	}
+
+	fmt.Println("---------------------------------")
+
+	for _, classifier := range classifiers {
+		for k, tab := range tables {
+			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
+
+			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 
 			if rul == nil {
 				fmt.Println("Rule was nil")

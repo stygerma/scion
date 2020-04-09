@@ -36,7 +36,7 @@ Things to do:
 
 // 	pq := PacketQueue{MaxLength: 128, MinBandwidth: priority, MaxBandWidth: priority}
 
-// 	bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 // 	que := PacketSliceQueue{pktQue: pq, mutex: &sync.Mutex{}, tb: bucket}
 
 // 	return que
@@ -103,7 +103,7 @@ Things to do:
 // 	priority := 1
 
 // 	pq := PacketQueue{MaxLength: 600, MinBandwidth: priority, MaxBandWidth: priority}
-// 	bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 // 	que := PacketBufQueue{pktQue: pq, mutex: &sync.Mutex{}, tb: bucket}
 // 	que.InitQueue(pq, &sync.Mutex{}, &sync.Mutex{})
 
@@ -120,7 +120,7 @@ Things to do:
 
 // func BenchmarkEnqDeque(b *testing.B) {
 
-// 	bucket := tokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 // 	pkt := setupQueuePaket()
 
 // 	pq1 := PacketQueue{MaxLength: 80, MinBandwidth: 0, MaxBandWidth: 0}
@@ -160,7 +160,7 @@ Things to do:
 
 // func BenchmarkEnqDequeMult(b *testing.B) {
 
-// 	bucket := tokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 // 	pkt := setupQueuePaket()
 
 // 	pq1 := PacketQueue{MaxLength: 32, MinBandwidth: 0, MaxBandWidth: 0}
@@ -209,7 +209,7 @@ Things to do:
 
 // func BenchmarkEnqDequeSingle(b *testing.B) {
 
-// 	bucket := tokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 // 	pkt := setupQueuePaket()
 
 // 	pq1 := PacketQueue{MaxLength: 32, MinBandwidth: 0, MaxBandWidth: 0}
@@ -264,7 +264,7 @@ Things to do:
 
 // func BenchmarkEnqPop(b *testing.B) {
 
-// 	bucket := tokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: 0, tokens: 0, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 // 	pkt := setupQueuePaket()
 
 // 	pq1 := PacketQueue{MaxLength: 10, MinBandwidth: 0, MaxBandWidth: 0}

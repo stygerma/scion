@@ -20,7 +20,7 @@ package qosqueues
 // 	bandwidth := 0
 // 	priority := 1
 
-// 	bucket := tokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
+// 	bucket := TokenBucket{MaxBandWidth: bandwidth, tokens: bandwidth, lastRefill: time.Now(), mutex: &sync.Mutex{}}
 // 	que := packetBufQueue{MaxLength: 128, MinBandwidth: priority, MaxBandWidth: priority, mutex: &sync.Mutex{}, tb: bucket}
 
 // 	que.InitQueue(&sync.Mutex{}, &sync.Mutex{})

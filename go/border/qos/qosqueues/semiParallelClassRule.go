@@ -70,8 +70,8 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(config *InternalRouterConfig,
 
 	// sourceAnyDestinationMatches = config.Rules.SourceAnyDestinationRules[srcAddr]
 	go pcr.getMatchFromMap(config, &config.Rules.SourceAnyDestinationRules, srcAddr, &pcr.sources, 3, done)
-	// destinationAnySourceRules = config.Rules.DestinationAnySourceRules[srcAddr]
-	go pcr.getMatchFromMap(config, &config.Rules.DestinationAnySourceRules, srcAddr, &pcr.destinations, 3, done)
+	// destinationAnySourceRules = config.Rules.DestinationAnySourceRules[dstAddr]
+	go pcr.getMatchFromMap(config, &config.Rules.DestinationAnySourceRules, dstAddr, &pcr.destinations, 3, done)
 
 	// asOnlySourceRules = config.Rules.ASOnlySourceRules[srcAddr.A]
 	go pcr.getMatchASFromMap(config, &config.Rules.ASOnlySourceRules, srcAddr.A, &pcr.sources, 1, done)

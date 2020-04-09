@@ -29,7 +29,7 @@ type PacketBufQueue struct {
 
 	bufQueue *ringbuf.Ring
 	length   int
-	tb       tokenBucket
+	tb       TokenBucket
 }
 
 var _ PacketQueueInterface = (*PacketBufQueue)(nil)
@@ -39,7 +39,7 @@ func (pq *PacketBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
-	pq.tb = tokenBucket{}
+	pq.tb = TokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
 	pq.bufQueue = ringbuf.New(pq.pktQue.MaxLength, func() interface{} {
 		return &QPkt{}
