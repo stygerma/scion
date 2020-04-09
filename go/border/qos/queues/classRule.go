@@ -78,7 +78,9 @@ func ConvClassRuleToInternal(cr conf.ExternalClassRule) (InternalClassRule, erro
 	return rule, nil
 }
 
-func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[addr.IA][]*InternalClassRule) {
+func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule,
+	map[addr.IA][]*InternalClassRule) {
+
 	sourceRules := make(map[addr.IA][]*InternalClassRule)
 	destinationRules := make(map[addr.IA][]*InternalClassRule)
 
@@ -91,7 +93,8 @@ func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[
 
 			for i := lowLimI; i <= upLimI; i++ {
 				for j := lowLimA; j <= upLimA; j++ {
-					sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[i])
+					sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] =
+						append(sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[i])
 				}
 			}
 		} else {
@@ -110,21 +113,28 @@ func RulesToMap(crs []InternalClassRule) (map[addr.IA][]*InternalClassRule, map[
 				}
 			}
 		} else {
-			destinationRules[cr.DestinationAs.IA] = append(destinationRules[cr.DestinationAs.IA], &crs[i])
+			destinationRules[cr.DestinationAs.IA] =
+				append(destinationRules[cr.DestinationAs.IA], &crs[i])
 		}
 	}
 
 	return sourceRules, destinationRules
 }
 
-func getMatchFromRule(cr conf.ExternalClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
+func getMatchFromRule(cr conf.ExternalClassRule, matchModeField int, matchRuleField string) (
+	matchRule, error) {
+
 	switch matchMode(matchModeField) {
 	case EXACT, ASONLY, ISDONLY, ANY:
 		IA, err := addr.IAFromString(matchRuleField)
 		if err != nil {
 			return matchRule{}, err
 		}
-		m := matchRule{IA: IA, lowLim: addr.IA{}, upLim: addr.IA{}, matchMode: matchMode(matchModeField)}
+		m := matchRule{
+			IA:        IA,
+			lowLim:    addr.IA{},
+			upLim:     addr.IA{},
+			matchMode: matchMode(matchModeField)}
 		return m, nil
 	case RANGE:
 		if matchMode(matchModeField) == RANGE {
@@ -140,19 +150,23 @@ func getMatchFromRule(cr conf.ExternalClassRule, matchModeField int, matchRuleFi
 			if err != nil {
 				return matchRule{}, err
 			}
-			m := matchRule{IA: addr.IA{}, lowLim: lowLim, upLim: upLim, matchMode: matchMode(matchModeField)}
+			m := matchRule{
+				IA:        addr.IA{},
+				lowLim:    lowLim,
+				upLim:     upLim,
+				matchMode: matchMode(matchModeField)}
 			return m, nil
 		}
 	}
 
-	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil, "matchMode", matchModeField)
+	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil,
+		"matchMode", matchModeField)
 }
 
 var matches = make([]InternalClassRule, 0)
 var returnRule InternalClassRule
 
 func GetRuleWithHashFor(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
-
 	srcAddr, _ := rp.SrcIA()
 	dstAddr, _ := rp.DstIA()
 
@@ -182,12 +196,10 @@ func GetRuleWithHashFor(config *InternalRouterConfig, rp *rpkt.RtrPkt) *Internal
 }
 
 func GetQueueNumberWithHashFor(config *InternalRouterConfig, rp *rpkt.RtrPkt) int {
-
 	return GetRuleWithHashFor(config, rp).QueueNumber
 }
 
 func getQueueNumberIterativeForInternal(config *InternalRouterConfig, rp *rpkt.RtrPkt) int {
-
 	queueNo := 0
 	matches := make([]InternalClassRule, 0)
 
@@ -209,8 +221,8 @@ func getQueueNumberIterativeForInternal(config *InternalRouterConfig, rp *rpkt.R
 	return queueNo
 }
 
-func (cr *InternalClassRule) matchSingleRule(rp *rpkt.RtrPkt, matchRuleField *matchRule, getIA func() (addr.IA, error)) bool {
-
+func (cr *InternalClassRule) matchSingleRule(rp *rpkt.RtrPkt, matchRuleField *matchRule,
+	getIA func() (addr.IA, error)) bool {
 	switch matchRuleField.matchMode {
 	case EXACT, ASONLY, ISDONLY, ANY:
 		Addr, err := getIA()
@@ -232,7 +244,6 @@ func (cr *InternalClassRule) matchSingleRule(rp *rpkt.RtrPkt, matchRuleField *ma
 }
 
 func (cr *InternalClassRule) matchInternalRule(rp *rpkt.RtrPkt) bool {
-
 	sourceMatches := cr.matchSingleRule(rp, &cr.SourceAs, rp.SrcIA)
 	destinationMatches := cr.matchSingleRule(rp, &cr.DestinationAs, rp.DstIA)
 	l4Matches := true
