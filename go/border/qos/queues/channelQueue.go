@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +33,6 @@ type ChannelPacketQueue struct {
 var _ PacketQueueInterface = (*ChannelPacketQueue)(nil)
 
 func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
-
 	pq.pktQue = que
 	pq.mutex = mutQue
 	// pq.length = 0
@@ -44,7 +42,6 @@ func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mut
 }
 
 func (pq *ChannelPacketQueue) Enqueue(rp *QPkt) {
-
 	pq.queue <- rp
 
 	// atomic.AddUint64(&pq.length, 1)
@@ -72,7 +69,6 @@ func (pq *ChannelPacketQueue) GetLength() int {
 }
 
 func (pq *ChannelPacketQueue) peek() *QPkt {
-
 	return nil
 }
 
@@ -92,11 +88,9 @@ func (pq *ChannelPacketQueue) Pop() *QPkt {
 func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
 
 	pkts := make([]*QPkt, number)
-
 	for i := 0; i < number; i++ {
 		pkts[i] = <-pq.queue
 	}
-
 	return pkts
 }
 
@@ -117,7 +111,6 @@ func (pq *ChannelPacketQueue) CheckAction() conf.PoliceAction {
 
 		}
 	}
-
 	return conf.PASS
 }
 
