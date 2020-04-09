@@ -1,3 +1,17 @@
+// Copyright 2020 ETH Zurich
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package scheduler
 
 import (
@@ -21,7 +35,6 @@ type DeficitRoundRobinScheduler struct {
 var _ SchedulerInterface = (*DeficitRoundRobinScheduler)(nil)
 
 func (sched *deficitRoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
-
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
 
@@ -61,11 +74,7 @@ func (sched *DeficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInte
 	}
 }
 
-<<<<<<< a30f4f9ce1fcd6781928bcadc9ab117c3f393840:go/border/qos/scheduler/drrScheduler.go
 func (sched *deficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
-=======
-func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
->>>>>>> UP:go/border/qos/qosscheduler/drrScheduler.go
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
