@@ -114,8 +114,9 @@ func InitClassification(qConfig *QosConfiguration) error {
 func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
-	qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
+	// qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
 	// qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
+	qConfig.schedul = &qosscheduler.DeficitRoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
@@ -145,7 +146,15 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 
 	// queueNo := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), rp)
 	config := qosConfig.GetConfig()
-	queueNo := rc.GetRuleForPacket(config, rp).QueueNumber
+	// queueNo := rc.GetRuleForPacket(config, rp).QueueNumber
+
+	rule := rc.GetRuleForPacket(config, rp)
+
+	queueNo := 0
+	if rule != nil {
+		queueNo = rule.QueueNumber
+	}
+
 	qp := qosqueues.QPkt{Rp: rp, QueueNo: queueNo}
 
 	//log.Trace("Our packet is", "QPkt", qp)
@@ -187,33 +196,27 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 	case conf.DROP:
 		qosConfig.dropPacket(qp.Rp)
 	default:
-		qosConfig.config.Queues[queueNo].Enqueue(qp)
+		qosConfig.dropPacket(qp.Rp)
+		// qosConfig.config.Queues[queueNo].Enqueue(qp)
 	}
 }
 
 func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 
-	rc := qosqueues.RegularClassRule{}
+	// TODO: Readd this
+	// rc := qosqueues.RegularClassRule{}
 
 	// queueNo := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), rp)
-	config := qosConfig.GetConfig()
-	rule := rc.GetRuleForPacket(config, qp.Rp)
+	// config := qosConfig.GetConfig()
+	// rule := rc.GetRuleForPacket(config, qp.Rp)
 
-	np := qosqueues.NPkt{Rule: rule, Qpkt: qp}
+	// np := qosqueues.NPkt{Rule: rule, Qpkt: qp}
 
 	// qosConfig.notifications <- &np
-
-	// TODO: Remove later
-	select {
-	case qosConfig.notifications <- &np:
-	default:
-		panic("We are overwhelmed")
-	}
 }
 
 func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
-	//TODO: Remove later
 	// qosConfig.notifications <- &qosqueues.NPkt{}
 	qosConfig.droppedPackets++
 	log.Debug("Dropping packet", "qosConfig.droppedPackets", qosConfig.droppedPackets)

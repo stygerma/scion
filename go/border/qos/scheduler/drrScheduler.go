@@ -45,13 +45,12 @@ func (sched *deficitRoundRobinScheduler) Init(routerConfig queues.InternalRouter
 		sched.quantumSum = sched.quantumSum + routerConfig.Queues[i].GetPriority()
 	}
 
-	sched.tb.Init(10000000)
-
 	if len(routerConfig.Queues) == 5 {
 		log.Debug("Priorities", "0", routerConfig.Queues[0].GetPriority(), "1", routerConfig.Queues[1].GetPriority(), "2", routerConfig.Queues[2].GetPriority())
-		sched.timeToSleep = 200
+
+		sched.tb.Init(1250000) // 10 Mbit
 	} else {
-		sched.timeToSleep = 1
+		sched.tb.Init(12500000) // 100 Mbit
 	}
 
 }
@@ -78,12 +77,16 @@ func (sched *DeficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInte
 
 	for i := 0; i < pktToDequeue; i++ {
 
-		time.Sleep(time.Duration(sched.timeToSleep) * time.Microsecond)
-
 		qp = queue.Pop()
+
 		if qp == nil {
-			continue
+			break
 		}
+
+		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
+			time.Sleep(50 * time.Millisecond)
+		}
+
 		lastRound[queueNo]++
 		total[queueNo]++
 		forwarder(qp.Rp)

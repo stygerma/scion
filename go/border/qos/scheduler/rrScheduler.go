@@ -15,6 +15,8 @@
 package scheduler
 
 import (
+	"time"
+
 	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
@@ -44,17 +46,11 @@ func (sched *RoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, 
 
 	for i := 0; i < length; i++ {
 		qp = queue.Pop()
+		if qp == nil {
+			continue
+		}
 		forwarder(qp.Rp)
 	}
-
-	// if length > 0 {
-	// qps := queue.PopMultiple(length)
-	// for _, qp := range qps {
-	// 	forwarder(qp.Rp)
-	// }
-
-	// }
-	// log.Debug("Finished Dequeue")
 }
 
 func (sched *RoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig,
@@ -64,23 +60,10 @@ func (sched *RoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterCon
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
 	for {
-		// log.Debug("Start of Dequeuer")
-		// select {
-		// case <-sched.messages:
-		// 	// sched.sleptLastTime = false
-		// default:
-		// 	// if sched.sleptLastTime {
-		// 	// 	sched.sleepTime = max(sched.sleepTime*2, 2)
-		// 	// } else {
-		// 	// 	sched.sleepTime = 2
-		// 	// }
-		// 	// sched.sleptLastTime = true
-		// 	// time.Sleep(1 * time.Millisecond)
-		// }
-		// time.Sleep(10 * time.Millisecond)
 		for i := 0; i < sched.totalLength; i++ {
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
+		time.Sleep(500 * time.Nanosecond)
 	}
 }
 
