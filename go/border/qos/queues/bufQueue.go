@@ -75,7 +75,8 @@ func (pq *PacketBufQueue) PopMultiple(number int) []*QPkt {
 	return retArr
 }
 
-// TODO: I suspect that rand.Intn isn't very fast. We can probably get by with worse random numbers
+// TODO(joelfischerr): I suspect that rand.Intn isn't very fast.
+// We can probably get by with worse random numbers
 func (pq *PacketBufQueue) CheckAction() conf.PoliceAction {
 	level := pq.GetFillLevel()
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
