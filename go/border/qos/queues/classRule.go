@@ -17,7 +17,6 @@ package queues
 import (
 	"strings"
 
-	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
@@ -171,7 +170,11 @@ func getMatchRuleTypeFromRule(cr qosconf.ExternalClassRule, matchModeField int, 
 		if err != nil {
 			return matchRule{}, err
 		}
-		m := matchRule{IA: IA, lowLim: addr.IA{}, upLim: addr.IA{}, matchMode: matchMode(matchModeField)}
+		m := matchRule{
+			IA:        IA,
+			lowLim:    addr.IA{},
+			upLim:     addr.IA{},
+			matchMode: matchMode(matchModeField)}
 		return m, nil
 	case RANGE:
 		if matchMode(matchModeField) == RANGE {
@@ -187,12 +190,17 @@ func getMatchRuleTypeFromRule(cr qosconf.ExternalClassRule, matchModeField int, 
 			if err != nil {
 				return matchRule{}, err
 			}
-			m := matchRule{IA: addr.IA{}, lowLim: lowLim, upLim: upLim, matchMode: matchMode(matchModeField)}
+			m := matchRule{
+				IA:        addr.IA{},
+				lowLim:    lowLim,
+				upLim:     upLim,
+				matchMode: matchMode(matchModeField)}
 			return m, nil
 		}
 	}
 
-	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil, "matchMode", matchModeField)
+	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil,
+		"matchMode", matchModeField)
 }
 
 var returnRule *InternalClassRule
