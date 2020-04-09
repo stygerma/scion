@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -78,10 +77,10 @@ func (qosConfig *QosConfiguration) SetAndInitSchedul(sched scheduler.SchedulerIn
 	qosConfig.schedul.Init(qosConfig.config)
 }
 
-func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {
+func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
+	QosConfiguration, error) {
 
 	qConfig := QosConfiguration{}
-
 	var err error
 	if err = ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
 		log.Error("Initialising the classification data structures has failed", "error", err)
@@ -160,17 +159,9 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 
 	qp := queues.QPkt{Rp: rp, QueueNo: queueNo}
 
-	//log.Trace("Our packet is", "QPkt", qp)
-	//log.Trace("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
-	//log.Trace("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
-
-	// log.Debug("Put packet on queue", "queueNo", queueNo)
-
 	select {
 	case *qosConfig.schedul.GetMessages() <- true:
-		//log.Trace("sent message")
 	default:
-		//log.Trace("no message sent")
 	}
 
 	// sch := qosConfig.schedul.(*scheduler.DeficitRoundRobinScheduler)
@@ -228,7 +219,6 @@ func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
 }
 
 func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRouterConfig, error) {
-
 	var internalRules []queues.InternalClassRule
 	var internalQueues []queues.PacketQueueInterface
 
@@ -274,7 +264,6 @@ func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRoute
 }
 
 func convertExternalToInteralQueue(extQueue conf.ExternalPacketQueue) queues.PacketQueue {
-
 	pq := queues.PacketQueue{
 		Name:         extQueue.Name,
 		ID:           extQueue.ID,
@@ -289,9 +278,7 @@ func convertExternalToInteralQueue(extQueue conf.ExternalPacketQueue) queues.Pac
 	return pq
 }
 func convertActionProfiles(externalActionProfile []conf.ActionProfile) []queues.ActionProfile {
-
 	ret := make([]queues.ActionProfile, 0)
-
 	for _, prof := range externalActionProfile {
 		ret = append(ret, convertActionProfile(prof))
 	}
@@ -299,13 +286,11 @@ func convertActionProfiles(externalActionProfile []conf.ActionProfile) []queues.
 }
 
 func convertActionProfile(externalActionProfile conf.ActionProfile) queues.ActionProfile {
-
 	ap := queues.ActionProfile{
 		FillLevel: externalActionProfile.FillLevel,
 		Prob:      externalActionProfile.Prob,
 		Action:    convertPoliceAction(externalActionProfile.Action),
 	}
-
 	return ap
 }
 
