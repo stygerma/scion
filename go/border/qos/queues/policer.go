@@ -22,21 +22,22 @@ import (
 	"github.com/scionproto/scion/go/border/qos/conf"
 )
 
-type tokenBucket struct {
+type TokenBucket struct {
 	maxBandWidth int // In Bps
 	tokens       int // One token is 1 B
 	lastRefill   time.Time
 	mutex        *sync.Mutex
 }
 
-func (tb *tokenBucket) Init(maxBandwidth int) {
+func (tb *TokenBucket) Init(maxBandwidth int) {
 	tb.maxBandWidth = maxBandwidth
 	tb.tokens = maxBandwidth
 	tb.lastRefill = time.Now()
 	tb.mutex = &sync.Mutex{}
 }
 
-func (tb *tokenBucket) refill() {
+func (tb *TokenBucket) refill() {
+
 	now := time.Now()
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
@@ -53,7 +54,16 @@ func (tb *tokenBucket) refill() {
 	}
 }
 
-func (tb *tokenBucket) PoliceBucket(qp *QPkt) conf.PoliceAction {
+func (tb *TokenBucket) Take(no int) bool {
+	tb.refill()
+	if tb.tokens-no > 0 {
+		tb.tokens -= no
+		return true
+	}
+	return false
+}
+
+func (tb *TokenBucket) PoliceBucket(qp *QPkt) PoliceAction {
 
 	tokenForPacket := (qp.Rp.Bytes().Len()) // In byte
 
