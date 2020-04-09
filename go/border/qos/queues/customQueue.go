@@ -26,7 +26,7 @@ type CustomPacketQueue struct {
 	mutex  *sync.Mutex
 	queue  []*QPkt
 	length int
-	tb     tokenBucket
+	tb     TokenBucket
 	head   int
 	tail   int
 	mask   int
@@ -38,7 +38,7 @@ func (pq *CustomPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutT
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
-	pq.tb = tokenBucket{}
+	pq.tb = TokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
 	pq.queue = make([]*QPkt, pq.pktQue.MaxLength)
 	pq.head = 0

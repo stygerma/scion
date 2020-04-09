@@ -94,6 +94,7 @@ func NewInfo(ifID common.IFIDType, ia addr.IA, active bool, srev *path_mgmt.Sign
 
 // Process processes Interface State updates from the beacon service.
 func Process(ifStates *path_mgmt.IFStateInfos) {
+	log.Debug("Processing state update")
 	cl := metrics.ControlLabels{Result: metrics.Success}
 	ctx := rctx.Get()
 	for _, info := range ifStates.Infos {

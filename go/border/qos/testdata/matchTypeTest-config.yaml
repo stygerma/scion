@@ -94,6 +94,19 @@ Queues:
             informationContent: 29
         profile:
             - {fill-level: 0, prob: 0, action: 2}
+    -
+        name: 'Queue 7'
+        id: 7
+        CIR: 50
+        PIR: 80
+        policeRate: 5000000
+        maxLength: 1024
+        priority: 1
+        congestionWarning:
+            approach: 22
+            informationContent: 29
+        profile:
+            - {fill-level: 0, prob: 0, action: 2}
 Rules:
     -
         name: 'Exact - Exact'
@@ -165,3 +178,17 @@ Rules:
             - 17
             - 222
         queueNumber: 5
+    -
+        name: 'ANY - Exact'
+        priority: 0
+        sourceAs: '139-ff00:0:989'
+        sourceMatchMode: 4
+        destinationAs: '2-ff00:0:011'
+        destinationMatchMode: 0
+        L4Type:
+            - 0
+            - 1
+            - 6
+            - 17
+            - 222
+        queueNumber: 6
