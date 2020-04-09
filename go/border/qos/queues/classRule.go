@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +17,7 @@ package queues
 import (
 	"strings"
 
+	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
@@ -30,7 +30,7 @@ type InternalClassRule struct {
 	SourceAs      matchRule
 	NextHopAs     matchRule
 	DestinationAs matchRule
-	L4Type        []common.L4ProtocolType
+	L4Type        map[common.L4ProtocolType]struct{}
 	QueueNumber   int
 }
 
@@ -43,17 +43,13 @@ type matchRule struct {
 
 type matchMode int
 
+// modes on how to match the rules.
 const (
-	// EXACT match the exact ISD and AS
-	EXACT matchMode = 0
-	// ISDONLY match the ISD only
-	ISDONLY matchMode = 1
-	// ASONLY match the AS only
-	ASONLY matchMode = 2
-	// RANGE match AS and ISD in this range
-	RANGE matchMode = 3
-	// ANY match anything
-	ANY matchMode = 4
+	EXACT   matchMode = 0 // EXACT match the exact ISD and AS
+	ISDONLY matchMode = 1 // ISDONLY match the ISD only
+	ASONLY  matchMode = 2 // ASONLY match the AS only
+	RANGE   matchMode = 3 // RANGE match AS and ISD in this range
+	ANY     matchMode = 4 // ANY match anything
 )
 
 type RegularClassRule struct{}
@@ -71,11 +67,9 @@ func ConvClassRuleToInternal(cr qosconf.ExternalClassRule) (InternalClassRule, e
 		return InternalClassRule{}, err
 	}
 
-	l4t := make([]common.L4ProtocolType, 0)
-
+	l4t := make(map[common.L4ProtocolType]struct{}, len(cr.L4Type))
 	for _, l4pt := range cr.L4Type {
-		l4t = append(l4t, common.L4ProtocolType(l4pt))
-
+		l4t[common.L4ProtocolType(l4pt)] = struct{}{}
 	}
 
 	rule := InternalClassRule{
