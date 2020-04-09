@@ -77,7 +77,8 @@ func (qosConfig *QosConfiguration) SetAndInitSchedul(sched scheduler.SchedulerIn
 	qosConfig.schedul.Init(qosConfig.config)
 }
 
-func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {
+func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
+	QosConfiguration, error) {
 
 	qConfig := QosConfiguration{}
 	var err error
@@ -157,12 +158,6 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	}
 
 	qp := queues.QPkt{Rp: rp, QueueNo: queueNo}
-
-	//log.Trace("Our packet is", "QPkt", qp)
-	//log.Trace("Number of workers", "qosConfig.worker.noWorker", qosConfig.worker.noWorker)
-	//log.Trace("Sending it to worker", "workerNo", queueNo%qosConfig.worker.noWorker)
-
-	// log.Debug("Put packet on queue", "queueNo", queueNo)
 
 	select {
 	case *qosConfig.schedul.GetMessages() <- true:
@@ -279,7 +274,6 @@ func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRoute
 }
 
 func convertExternalToInteralQueue(extQueue conf.ExternalPacketQueue) queues.PacketQueue {
-
 	pq := queues.PacketQueue{
 		Name:         extQueue.Name,
 		ID:           extQueue.ID,
