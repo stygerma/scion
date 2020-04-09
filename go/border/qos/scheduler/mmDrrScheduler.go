@@ -1,15 +1,33 @@
+// Copyright 2020 ETH Zurich
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package scheduler
 
 import (
 	"sync"
 	"time"
 
+	"github.com/scionproto/scion/go/border/qos/qosqueues"
 	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
-// This is also a deficit round robin dequeuer. But instead of the priority field it uses the min-bandwidth field for the minimum number of packets to dequeue. If there are fewer than the minimal value of packets to dequeue, the remaining min-bandwidth will be put onto a surplus counter and another queue might use more than its min-bandwidth (but still less than its max-bandwidth).
-
+// MinMaxDeficitRoundRobinScheduler is also a deficit round robin dequeuer.
+// But instead of the priority field it uses the min-bandwidth field for the minimum number
+// of packets to dequeue. If there are fewer than the minimal value of packets to dequeue,
+// the remaining min-bandwidth will be put onto a surplus counter and another queue
+// might use more than its min-bandwidth (but still less than its max-bandwidth).
 type MinMaxDeficitRoundRobinScheduler struct {
 	quantumSum          int
 	totalLength         int
@@ -28,10 +46,8 @@ type surplus struct {
 var _ SchedulerInterface = (*MinMaxDeficitRoundRobinScheduler)(nil)
 
 func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
-
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
-
 	sched.schedulerSurplusMtx = &sync.Mutex{}
 	sched.schedulerSurplus = surplus{0, make([]int, sched.totalLength), -1}
 
@@ -43,10 +59,11 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig queues.Internal
 	for i := 0; i < sched.totalLength; i++ {
 		sched.schedulerSurplus.MaxSurplus += routerConfig.Queues[i].GetMinBandwidth()
 	}
-
 }
 
-func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
+func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig,
+	forwarder func(rp *rpkt.RtrPkt)) {
+
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
@@ -166,7 +183,6 @@ func (sched *MinMaxDeficitRoundRobinScheduler) getFromSurplus(queue qosqueues.Pa
 	// log.Debug("Queue got credit", "queueNo", queueNo, "credit", credit)
 
 	return credit
-
 }
 
 func (sched *MinMaxDeficitRoundRobinScheduler) payIntoSurplus(queue qosqueues.PacketQueueInterface, queueNo int, payment int) {
