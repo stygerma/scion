@@ -26,10 +26,9 @@ import (
 	"github.com/scionproto/scion/go/lib/xtest"
 )
 
-// TODO: Add tests for MatchModes as soon as you have decided which thing
+// TODO(joelfischerr): Add tests for MatchModes as soon as you have decided which thing
 
 func TestRulesWithPriority(t *testing.T) {
-
 	tables := []struct {
 		srcIA         string
 		dstIA         string

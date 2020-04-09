@@ -37,9 +37,7 @@ func (tb *tokenBucket) Init(maxBandwidth int) {
 }
 
 func (tb *tokenBucket) refill() {
-
 	now := time.Now()
-
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
 	if timeSinceLastUpdate > 100 {
@@ -56,7 +54,6 @@ func (tb *tokenBucket) refill() {
 }
 
 func (tb *tokenBucket) PoliceBucket(qp *QPkt) conf.PoliceAction {
-
 	tb.mutex.Lock()
 	defer tb.mutex.Unlock()
 
