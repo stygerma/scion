@@ -118,14 +118,7 @@ func (pq *CustomPacketQueue) CheckAction() conf.PoliceAction {
 	level := pq.GetFillLevel()
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
-<<<<<<< 82102bf27a694b6125fa87ce957aea70d5cc5377
-			//log.Trace("Matched a rule!")
-			rand := rand.Intn(100)
-			if rand < (pq.pktQue.Profile[j].Prob) {
-				//log.Trace("Take Action!")
-=======
 			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
->>>>>>> cleanup
 				return pq.pktQue.Profile[j].Action
 			}
 		}
