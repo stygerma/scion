@@ -1,103 +1,177 @@
 #!/bin/bash
 
-# doStuff() {
-#     ls
-#     sleep 3
-# }
+# Copyright 2020 ETH Zurich
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+interactive='false'
+verbose='false'
+
+printUseage() {
+  echo "Usage:"
+  echo "-v for verbose mode to print explanations for each of the steps"
+  echo "-i for interactive mode. Requires some keypresses to continue."
+  exit 0
+}
+
+while getopts ':ivh' flag; do
+  case "${flag}" in
+    i) interactive='true' ;;
+    v) verbose='true' ;;
+    h) printUseage
+  esac
+done
+
+output() {
+if $verbose; then
+    echo "$1"
+fi
+}
 
 printBlue() {
-    tput setaf 4; echo "$1"; tput sgr0;
+    tput setaf 4; output "$1"; tput sgr0;
+}
+
+waitForEnter() {
+    if $interactive; then
+        printBlue "Press enter to continue $1" 
+        read -p ""
+    fi
 }
 
 startNetcatListener() {
     SCION_DAEMON_ADDRESS='127.0.0.19:30255'
     export SCION_DAEMON_ADDRESS
-    tail -f /dev/null | ./../scion-apps/netcat/netcat -l $1 > ../scion-apps/netcat/data/server1.output
+    tail -f /dev/null | ./../scion-apps/netcat/netcat -l "$1" > ../scion-apps/netcat/data/server"$2".output
 }
 
+transferFileTo() {
+    local start
+    start=$(date +%s)
+    SCION_DAEMON_ADDRESS="127.0.0.$1:30255"
+    export SCION_DAEMON_ADDRESS
+    ./../scion-apps/netcat/netcat 1-ff00:0:111,[127.0.0.1]:"$2" < ../scion-apps/netcat/data/test100Mb.db
+    local end=`date +%s`
+    local runtime=$((end-start))
+    echo $runtime >  ".tempFile$2"
+}
 
-# exec 3>&1 4>&2
-# time=$(TIMEFORMAT="%R"; { time doStuff 1>&3 2>&4; } 2>&1)
-# exec 3>&- 4>&-
+printBlue "Starting the demo"
 
-# echo "-----------------------"
-# echo $time
+# Generate topology and copy configuration files
 
-tput setaf 4; echo "Starting the demo"; tput sgr0;
+output "Generate topology and copy configuration files"
 
-# # Generate topology and copy configuration files
-# echo "Generate topology and copy configuration files"
+./scion.sh topology -c topology/DemoTiny.topo
 
-# ./scion.sh topology -c topology/DemoTiny.topo
-
-# cp go/border/qos/testdata/DemoConfig.yaml gen/ISD1/ASff00_0_110/br1-ff00_0_110-1/qosConfig.yaml
-# cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_111/br1-ff00_0_111-1/qosConfig.yaml
-# cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_112/br1-ff00_0_112-1/qosConfig.yaml
+cp go/border/qos/testdata/DemoConfig.yaml gen/ISD1/ASff00_0_110/br1-ff00_0_110-1/qosConfig.yaml
+cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_111/br1-ff00_0_111-1/qosConfig.yaml
+cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_112/br1-ff00_0_112-1/qosConfig.yaml
 
 # # # Start SCION
-# printBlue "Start SCION"
+printBlue "Start SCION"
 
-# ./scion.sh start nobuild
-# ./scion.sh status
-# sleep 5
+./scion.sh start nobuild
+./scion.sh status
+sleep 5
 
-# # # Do PING for 5 seconds AS110 to AS111
-# printBlue "AS110 to AS111"
-# ./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:111,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
-# # # Do PING for 5 seconds AS110 to AS112
-# printBlue "AS110 to AS112"
-# ./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
-# # # Do PING for 5 seconds AS111 to AS112
-# printBlue "AS111 to AS112"
-# ./bin/scmp echo -local 1-ff00:0:111,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.19:30255 -c 5
+# # # # Do PING for 5 seconds AS110 to AS111
+printBlue "AS110 to AS111"
+./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:111,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
+# # # # Do PING for 5 seconds AS110 to AS112
+printBlue "AS110 to AS112"
+./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
+# # # # Do PING for 5 seconds AS111 to AS112
+printBlue "AS111 to AS112"
+./bin/scmp echo -local 1-ff00:0:111,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.19:30255 -c 5
 
-# printBlue "Press enter to continue" 
-# read -p ""
+waitForEnter
+
+# Make sure that no netcat processes are left running
+killall netcat
 
 # # Start netcat server 1 in AS111
-SCION_DAEMON_ADDRESS='127.0.0.19:30255'
-export SCION_DAEMON_ADDRESS
-tail -f /dev/null | ./../scion-apps/netcat/netcat -l 34234 > ../scion-apps/netcat/data/server1.output &
+startNetcatListener 34234 1 &
 pid1=$!
 # # Start netcat server 2 in AS111
-SCION_DAEMON_ADDRESS='127.0.0.19:30255'
-export SCION_DAEMON_ADDRESS
-tail -f /dev/null | ./../scion-apps/netcat/netcat -l 35234 > ../scion-apps/netcat/data/server1.output &
+startNetcatListener 35234 2 &
 pid2=$!
 # # Start netcat server 3 in AS111
-SCION_DAEMON_ADDRESS='127.0.0.19:30255'
-export SCION_DAEMON_ADDRESS
-tail -f /dev/null | ./../scion-apps/netcat/netcat -l 36234 > ../scion-apps/netcat/data/server1.output &
+startNetcatListener 36234 3 &
 pid3=$!
 
-printBlue "Started netcat servers"
-
-printBlue "Start transfer file"
-# # Transfer File from AS110 to AS111 to show that 10 Mbit/s can be reached
+# # # Transfer File from AS110 to AS111 to show that 10 Mbit/s can be reached
 SCION_DAEMON_ADDRESS='127.0.0.11:30255'
 export SCION_DAEMON_ADDRESS
-# pv ../scion-apps/netcat/data/test100Mb.db | ./../scion-apps/netcat/netcat -vv 1-ff00:0:111,[127.0.0.1]:34234
+pv ../scion-apps/netcat/data/test100Mb.db | ./../scion-apps/netcat/netcat -vv 1-ff00:0:111,[127.0.0.1]:34234
 
-# printBlue "Press enter to continue" 
-# read -p ""
+waitForEnter
 
-# # Transfer File from AS110 to AS111 to show that the transfer is two times faster
-SCION_DAEMON_ADDRESS='127.0.0.11:30255'
-export SCION_DAEMON_ADDRESS
-time ./../scion-apps/netcat/netcat 1-ff00:0:111,[127.0.0.1]:35234 < ../scion-apps/netcat/data/test100Mb.db
-&
-# # Transfer File from AS112 to AS111 to show that it does not starve
-SCION_DAEMON_ADDRESS='127.0.0.11:30255'
-export SCION_DAEMON_ADDRESS
-time ./../scion-apps/netcat/netcat 1-ff00:0:111,[127.0.0.1]:36234 < ../scion-apps/netcat/data/test100Mb.db
+# Transfer File from AS110 to AS111 to show that the transfer is two times faster
+transferFileTo 11 35234 &
+pid4=$!
+# Transfer File from AS112 to AS111 to show that it does not starve
+transferFileTo 27 36234 &
+pid5=$!
 
-# # Measure time of execution and divide by file size to get the transfer speed
-# # Show the transfer speeds, the ratio of the transfer speeds and the ratio attempted
+printBlue "Finished netcat sender setup. Waiting for them to finish..."
 
-# # Kill all started processes
+wait $pid4
+printBlue "First transfer is done!"
+wait $pid5
+printBlue "Second transfer is done!"
 
-kill -9 "$pid1"
-kill -9 "$pid2"
-kill -9 "$pid3"
+# Measure time of execution and divide by file size to get the transfer speed
+# Show the transfer speeds, the ratio of the transfer speeds and the ratio attempted
 
-# ./scion.sh stop
+result1=$(cat .tempFile35234)
+result2=$(cat .tempFile36234)
+
+result3=800/$result1
+result4=800/$result1
+
+output "AS110 1: $result1 s, AS111 2: $result2 s"
+
+result3=$(printf %.2f $(echo "800/$result1"| bc -l))
+result4=$(printf %.2f $(echo "800/$result2"| bc -l))
+ratio=$(printf %.2f $(echo "$result3/$result4"| bc -l))
+
+output "Speed AS110 $result3 Mbit/s"
+output "Speed AS111 $result4 Mbit/s"
+output "Ratio $ratio"
+
+if (( $(echo "$ratio < 2.5" |bc -l) )) && (( $(echo "$ratio > 1.5" |bc -l) )); then
+tput setaf 2; output "Passed the test"; tput sgr0;
+failed=0
+else
+tput setaf 1; output "Failed the test. We wanted a ratio between 1.5 and 2.5 but we had $ratio"; tput sgr0;
+failed=1
+fi
+
+# Kill all started processes
+
+# Remove tempfiles
+rm -f .tempFile35234
+rm -f .tempFile36234
+
+kill -9 $pid1
+kill -9 $pid2
+kill -9 $pid3
+
+killall netcat
+
+./scion.sh stop
+
+if $failed; then
+    exit 1
+fi
