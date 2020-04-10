@@ -50,7 +50,7 @@ func (sched *deficitRoundRobinScheduler) Init(routerConfig queues.InternalRouter
 
 		sched.tb.Init(1250000) // 10 Mbit
 	} else {
-		sched.tb.Init(12500000) // 100 Mbit
+		sched.tb.Init(125000000) // 1000 Mbit
 	}
 
 }

@@ -14,12 +14,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+currDir=$(pwd)
+echo "$currDir"
+cd $(dirname $0)
+
+cd .. # Going to border
+cd .. # Going to go
+cd .. # Going to the SCION folder
+
 interactive='false'
-verbose='false'
+verbose='true'
 
 printUseage() {
   echo "Usage:"
-  echo "-v for verbose mode to print explanations for each of the steps"
+  echo "-q for quiet mode to suppress explanations for each of the steps"
   echo "-i for interactive mode. Requires some keypresses to continue."
   exit 0
 }
@@ -27,7 +35,7 @@ printUseage() {
 while getopts ':ivh' flag; do
   case "${flag}" in
     i) interactive='true' ;;
-    v) verbose='true' ;;
+    q) verbose='false' ;;
     h) printUseage
   esac
 done
@@ -150,12 +158,14 @@ output "Speed AS110 $result3 Mbit/s"
 output "Speed AS111 $result4 Mbit/s"
 output "Ratio $ratio"
 
+failed
+
 if (( $(echo "$ratio < 2.5" |bc -l) )) && (( $(echo "$ratio > 1.5" |bc -l) )); then
 tput setaf 2; output "Passed the test"; tput sgr0;
-failed=0
+failed='false'
 else
 tput setaf 1; output "Failed the test. We wanted a ratio between 1.5 and 2.5 but we had $ratio"; tput sgr0;
-failed=1
+failed='true'
 fi
 
 # Kill all started processes
