@@ -174,6 +174,8 @@ output "Speed AS110 $result3 Mbit/s"
 output "Speed AS111 $result4 Mbit/s"
 output "Ratio $ratio"
 
+failed
+
 if (( $(echo "$ratio < 2.5" |bc -l) )) && (( $(echo "$ratio > 1.5" |bc -l) )); then
 tput setaf 2; output "Passed the test"; tput sgr0;
 failed='false'
