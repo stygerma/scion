@@ -27,6 +27,8 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/user"
+	"runtime/pprof"
+	"time"
 
 	"github.com/BurntSushi/toml"
 
@@ -56,6 +58,14 @@ func main() {
 }
 
 func realMain() int {
+
+	f, _ := os.Create("/home/fischjoe/go/src/github.com/joelfischerr/scion/testProfile.pprof")
+	pprof.StartCPUProfile(f)
+	go func() {
+		time.Sleep(30 * time.Second)
+		pprof.StopCPUProfile()
+	}()
+
 	fatal.Init()
 	env.AddFlags()
 	flag.Parse()
