@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"os/exec"
 	"testing"
 	"time"
 
@@ -11,6 +12,19 @@ import (
 	"github.com/scionproto/scion/go/border/qos/qosconf"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
+
+func TestRunDemoAsIntegrationTest(t *testing.T) {
+
+	scriptCmd := exec.Command("bash", "-c", "./demoScript.sh -q")
+	scriptOut, err := scriptCmd.Output()
+	fmt.Println("f./demoScript.sh")
+	fmt.Println(string(scriptOut))
+	if err != nil {
+		t.Errorf("An error has occurred")
+		t.Error(err)
+	}
+
+}
 
 func getPackets(numberOfPackets int) []*rpkt.RtrPkt {
 
