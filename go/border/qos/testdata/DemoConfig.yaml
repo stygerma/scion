@@ -101,7 +101,7 @@ Rules:
             - 222
         queueNumber: 2
     -
-        name: 'TO AS112 ON Queue=3'
+        name: 'TO AS112 ON Queue=2'
         priority: 2
         sourceAs: '100-ff00:0:989'
         sourceMatchMode: 4
