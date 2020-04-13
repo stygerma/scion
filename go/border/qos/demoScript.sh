@@ -91,7 +91,7 @@ fi
 
 output "Generate topology and copy configuration files"
 
-./scion.sh topology -c topology/DemoTiny.topo
+./scion.sh topology -c topology/DemoTiny.topo >> /dev/null
 
 cp go/border/qos/testdata/DemoConfig.yaml gen/ISD1/ASff00_0_110/br1-ff00_0_110-1/qosConfig.yaml
 cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_111/br1-ff00_0_111-1/qosConfig.yaml
@@ -100,21 +100,21 @@ cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_112/br1-ff00_0_
 # # # Start SCION
 printBlue "Start SCION"
 
-./scion.sh start nobuild
-./scion.sh status
+./scion.sh start nobuild >> /dev/null
+./scion.sh status >> /dev/null
 sleep 5
 
-# # # # Do PING for 5 seconds AS110 to AS111
-printBlue "AS110 to AS111"
-./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:111,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
-# # # # Do PING for 5 seconds AS110 to AS112
-printBlue "AS110 to AS112"
-./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
-# # # # Do PING for 5 seconds AS111 to AS112
-printBlue "AS111 to AS112"
-./bin/scmp echo -local 1-ff00:0:111,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.19:30255 -c 5
+# # # # # Do PING for 5 seconds AS110 to AS111
+# printBlue "AS110 to AS111"
+# ./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:111,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
+# # # # # Do PING for 5 seconds AS110 to AS112
+# printBlue "AS110 to AS112"
+# ./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
+# # # # # Do PING for 5 seconds AS111 to AS112
+# printBlue "AS111 to AS112"
+# ./bin/scmp echo -local 1-ff00:0:111,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.19:30255 -c 5
 
-waitForEnter
+# waitForEnter
 
 # Make sure that no netcat processes are left running
 killall netcat
@@ -130,11 +130,11 @@ startNetcatListener 36234 3 &
 pid3=$!
 
 # # # Transfer File from AS110 to AS111 to show that 10 Mbit/s can be reached
-SCION_DAEMON_ADDRESS='127.0.0.11:30255'
-export SCION_DAEMON_ADDRESS
-pv ../scion-apps/netcat/data/test100Mb.db | ./../scion-apps/netcat/netcat -vv 1-ff00:0:111,[127.0.0.1]:34234
+# SCION_DAEMON_ADDRESS='127.0.0.11:30255'
+# export SCION_DAEMON_ADDRESS
+# pv ../scion-apps/netcat/data/test100Mb.db | ./../scion-apps/netcat/netcat -vv 1-ff00:0:111,[127.0.0.1]:34234
 
-waitForEnter
+# waitForEnter
 
 # Transfer File from AS110 to AS111 to show that the transfer is two times faster
 transferFileTo 11 35234 &
@@ -173,8 +173,6 @@ ratio=$(printf %.2f $(echo "$result3/$result4"| bc -l))
 output "Speed AS110 $result3 Mbit/s"
 output "Speed AS111 $result4 Mbit/s"
 output "Ratio $ratio"
-
-failed
 
 if (( $(echo "$ratio < 2.5" |bc -l) )) && (( $(echo "$ratio > 1.5" |bc -l) )); then
 tput setaf 2; output "Passed the test"; tput sgr0;
