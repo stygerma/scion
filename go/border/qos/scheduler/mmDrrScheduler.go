@@ -115,6 +115,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) LogUpdate(routerConfig qosqueues.
 func (sched *MinMaxDeficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	pktToDequeue := sched.adjustForQuantum(queue)
+	pktToDequeue = sched.adjustForSurplus(queue, pktToDequeue, queueNo)
 
 	attempted[queueNo] += pktToDequeue
 
@@ -168,8 +169,6 @@ func (sched *MinMaxDeficitRoundRobinScheduler) adjustForQuantum(queue qosqueues.
 	b := 10.0 / float64(sched.quantumSum)
 	pd := float64(a) * b
 	pktToDequeue := max(int(pd), 1)
-
-	// pktToDequeue := int(float64(a) / 10.0)
 
 	return pktToDequeue
 }
