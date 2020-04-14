@@ -9,12 +9,9 @@ go_library(
         "//go/border/qos/conf:go_default_library",
         "//go/border/qos/queues:go_default_library",
         "//go/border/qos/scheduler:go_default_library",
-<<<<<<< 5f49cbd259d4d13a0cafe4b20aed5b5d77537442
         "//go/border/rpkt:go_default_library",
         "//go/lib/log:go_default_library",
         "@in_gopkg_yaml_v2//:go_default_library",
-=======
->>>>>>> refactor.
         "//go/border/rpkt:go_default_library",
         "//go/lib/log:go_default_library",
     ],
