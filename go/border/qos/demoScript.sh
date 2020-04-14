@@ -83,7 +83,7 @@ printBlue "Starting the demo"
 
 output "Generate topology and copy configuration files"
 
-./scion.sh topology -c topology/DemoTiny.topo >> /dev/null
+./scion.sh topology -c topology/DemoTiny.topo
 
 cp go/border/qos/testdata/DemoConfig.yaml gen/ISD1/ASff00_0_110/br1-ff00_0_110-1/qosConfig.yaml
 cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_111/br1-ff00_0_111-1/qosConfig.yaml
@@ -92,8 +92,8 @@ cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_112/br1-ff00_0_
 # # # Start SCION
 printBlue "Start SCION"
 
-./scion.sh start nobuild >> /dev/null
-./scion.sh status >> /dev/null
+./scion.sh start nobuild
+./scion.sh status
 sleep 5
 
 # # # # # Do PING for 5 seconds AS110 to AS111
@@ -154,7 +154,7 @@ result1=$(cat .tempFile35234)
 FSSLOWERTRANSFER=$(stat -c%s ../scion-apps/netcat/data/server3.output)
 txMB=$(printf %.2f $(echo "$FSSLOWERTRANSFER/1024/1024"| bc -l))
 output "Managed to transfer $txMB MB"
-txMbit=$(printf %.2f $(echo "$transferredMB * 8"| bc -l))
+txMbit=$(printf %.2f $(echo "$txMB * 8"| bc -l))
 
 output "AS110 1: $result1 s, AS111 2: $result2 s"
 
