@@ -105,7 +105,7 @@ func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
 func (pq *ChannelPacketQueue) CheckAction() PoliceAction {
 
 	if pq.pktQue.MaxLength-100 <= pq.GetLength() {
-		log.Info("Queue is at max capacity", "queueNo", pq.pktQue.ID)
+		log.Debug("Queue is at max capacity", "queueNo", pq.pktQue.ID)
 		return DROPNOTIFY
 	}
 
