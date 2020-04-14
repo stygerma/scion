@@ -6,6 +6,7 @@ go_library(
         "drrScheduler.go",
         "meanScheduler.go",
         "mmDrrScheduler.go",
+        "raterrScheduler.go",
         "rrScheduler.go",
         "scheduler.go",
     ],
@@ -23,6 +24,7 @@ go_test(
     srcs = [
         "drrScheduler_test.go",
         "mmDrrScheduler_test.go",
+        "raterrScheduler_test.go",
         "rrScheduler_test.go",
         "scheduler_test.go",
     ],
