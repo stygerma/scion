@@ -115,9 +115,10 @@ func InitClassification(qConfig *QosConfiguration) error {
 func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
-	// qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
 	// qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
-	qConfig.schedul = &qosscheduler.DeficitRoundRobinScheduler{}
+	// qConfig.schedul = &qosscheduler.DeficitRoundRobinScheduler{}
+	// qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
+	qConfig.schedul = &qosscheduler.RateRoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
@@ -168,7 +169,15 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	case *qosConfig.schedul.GetMessages() <- true:
 	default:
 	}
-	putOnQueue(qosConfig, queueNo, &qp)
+
+	// sch := qosConfig.schedul.(*qosscheduler.DeficitRoundRobinScheduler)
+	// sch.UpdateIncoming(queueNo)
+	qosConfig.SendToWorker(queueNo, &qp)
+
+	// putOnQueue(qosConfig, queueNo, &qp)
+
+	//log.Trace("Finished QueuePacket")
+
 }
 
 func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
