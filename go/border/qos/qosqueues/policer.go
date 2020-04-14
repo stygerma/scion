@@ -40,7 +40,7 @@ func (tb *TokenBucket) refill() {
 
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
-	if timeSinceLastUpdate > 100 {
+	if timeSinceLastUpdate > 20 {
 
 		newTokens := ((tb.maxBandWidth) * int(timeSinceLastUpdate)) / (1000)
 		tb.lastRefill = now
@@ -53,8 +53,32 @@ func (tb *TokenBucket) refill() {
 	}
 }
 
+func (tb *TokenBucket) Available(amount int) bool {
+	tb.refill()
+	if tb.tokens > amount {
+		return true
+	}
+	return false
+}
+
+func (tb *TokenBucket) GetAvailable() int {
+	tb.refill()
+	return tb.tokens
+}
+
+func (tb *TokenBucket) GetAll() int {
+	val := tb.tokens
+	tb.tokens = 0
+	return val
+}
+
+func (tb *TokenBucket) ForceTake(no int) {
+	tb.tokens -= no
+}
+
 func (tb *TokenBucket) Take(no int) bool {
 	tb.refill()
+	// log.Debug("Tokens available", "tb.tokens", tb.tokens)
 	if tb.tokens-no > 0 {
 		tb.tokens -= no
 		return true
