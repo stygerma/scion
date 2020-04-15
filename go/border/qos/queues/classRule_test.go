@@ -24,7 +24,7 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 
 	"github.com/scionproto/scion/go/border/qos"
-	"github.com/scionproto/scion/go/border/qos/qosqueues"
+	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
@@ -33,7 +33,7 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
-	rc := qosqueues.RegularClassRule{}
+	rc := queues.RegularClassRule{}
 
 	tables := []struct {
 		srcIA       string
@@ -95,7 +95,7 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 
 	qosConfig := qConfig
 
-	rc := qosqueues.RegularClassRule{}
+	rc := queues.RegularClassRule{}
 
 	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
 
@@ -124,7 +124,7 @@ func BenchmarkSingleMatchParallel(b *testing.B) {
 
 	qosConfig := qConfig
 
-	rc := qosqueues.ParallelClassRule{}
+	rc := queues.ParallelClassRule{}
 
 	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
 
@@ -154,7 +154,7 @@ func BenchmarkSingleMatchParallel(b *testing.B) {
 
 // 	qosConfig := qConfig
 
-// 	rc := qosqueues.SemiParallelClassRule{}
+// 	rc := queues.SemiParallelClassRule{}
 
 // 	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
 
@@ -171,11 +171,11 @@ func TestRuleMatchModes(t *testing.T) {
 	extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
-	rc := qosqueues.RegularClassRule{}
-	rcp := qosqueues.ParallelClassRule{}
-	rcsp := qosqueues.SemiParallelClassRule{}
+	rc := queues.RegularClassRule{}
+	rcp := queues.ParallelClassRule{}
+	rcsp := queues.SemiParallelClassRule{}
 
-	classifiers := [3]qosqueues.ClassRuleInterface{&rc, &rcp, &rcsp}
+	classifiers := [3]queues.ClassRuleInterface{&rc, &rcp, &rcsp}
 
 	tables := []struct {
 		srcIA       string
@@ -208,7 +208,7 @@ func TestRuleMatchModes(t *testing.T) {
 			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
 			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
-			// queue := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
+			// queue := queues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
 
 			if rul == nil {
 				fmt.Println("Rule was nil")
@@ -234,12 +234,12 @@ func TestRuleMatchModesForDemo(t *testing.T) {
 	extConf, _ := qosconf.LoadConfig("../testdata/DemoConfig.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
-	rc := qosqueues.RegularClassRule{}
-	// rcp := qosqueues.ParallelClassRule{}
-	// rcsp := qosqueues.SemiParallelClassRule{}
+	rc := queues.RegularClassRule{}
+	// rcp := queues.ParallelClassRule{}
+	// rcsp := queues.SemiParallelClassRule{}
 
-	// classifiers := [3]qosqueues.ClassRuleInterface{&rc, &rcp, &rcsp}
-	classifiers := [1]qosqueues.ClassRuleInterface{&rc}
+	// classifiers := [3]queues.ClassRuleInterface{&rc, &rcp, &rcsp}
+	classifiers := [1]queues.ClassRuleInterface{&rc}
 
 	tables := []struct {
 		srcIA       string
