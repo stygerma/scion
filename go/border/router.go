@@ -193,14 +193,13 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
 
-	l := metrics.ProcessLabels{
-		IntfIn:  metrics.IntfToLabel(rp.Ingress.IfID),
-		IntfOut: metrics.Drop,
-	}
-
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
 		r.handlePktError(rp, err, "Error routing packet")
+        l := metrics.ProcessLabels{
+            IntfIn:  metrics.IntfToLabel(rp.Ingress.IfID),
+            IntfOut: metrics.Drop,
+        }
 		l.Result = metrics.ErrRoute
 		metrics.Process.Pkts(l).Inc()
 	}
