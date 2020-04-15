@@ -20,9 +20,6 @@ import (
 	"testing"
 
 	"github.com/inconshreveable/log15"
-	"github.com/scionproto/scion/go/border/qos/qosconf"
-	"github.com/scionproto/scion/go/lib/log"
-
 	"github.com/scionproto/scion/go/border/qos"
 	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/qos/queues"
@@ -30,8 +27,7 @@ import (
 )
 
 func BenchmarkRuleMatchModes(b *testing.B) {
-	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
-	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
+	extConf, _ := conf.LoadConfig("../testdata/matchBenchmark-config.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
 	rc := queues.RegularClassRule{}
@@ -80,18 +76,18 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 
 func BenchmarkSingleMatchSequential(b *testing.B) {
 	disableLog(b)
-	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
-	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
+	// extConf, _ := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
+	extConf, _ := conf.LoadConfig("../testdata/matchBenchmark-config.yaml")
 	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
 
 	qConfig := qos.QosConfiguration{}
 
 	var err error
-	if err = qos.ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
-		log.Error("Initialising the classification data structures has failed", "error", err)
+	if err = qos.ConvExternalToInternalConfig(&qConfig, extConf); err != nil {
+		log15.Error("Initialising the classification data structures has failed", "error", err)
 	}
 	if err = qos.InitClassification(&qConfig); err != nil {
-		log.Error("Initialising the classification data structures has failed", "error", err)
+		log15.Error("Initialising the classification data structures has failed", "error", err)
 	}
 
 	qosConfig := qConfig
@@ -109,18 +105,18 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 
 func BenchmarkSingleMatchParallel(b *testing.B) {
 	disableLog(b)
-	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
-	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
+	// extConf, _ := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
+	extConf, _ := conf.LoadConfig("../testdata/matchBenchmark-config.yaml")
 	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
 
 	qConfig := qos.QosConfiguration{}
 
 	var err error
-	if err = qos.ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
-		log.Error("Initialising the classification data structures has failed", "error", err)
+	if err = qos.ConvExternalToInternalConfig(&qConfig, extConf); err != nil {
+		log15.Error("Initialising the classification data structures has failed", "error", err)
 	}
 	if err = qos.InitClassification(&qConfig); err != nil {
-		log.Error("Initialising the classification data structures has failed", "error", err)
+		log15.Error("Initialising the classification data structures has failed", "error", err)
 	}
 
 	qosConfig := qConfig
@@ -133,43 +129,12 @@ func BenchmarkSingleMatchParallel(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		rul := rc.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 		_ = rul
-		// fmt.Println("Iteration", i)
 	}
 }
 
-// func BenchmarkSingleMatchSemiParallel(b *testing.B) {
-// 	disableLog(b)
-// 	// extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
-// 	extConf, _ := qosconf.LoadConfig("../testdata/matchBenchmark-config.yaml")
-// 	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
-
-// 	qConfig := qos.QosConfiguration{}
-
-// 	var err error
-// 	if err = qos.ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
-// 		log.Error("Initialising the classification data structures has failed", "error", err)
-// 	}
-// 	if err = qos.InitClassification(&qConfig); err != nil {
-// 		log.Error("Initialising the classification data structures has failed", "error", err)
-// 	}
-
-// 	qosConfig := qConfig
-
-// 	rc := queues.SemiParallelClassRule{}
-
-// 	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
-
-// 	b.ResetTimer()
-// 	for i := 0; i < b.N; i++ {
-// 		rul := rc.GetRuleForPacket(qosConfig.GetConfig(), pkt)
-// 		_ = rul
-// 		// fmt.Println("Iteration", i)
-// 	}
-// }
-
 func TestRuleMatchModes(t *testing.T) {
 
-	extConf, _ := qosconf.LoadConfig("../testdata/matchTypeTest-config.yaml")
+	extConf, _ := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
 	rc := queues.RegularClassRule{}
@@ -203,13 +168,6 @@ func TestRuleMatchModes(t *testing.T) {
 		{"2-ff00:0:011", "123-ff00:344:222", "Exact - ANY", 5, true},
 		{"123-ff00:344:222", "2-ff00:0:011", "ANY - Exact", 6, true},
 	}
-<<<<<<< bcd0a8bb081e989ca04a29c54a1583c2f546312d
-<<<<<<< bb61592f5264414f50b4c19d465d340070302781
-=======
-<<<<<<< f61bb1ac385e6ed94ebbd73fe69c12f112e2bcc3:go/border/qos/qosqueues/classRule_test.go
->>>>>>> refactor.
-=======
->>>>>>> cleanup
 	for k, tab := range tables {
 		pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
@@ -221,9 +179,13 @@ func TestRuleMatchModes(t *testing.T) {
 			}
 
 			if (rul.Name == tab.ruleName) != tab.shouldMatch {
-				t.Errorf("%d should match rule %v %v but matches rule %v", k, tab.shouldMatch, tab.ruleName, rul.Name)
+				t.Errorf("%d should match rule %v %v but matches rule %v",
+					k,
+					tab.shouldMatch,
+					tab.ruleName,
+					rul.Name)
 			}
-<<<<<<< bb61592f5264414f50b4c19d465d340070302781
+
 		}
 	}
 }
@@ -257,49 +219,6 @@ func TestRuleMatchModesForDemo(t *testing.T) {
 	for _, classifier := range classifiers {
 		for k, tab := range tables {
 			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
-=======
->>>>>>> refactor.
-
-			// if (queue == tab.queueNumber) != tab.shouldMatch {
-			// 	t.Errorf("%d should match queue %v but matches queue %v", k, tab.queueNumber, queue)
-			// }
-
-		}
-	}
-
-	// t.Errorf("Show Logs")
-
-}
-
-func TestRuleMatchModesForDemo(t *testing.T) {
-
-	extConf, _ := qosconf.LoadConfig("../testdata/DemoConfig.yaml")
-	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
-
-	rc := queues.RegularClassRule{}
-	// rcp := queues.ParallelClassRule{}
-	// rcsp := queues.SemiParallelClassRule{}
-
-	// classifiers := [3]queues.ClassRuleInterface{&rc, &rcp, &rcsp}
-	classifiers := [1]queues.ClassRuleInterface{&rc}
-
-	tables := []struct {
-		srcIA       string
-		dstIA       string
-		ruleName    string
-		queueNumber int
-		shouldMatch bool
-	}{
-		{"1-ff00:0:110", "111-ff00:0:999", "FROM AS110 TO ANY ON Queue=1", 1, true},
-		{"1-ff00:0:110", "1-ff00:0:111", "FROM AS110 TO ANY ON Queue=1", 1, true},
-		{"111-ff00:0:999", "1-ff00:0:110", "FROM ANY TO AS110 ON Queue=1", 1, true},
-	}
-
-	fmt.Println("---------------------------------")
-
-	for _, classifier := range classifiers {
-		for k, tab := range tables {
-			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
 
 			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 
@@ -308,16 +227,14 @@ func TestRuleMatchModesForDemo(t *testing.T) {
 			}
 
 			if (rul.Name == tab.ruleName) != tab.shouldMatch {
-				t.Errorf("%d should match rule %v %v but matches rule %v", k, tab.shouldMatch, tab.ruleName, rul.Name)
+				t.Errorf("%d should match rule %v %v but matches rule %v",
+					k,
+					tab.shouldMatch,
+					tab.ruleName,
+					rul.Name)
 			}
-
-			// if (queue == tab.queueNumber) != tab.shouldMatch {
-			// 	t.Errorf("%d should match queue %v but matches queue %v", k, tab.queueNumber, queue)
-			// }
-
 		}
 	}
-
 }
 
 var forward = make(chan bool, 1)

@@ -75,11 +75,14 @@ func (pq *PacketBufQueue) PopMultiple(number int) []*QPkt {
 	return retArr
 }
 
-// CheckAction checks how full the queue is and whether a profile has been configured for this fullness.
-// If the rule should only be applied with a certain probability (for fairness reasons) the random number
-// will be used to determine whether it should match or not.
-// In some benchmarks rand.Intn() has shown up as bottleneck in this function. A faster but less random
-// random number might be fine as well.
+// CheckAction checks how full the queue is and whether a profile
+// has been configured for this fullness.
+// If the rule should only be applied with a certain probability
+// (for fairness reasons) the random number will be
+// used to determine whether it should match or not.
+// In some benchmarks rand.Intn() has shown up as bottleneck
+// in this function.
+// A faster but less random random number might be fine as well.
 func (pq *PacketBufQueue) CheckAction() conf.PoliceAction {
 	level := pq.GetFillLevel()
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
