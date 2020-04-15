@@ -47,7 +47,8 @@ func (pq *CustomPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutT
 }
 
 func (pq *CustomPacketQueue) Enqueue(rp *QPkt) {
-	// TODO(joelfischerr): Making this lockfree makes it 10 times faster
+
+	// Making this lockfree makes it 10 times faster
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
 
@@ -88,7 +89,6 @@ func (pq *CustomPacketQueue) Pop() *QPkt {
 }
 
 func (pq *CustomPacketQueue) PopMultiple(number int) []*QPkt {
-	// TODO(joelfischerr): Readd this as soon as popMultiple works as standalone
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
 
