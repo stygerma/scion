@@ -30,7 +30,7 @@ const (
 	DefaultKeepaliveInterval = time.Second
 	// DefaultKeepaliveTimeout specifies the default for how long an interface
 	// can receive no IFID keepalive packets until it is considered expired.
-	DefaultKeepaliveTimeout = 30 * DefaultKeepaliveInterval
+	DefaultKeepaliveTimeout = 3 * DefaultKeepaliveInterval
 )
 
 const (
@@ -163,7 +163,6 @@ func (intf *Interface) Revoke() bool {
 	if time.Now().Sub(intf.lastActivate) > intf.cfg.KeepaliveTimeout {
 		intf.lastOriginate = time.Time{}
 		intf.lastPropagate = time.Time{}
-		// Look at this
 		intf.state = Revoked
 	}
 	return intf.state == Revoked
