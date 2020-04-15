@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +23,7 @@ import (
 
 type TokenBucket struct {
 	maxBandWidth int // In Bps
-	tokens       int // One token is 1 B
+	tokens       int // One token is 1B
 	lastRefill   time.Time
 	mutex        *sync.Mutex
 }
@@ -79,7 +78,6 @@ func (tb *TokenBucket) ForceTake(no int) {
 
 func (tb *TokenBucket) Take(no int) bool {
 	tb.refill()
-	// log.Debug("Tokens available", "tb.tokens", tb.tokens)
 	if tb.tokens-no > 0 {
 		tb.tokens -= no
 		return true

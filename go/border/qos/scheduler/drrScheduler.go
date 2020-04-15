@@ -1,8 +1,6 @@
 // Copyright 2020 ETH Zurich
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-	"time"
-
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -17,11 +15,8 @@
 package scheduler
 
 import (
-<<<<<<< HEAD
 	"time"
 
-=======
->>>>>>> b358d878ecb28431f30bab21bef435bea102bae0
 	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/log"

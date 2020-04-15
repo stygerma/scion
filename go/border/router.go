@@ -68,8 +68,6 @@ func NewRouter(id, confDir string) (*Router, error) {
 // Start sets up networking, and starts go routines for handling the main packet
 // processing as well as various other router functions.
 func (r *Router) Start() {
-
-	log.Info("My id is", "r.Id", r.Id)
 	go func() {
 		defer log.HandlePanic()
 		r.PacketError()
@@ -145,12 +143,10 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 
 	// TODO(joelfischerr): This is for the demo only. Remove this for the final PR.
 	if r.Id == "br1-ff00_0_110-1" {
-		// log.Debug("Queue Packet!")
         // Enqueue the packet. Packets will be classified, put on different queues,
         // scheduled and forwarded by forwardPacket
 		r.qosConfig.QueuePacket(rp)
 	} else {
-		// log.Debug("Just forward!")
 		r.forwardPacket(rp)
 	}
 }
@@ -166,7 +162,6 @@ func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
 		r.handlePktError(rp, err, "Error routing packet")
-		log.Debug("There was an error!!!!")
 		l.Result = metrics.ErrRoute
 		metrics.Process.Pkts(l).Inc()
 	}
