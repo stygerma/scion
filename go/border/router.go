@@ -143,16 +143,6 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		return
 	}
 
-	// log.Debug("Extensions", "rp.HBHExt", rp.HBHExt)
-	// log.Debug("Extensions", "rp.E2EExt", rp.E2EExt)
-
-	// host, _ := rp.SrcHost()
-	// log.Debug("Source host", "rp.SrcHost()", host, "rp.Type()", host.Type())
-
-	// Enqueue the packet. Packets will be classified, put on different queues,
-	// scheduled and forwarded by forwardPacket
-
-	// log.Debug(r.Id)
 	// TODO(joelfischerr): This is for the demo only. Remove this for the final PR.
 	if r.Id == "br1-ff00_0_110-1" {
 		// log.Debug("Queue Packet!")
@@ -161,59 +151,15 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		// log.Debug("Just forward!")
 		r.forwardPacket(rp)
 	}
-
-	// r.qosConfig.QueuePacket(rp)
 }
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
-
 	defer rp.Release()
 
 	l := metrics.ProcessLabels{
 		IntfIn:  metrics.IntfToLabel(rp.Ingress.IfID),
 		IntfOut: metrics.Drop,
 	}
-
-	// Validation looks for errors in the packet that didn't break basic
-	// parsing.
-	valid, err := rp.Validate()
-	if err != nil {
-		r.handlePktError(rp, err, "Error validating packet")
-		l.Result = metrics.ErrValidate
-		metrics.Process.Pkts(l).Inc()
-		return
-	}
-	if !valid {
-		rp.Error("Error validating packet, no specific error")
-		l.Result = metrics.ErrValidate
-		metrics.Process.Pkts(l).Inc()
-		return
-	}
-	// Check if the packet needs to be processed locally, and if so register hooks for doing so.
-	rp.NeedsLocalProcessing()
-	// Parse the packet payload, if a previous step has registered a relevant hook for doing so.
-	if _, err := rp.Payload(true); err != nil {
-		// Any errors at this point are application-level, and hence not
-		// calling handlePktError, as no SCMP errors will be sent.
-		rp.Error("Error parsing payload", "err", err)
-		l.Result = metrics.ErrParsePayload
-		metrics.Process.Pkts(l).Inc()
-		return
-	}
-	// Process the packet, if a previous step has registered a relevant hook for doing so.
-	if err := rp.Process(); err != nil {
-		r.handlePktError(rp, err, "Error processing packet")
-		l.Result = metrics.ErrProcess
-		metrics.Process.Pkts(l).Inc()
-		return
-	}
-	// Enqueue the packet. Packets will be classified, put on different queues,
-	// scheduled and forwarded by forwardPacket
-	r.qosConfig.QueuePacket(rp)
-}
-
-func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
-	defer rp.Release()
 
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {

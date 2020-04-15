@@ -1,4 +1,4 @@
-package qosscheduler
+package scheduler
 
 import (
 	"fmt"
