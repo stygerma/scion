@@ -12,9 +12,15 @@ import (
 // 	DestinationRules map[addr.IA][]*InternalClassRule
 // }
 
+type SchedulerConfig struct {
+	Latency   int
+	Bandwidth int
+}
+
 type InternalRouterConfig struct {
-	Queues []PacketQueueInterface
-	Rules  MapRules
+	Scheduler SchedulerConfig
+	Queues    []PacketQueueInterface
+	Rules     MapRules
 }
 
 type MapRules struct {
