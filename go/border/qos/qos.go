@@ -119,9 +119,9 @@ func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) e
 	qConfig.notifications = make(chan *qosqueues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
 	// qConfig.schedul = &qosscheduler.RoundRobinScheduler{}
-	// qConfig.schedul = &qosscheduler.DeficitRoundRobinScheduler{}
+	qConfig.schedul = &qosscheduler.DeficitRoundRobinScheduler{}
 	// qConfig.schedul = &qosscheduler.MinMaxDeficitRoundRobinScheduler{}
-	qConfig.schedul = &qosscheduler.RateRoundRobinScheduler{}
+	// qConfig.schedul = &qosscheduler.RateRoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
@@ -277,7 +277,11 @@ func convertExternalToInteral(extConf qosconf.ExternalConfig) (qosqueues.Interna
 		log.Trace("We have gotten the queue", "queue", iq.GetPacketQueue().Name)
 	}
 
-	return qosqueues.InternalRouterConfig{Queues: internalQueues, Rules: qosqueues.MapRules{RulesList: internalRules}}, nil
+	bw := convStringToNumber(rc.SchedulerConfig.Bandwidth)
+
+	sc := qosqueues.SchedulerConfig{Latency: rc.SchedulerConfig.Latency, Bandwidth: bw}
+
+	return qosqueues.InternalRouterConfig{Scheduler: sc, Queues: internalQueues, Rules: qosqueues.MapRules{RulesList: internalRules}}, nil
 
 }
 
