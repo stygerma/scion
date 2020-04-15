@@ -40,7 +40,8 @@ func (sched *RoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig)
 	sched.sleepDuration = routerConfig.Scheduler.Latency
 }
 
-func (sched *RoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
+func (sched *RoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
+	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	length := queue.GetLength()
 	var qp *queues.QPkt
@@ -59,16 +60,18 @@ func (sched *RoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface, for
 	}
 }
 
-func (sched *RoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
+func (sched *RoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig,
+	forwarder func(rp *rpkt.RtrPkt)) {
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
+	sleepDuration := time.Duration(time.Duration(sched.sleepDuration) * time.Microsecond)
 	for {
 		t0 := time.Now()
 		for i := 0; i < sched.totalLength; i++ {
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
-		for time.Now().Sub(t0) < time.Duration(time.Duration(sched.sleepDuration)*time.Microsecond) {
+		for time.Now().Sub(t0) < sleepDuration {
 			time.Sleep(time.Duration(sched.sleepDuration/10) * time.Microsecond)
 		}
 	}

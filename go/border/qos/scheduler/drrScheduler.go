@@ -8,7 +8,8 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
-// This is a deficit round robin dequeuer. Queues with higher priority will have more packets dequeued at the same time.
+// This is a deficit round robin dequeuer.
+// Queues with higher priority will have more packets dequeued at the same time.
 
 type DeficitRoundRobinScheduler struct {
 	quantumSum       int
@@ -42,7 +43,8 @@ var lastRound [5]int
 var attempted [5]int
 var total [5]int
 
-func (sched *DeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
+func (sched *DeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
+	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	nopkts := getNoPacketsToDequeue(sched.totalQueueLength, queue.GetPriority(), sched.quantumSum)
 	pktToDequeue := nopkts
@@ -69,10 +71,12 @@ func (sched *DeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterfa
 	}
 }
 
-func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
+func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig,
+	forwarder func(rp *rpkt.RtrPkt)) {
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
+	sleepDuration := time.Duration(time.Duration(sched.sleepDuration) * time.Microsecond)
 	for {
 		t0 := time.Now()
 		sched.totalQueueLength = 0
@@ -86,7 +90,7 @@ func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRo
 
 		sched.showLog(routerConfig)
 
-		for time.Now().Sub(t0) < time.Duration(time.Duration(sched.sleepDuration)*time.Microsecond) {
+		for time.Now().Sub(t0) < sleepDuration {
 			time.Sleep(time.Duration(sched.sleepDuration/10) * time.Microsecond)
 		}
 	}
@@ -105,7 +109,13 @@ func (sched *DeficitRoundRobinScheduler) showLog(routerConfig queues.InternalRou
 		for i := 0; i < sched.totalLength; i++ {
 			queLen[i] = routerConfig.Queues[i].GetLength()
 		}
-		log.Debug("STAT", "iterations", iterations, "incoming", incoming, "deqLastRound", lastRound, "deqAttempted", attempted, "deqTotal", total, "currQueueLen", queLen)
+		log.Debug("STAT",
+			"iterations", iterations,
+			"incoming", incoming,
+			"deqLastRound",
+			lastRound, "deqAttempted",
+			attempted, "deqTotal",
+			total, "currQueueLen", queLen)
 		for i := 0; i < len(lastRound); i++ {
 			lastRound[i] = 0
 		}
