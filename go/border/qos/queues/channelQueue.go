@@ -19,6 +19,7 @@ import (
 	"sync"
 
 	"github.com/scionproto/scion/go/border/qos/conf"
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 type ChannelPacketQueue struct {
@@ -103,7 +104,7 @@ func (pq *ChannelPacketQueue) CheckAction() conf.PoliceAction {
 
 	if pq.pktQue.MaxLength-100 <= pq.GetLength() {
 		log.Debug("Queue is at max capacity", "queueNo", pq.pktQue.ID)
-		return DROPNOTIFY
+		return conf.DROPNOTIFY
 	}
 
 	level := pq.GetFillLevel()

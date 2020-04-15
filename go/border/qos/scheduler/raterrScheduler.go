@@ -1,10 +1,10 @@
-package qosscheduler
+package scheduler
 
 import (
 	"sync"
 	"time"
 
-	"github.com/scionproto/scion/go/border/qos/qosqueues"
+	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/log"
 )
@@ -20,14 +20,14 @@ type RateRoundRobinScheduler struct {
 	jobs                chan int
 
 	sleepDuration int
-	cirBuckets    []qosqueues.TokenBucket
-	pirBuckets    []qosqueues.TokenBucket
-	tb            qosqueues.TokenBucket
+	cirBuckets    []queues.TokenBucket
+	pirBuckets    []queues.TokenBucket
+	tb            queues.TokenBucket
 }
 
 var _ SchedulerInterface = (*RateRoundRobinScheduler)(nil)
 
-func (sched *RateRoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConfig) {
+func (sched *RateRoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
 
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
@@ -48,8 +48,8 @@ func (sched *RateRoundRobinScheduler) Init(routerConfig qosqueues.InternalRouter
 
 	sched.schedulerSurplus.MaxSurplus = maxBW
 
-	sched.cirBuckets = make([]qosqueues.TokenBucket, sched.totalLength)
-	sched.pirBuckets = make([]qosqueues.TokenBucket, sched.totalLength)
+	sched.cirBuckets = make([]queues.TokenBucket, sched.totalLength)
+	sched.pirBuckets = make([]queues.TokenBucket, sched.totalLength)
 
 	for i := 0; i < sched.totalLength; i++ {
 		// bw := float64(routerConfig.Queues[i].GetMinBandwidth()) / float64(sched.quantumSum)
@@ -67,7 +67,7 @@ func (sched *RateRoundRobinScheduler) Init(routerConfig qosqueues.InternalRouter
 
 }
 
-func (sched *RateRoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
+func (sched *RateRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
@@ -94,7 +94,7 @@ var payedIntoSurplus [5]int
 var forceTake [5]int
 var overallTokensUsed int
 
-func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig qosqueues.InternalRouterConfig) {
+func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRouterConfig) {
 
 	iterations++
 	if time.Now().Sub(t0) > time.Duration(5*time.Second) {
@@ -149,15 +149,15 @@ func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig qosqueues.InternalR
 
 }
 
-func (sched *RateRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
+func (sched *RateRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 	// no := queue.GetMinBandwidth()
 	no := 5
 	attempted[queueNo] += no
 	sched.dequeuePackets(queue, no, forwarder, queueNo)
 }
 
-func (sched *RateRoundRobinScheduler) dequeuePackets(queue qosqueues.PacketQueueInterface, pktToDequeue int, forwarder func(rp *rpkt.RtrPkt), queueNo int) int {
-	var qp *qosqueues.QPkt
+func (sched *RateRoundRobinScheduler) dequeuePackets(queue queues.PacketQueueInterface, pktToDequeue int, forwarder func(rp *rpkt.RtrPkt), queueNo int) int {
+	var qp *queues.QPkt
 	j := 0
 
 	for i := 0; i < pktToDequeue; i++ {
@@ -259,7 +259,7 @@ func (sched *RateRoundRobinScheduler) takeSurplus(amount int) bool {
 	return false
 }
 
-func (sched *RateRoundRobinScheduler) payIntoSurplus(queue qosqueues.PacketQueueInterface, queueNo int, payment int) {
+func (sched *RateRoundRobinScheduler) payIntoSurplus(queue queues.PacketQueueInterface, queueNo int, payment int) {
 
 	// sched.schedulerSurplusMtx.Lock()
 	// defer sched.schedulerSurplusMtx.Unlock()
