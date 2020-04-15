@@ -7,10 +7,6 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
-type ClassRuleInterface interface {
-	GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule
-}
-
 type ParallelClassRule struct {
 	result []*InternalClassRule
 
@@ -20,7 +16,9 @@ type ParallelClassRule struct {
 
 var _ ClassRuleInterface = (*ParallelClassRule)(nil)
 
-func (pcr *ParallelClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
+func (pcr *ParallelClassRule) GetRuleForPacket(
+	config *InternalRouterConfig,
+	rp *rpkt.RtrPkt) *InternalClassRule {
 
 	done := make(chan bool, 3)
 
@@ -39,8 +37,6 @@ func (pcr *ParallelClassRule) GetRuleForPacket(config *InternalRouterConfig, rp 
 	go func(dun chan bool) {
 
 		l4h, _ := rp.L4Hdr(false)
-
-		// log.Debug("Adresses", "srcAddr", srcAddr, "dstAddr", dstAddr, "l4t", l4t)
 
 		if l4h == nil {
 			l4t = 0
@@ -68,24 +64,72 @@ func (pcr *ParallelClassRule) GetRuleForPacket(config *InternalRouterConfig, rp 
 	done = make(chan bool, 8)
 
 	// exactAndRangeSourceMatches = config.Rules.SourceRules[srcAddr]
-	go pcr.getMatchFromMap(config, &config.Rules.SourceRules, srcAddr, &pcr.sources, 0, done)
+	go pcr.getMatchFromMap(
+		config,
+		&config.Rules.SourceRules,
+		srcAddr,
+		&pcr.sources,
+		0,
+		done)
 	// exactAndRangeDestinationMatches = config.Rules.DestinationRules[dstAddr]
-	go pcr.getMatchFromMap(config, &config.Rules.DestinationRules, dstAddr, &pcr.destinations, 0, done)
+	go pcr.getMatchFromMap(
+		config,
+		&config.Rules.DestinationRules,
+		dstAddr,
+		&pcr.destinations,
+		0,
+		done)
 
 	// sourceAnyDestinationMatches = config.Rules.SourceAnyDestinationRules[srcAddr]
-	go pcr.getMatchFromMap(config, &config.Rules.SourceAnyDestinationRules, srcAddr, &pcr.sources, 3, done)
+	go pcr.getMatchFromMap(
+		config,
+		&config.Rules.SourceAnyDestinationRules,
+		srcAddr,
+		&pcr.sources,
+		3,
+		done)
 	// destinationAnySourceRules = config.Rules.DestinationAnySourceRules[dstAddr]
-	go pcr.getMatchFromMap(config, &config.Rules.DestinationAnySourceRules, dstAddr, &pcr.destinations, 3, done)
+	go pcr.getMatchFromMap(
+		config,
+		&config.Rules.DestinationAnySourceRules,
+		dstAddr,
+		&pcr.destinations,
+		3,
+		done)
 
 	// asOnlySourceRules = config.Rules.ASOnlySourceRules[srcAddr.A]
-	go pcr.getMatchASFromMap(config, &config.Rules.ASOnlySourceRules, srcAddr.A, &pcr.sources, 1, done)
+	go pcr.getMatchASFromMap(
+		config,
+		&config.Rules.ASOnlySourceRules,
+		srcAddr.A,
+		&pcr.sources,
+		1,
+		done)
 	// asOnlyDestinationRules = config.Rules.ASOnlyDestRules[dstAddr.A]
-	go pcr.getMatchASFromMap(config, &config.Rules.ASOnlyDestRules, dstAddr.A, &pcr.destinations, 1, done)
+	go pcr.getMatchASFromMap(
+		config,
+		&config.Rules.ASOnlyDestRules,
+		dstAddr.A,
+		&pcr.destinations,
+		1,
+		done)
 
 	// isdOnlySourceRules = config.Rules.ISDOnlySourceRules[srcAddr.I]
-	go pcr.getMatchISDFromMap(config, &config.Rules.ISDOnlySourceRules, srcAddr.I, &pcr.sources, 2, done)
+	go pcr.getMatchISDFromMap(
+		config,
+		&config.Rules.ISDOnlySourceRules,
+		srcAddr.I,
+		&pcr.sources,
+		2,
+		done)
 	// isdOnlyDestinationRules = config.Rules.ISDOnlyDestRules[dstAddr.I]
-	go pcr.getMatchISDFromMap(config, &config.Rules.ISDOnlyDestRules, dstAddr.I, &pcr.destinations, 2, done)
+	go pcr.getMatchISDFromMap(
+		config,
+		&config.Rules.ISDOnlyDestRules,
+		dstAddr.I,
+		&pcr.destinations,
+		2,
+		done)
 
 	for i := 0; i < cap(done); i++ {
 		<-done
@@ -122,28 +166,52 @@ func (pcr *ParallelClassRule) GetRuleForPacket(config *InternalRouterConfig, rp 
 	return returnRule
 }
 
-func (pcr *ParallelClassRule) getMatchISDFromMap(config *InternalRouterConfig, m *map[addr.ISD][]*InternalClassRule, address addr.ISD, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
+func (pcr *ParallelClassRule) getMatchISDFromMap(
+	config *InternalRouterConfig,
+	m *map[addr.ISD][]*InternalClassRule,
+	address addr.ISD,
+	result *[4][]*InternalClassRule,
+	resultSpot int,
+	done chan bool) {
+
 	returnRule = emptyRule
 	exactAndRangeSourceMatches = (*m)[address]
 	result[resultSpot] = exactAndRangeSourceMatches
 	done <- true
 }
 
-func (pcr *ParallelClassRule) getMatchASFromMap(config *InternalRouterConfig, m *map[addr.AS][]*InternalClassRule, address addr.AS, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
+func (pcr *ParallelClassRule) getMatchASFromMap(
+	config *InternalRouterConfig,
+	m *map[addr.AS][]*InternalClassRule,
+	address addr.AS,
+	result *[4][]*InternalClassRule,
+	resultSpot int,
+	done chan bool) {
+
 	returnRule = emptyRule
 	exactAndRangeSourceMatches = (*m)[address]
 	result[resultSpot] = exactAndRangeSourceMatches
 	done <- true
 }
 
-func (pcr *ParallelClassRule) getMatchFromMap(config *InternalRouterConfig, m *map[addr.IA][]*InternalClassRule, address addr.IA, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
+func (pcr *ParallelClassRule) getMatchFromMap(
+	config *InternalRouterConfig,
+	m *map[addr.IA][]*InternalClassRule,
+	address addr.IA,
+	result *[4][]*InternalClassRule,
+	resultSpot int,
+	done chan bool) {
+
 	returnRule = emptyRule
 	exactAndRangeSourceMatches = (*m)[address]
 	result[resultSpot] = exactAndRangeSourceMatches
 	done <- true
 }
 
-func intersectLongListsRules(a [4][]*InternalClassRule, b [4][]*InternalClassRule) []*InternalClassRule {
+func intersectLongListsRules(
+	a [4][]*InternalClassRule,
+	b [4][]*InternalClassRule) []*InternalClassRule {
+
 	for i := 0; i < len(matches); i++ {
 		matches[i] = nil
 	}
@@ -166,7 +234,10 @@ func intersectLongListsRules(a [4][]*InternalClassRule, b [4][]*InternalClassRul
 	return matches
 }
 
-func getRuleWithMaxFrom(result *InternalClassRule, list []*InternalClassRule, done *chan bool) {
+func getRuleWithMaxFrom(
+	result *InternalClassRule,
+	list []*InternalClassRule,
+	done *chan bool) {
 
 	prevMax := -1
 	for i := 0; i < len(list); i++ {
