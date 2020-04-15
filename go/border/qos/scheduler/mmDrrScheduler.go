@@ -31,8 +31,6 @@ type surplus struct {
 
 var _ SchedulerInterface = (*MinMaxDeficitRoundRobinScheduler)(nil)
 
-// var jobs chan int
-
 func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
 
 	sched.quantumSum = 0
@@ -73,11 +71,6 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig queues.Inte
 		}
 	}
 }
-
-// var attemptedToRoute [5]int
-// var packets [5]int
-// var surplusAdjustments [5]int
-var t0 time.Time
 
 func (sched *MinMaxDeficitRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRouterConfig) {
 
