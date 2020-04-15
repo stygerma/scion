@@ -16,7 +16,7 @@ Queues:
         name: 'Priority'
         id: 1
         CIR: 40
-        PIR: 80
+        PIR: 40
         policeRate: 500Mbps
         maxLength: 512
         priority: 4
@@ -28,7 +28,7 @@ Queues:
         name: 'Transit Traffic Level 1'
         id: 2
         CIR: 20
-        PIR: 40
+        PIR: 20
         policeRate: 500Mbps
         maxLength: 512
         priority: 2
