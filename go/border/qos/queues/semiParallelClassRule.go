@@ -1,4 +1,4 @@
-package queues
+package qosqueues
 
 import (
 	"github.com/scionproto/scion/go/border/rpkt"
@@ -16,15 +16,12 @@ type SemiParallelClassRule struct {
 
 var _ ClassRuleInterface = (*SemiParallelClassRule)(nil)
 
-func (pcr *SemiParallelClassRule) GetRuleForPacket(
-	config *InternalRouterConfig,
-	rp *rpkt.RtrPkt) *InternalClassRule {
+func (pcr *SemiParallelClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
 
 	done := make(chan bool, 3)
 
 	var srcAddr addr.IA
 	var dstAddr addr.IA
-	var extensions []common.ExtnType
 	var l4t common.L4ProtocolType
 
 	go func(dun chan bool) {
@@ -39,20 +36,12 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 
 		l4h, _ := rp.L4Hdr(false)
 
+		// log.Debug("Adresses", "srcAddr", srcAddr, "dstAddr", dstAddr, "l4t", l4t)
+
 		if l4h == nil {
 			l4t = 0
 		} else {
 			l4t = l4h.L4Type()
-			hbhext := rp.HBHExt
-			e2eext := rp.E2EExt
-			for k := 0; k < len(hbhext); k++ {
-				ext, _ := hbhext[k].GetExtn()
-				extensions = append(extensions, ext.Type())
-			}
-			for k := 0; k < len(e2eext); k++ {
-				ext, _ := e2eext[k].GetExtn()
-				extensions = append(extensions, ext.Type())
-			}
 		}
 
 		dun <- true
@@ -67,81 +56,32 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 	returnRule = config.Rules.CrCache.Get(entry)
 
 	if returnRule != nil {
-		if matchRuleL4Type(returnRule, extensions) {
-			return returnRule
-		}
+		return returnRule
 	}
 
 	returnRule = emptyRule
 
 	done = make(chan bool, 8)
+
 	// exactAndRangeSourceMatches = config.Rules.SourceRules[srcAddr]
-	go pcr.getMatchFromMap(
-		config,
-		&config.Rules.SourceRules,
-		srcAddr,
-		&pcr.sources,
-		0,
-		done)
+	go pcr.getMatchFromMap(config, &config.Rules.SourceRules, srcAddr, &pcr.sources, 0, done)
 	// exactAndRangeDestinationMatches = config.Rules.DestinationRules[dstAddr]
-	go pcr.getMatchFromMap(
-		config,
-		&config.Rules.DestinationRules,
-		dstAddr,
-		&pcr.destinations,
-		0,
-		done)
+	go pcr.getMatchFromMap(config, &config.Rules.DestinationRules, dstAddr, &pcr.destinations, 0, done)
 
 	// sourceAnyDestinationMatches = config.Rules.SourceAnyDestinationRules[srcAddr]
-	go pcr.getMatchFromMap(
-		config,
-		&config.Rules.SourceAnyDestinationRules,
-		srcAddr,
-		&pcr.sources,
-		3,
-		done)
+	go pcr.getMatchFromMap(config, &config.Rules.SourceAnyDestinationRules, srcAddr, &pcr.sources, 3, done)
 	// destinationAnySourceRules = config.Rules.DestinationAnySourceRules[dstAddr]
-	go pcr.getMatchFromMap(
-		config,
-		&config.Rules.DestinationAnySourceRules,
-		dstAddr,
-		&pcr.destinations,
-		3,
-		done)
+	go pcr.getMatchFromMap(config, &config.Rules.DestinationAnySourceRules, dstAddr, &pcr.destinations, 3, done)
 
 	// asOnlySourceRules = config.Rules.ASOnlySourceRules[srcAddr.A]
-	go pcr.getMatchASFromMap(
-		config,
-		&config.Rules.ASOnlySourceRules,
-		srcAddr.A,
-		&pcr.sources,
-		1,
-		done)
+	go pcr.getMatchASFromMap(config, &config.Rules.ASOnlySourceRules, srcAddr.A, &pcr.sources, 1, done)
 	// asOnlyDestinationRules = config.Rules.ASOnlyDestRules[dstAddr.A]
-	go pcr.getMatchASFromMap(
-		config,
-		&config.Rules.ASOnlyDestRules,
-		dstAddr.A,
-		&pcr.destinations,
-		1,
-		done)
+	go pcr.getMatchASFromMap(config, &config.Rules.ASOnlyDestRules, dstAddr.A, &pcr.destinations, 1, done)
 
 	// isdOnlySourceRules = config.Rules.ISDOnlySourceRules[srcAddr.I]
-	go pcr.getMatchISDFromMap(
-		config,
-		&config.Rules.ISDOnlySourceRules,
-		srcAddr.I,
-		&pcr.sources,
-		2,
-		done)
+	go pcr.getMatchISDFromMap(config, &config.Rules.ISDOnlySourceRules, srcAddr.I, &pcr.sources, 2, done)
 	// isdOnlyDestinationRules = config.Rules.ISDOnlyDestRules[dstAddr.I]
-	go pcr.getMatchISDFromMap(
-		config,
-		&config.Rules.ISDOnlyDestRules,
-		dstAddr.I,
-		&pcr.destinations,
-		2,
-		done)
+	go pcr.getMatchISDFromMap(config, &config.Rules.ISDOnlyDestRules, dstAddr.I, &pcr.destinations, 2, done)
 
 	for i := 0; i < cap(done); i++ {
 		<-done
@@ -152,7 +92,7 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 
 	matched = intersectLongListsRules(pcr.sources, pcr.destinations)
 
-	matchL4Type(&matched, l4t, extensions)
+	matchL4Type(&matched, l4t)
 
 	var result [3]*InternalClassRule
 
@@ -173,47 +113,72 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 		}
 	}
 
+	// config.Rules.CrCache.Put(entry, returnRule)
+
 	return returnRule
 }
 
-func (pcr *SemiParallelClassRule) getMatchISDFromMap(
-	config *InternalRouterConfig,
-	m *map[addr.ISD][]*InternalClassRule,
-	address addr.ISD,
-	result *[4][]*InternalClassRule,
-	resultSpot int,
-	done chan bool) {
-
+func (pcr *SemiParallelClassRule) getMatchISDFromMap(config *InternalRouterConfig, m *map[addr.ISD][]*InternalClassRule, address addr.ISD, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
 	returnRule = emptyRule
 	exactAndRangeSourceMatches = (*m)[address]
 	result[resultSpot] = exactAndRangeSourceMatches
 	done <- true
 }
 
-func (pcr *SemiParallelClassRule) getMatchASFromMap(
-	config *InternalRouterConfig,
-	m *map[addr.AS][]*InternalClassRule,
-	address addr.AS,
-	result *[4][]*InternalClassRule,
-	resultSpot int,
-	done chan bool) {
-
+func (pcr *SemiParallelClassRule) getMatchASFromMap(config *InternalRouterConfig, m *map[addr.AS][]*InternalClassRule, address addr.AS, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
 	returnRule = emptyRule
 	exactAndRangeSourceMatches = (*m)[address]
 	result[resultSpot] = exactAndRangeSourceMatches
 	done <- true
 }
 
-func (pcr *SemiParallelClassRule) getMatchFromMap(
-	config *InternalRouterConfig,
-	m *map[addr.IA][]*InternalClassRule,
-	address addr.IA,
-	result *[4][]*InternalClassRule,
-	resultSpot int,
-	done chan bool) {
-
+func (pcr *SemiParallelClassRule) getMatchFromMap(config *InternalRouterConfig, m *map[addr.IA][]*InternalClassRule, address addr.IA, result *[4][]*InternalClassRule, resultSpot int, done chan bool) {
 	returnRule = emptyRule
 	exactAndRangeSourceMatches = (*m)[address]
 	result[resultSpot] = exactAndRangeSourceMatches
+	// fmt.Println("From map", *m)
 	done <- true
 }
+
+// func intersectLongListsRules(a [4][]*InternalClassRule, b [4][]*InternalClassRule) []*InternalClassRule {
+// 	for i := 0; i < len(matches); i++ {
+// 		matches[i] = nil
+// 	}
+// 	k := 0
+
+// 	for l := 0; l < 3; l++ {
+// 		for m := 0; m < 3; m++ {
+// 			lb := len(b[m])
+// 			la := len(a[l])
+// 			for i := 0; i < la; i++ {
+// 				for j := 0; j < lb; j++ {
+// 					fmt.Println("compare", i, "and", j)
+// 					if a[l][i] == b[m][j] {
+// 						matches[k] = a[l][i]
+// 						k++
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return matches
+// }
+
+// func getRuleWithMaxFrom(result *InternalClassRule, list []*InternalClassRule, done *chan bool) {
+
+// 	prevMax := -1
+// 	fmt.Println("List is", list)
+// 	for i := 0; i < len(list); i++ {
+// 		if list[i] != nil {
+// 			fmt.Println(list[i].Priority)
+// 			fmt.Println(prevMax)
+// 			if list[i].Priority > prevMax {
+// 				returnRule = list[i]
+// 				prevMax = list[i].Priority
+// 			}
+// 		} else {
+// 			break
+// 		}
+// 	}
+// 	*done <- true
+// }

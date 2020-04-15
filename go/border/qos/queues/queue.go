@@ -13,13 +13,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package queues
+package qosqueues
 
 import (
 	"sync"
 
-	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/rpkt"
+)
+
+type PoliceAction uint8
+
+const (
+	// PASS Pass the packet
+	PASS PoliceAction = iota
+	// NOTIFY Notify the sending host of the packet
+	NOTIFY
+	// DROP Drop the packet
+	DROP
+	// DROPNOTIFY Drop and then notify someone
+	DROPNOTIFY
+)
+
+type PrimePoliceAction uint8
+
+const (
+	PrimePASS PrimePoliceAction = 3
+	// NOTIFY Notify the sending host of the packet
+	PrimeNOTIFY PrimePoliceAction = 5
+	// DROP Drop the packet
+	PrimeDROP PrimePoliceAction = 11
+	// DROPNOTIFY Drop and then notify someone
+	PrimeDROPNOTIFY PrimePoliceAction = 13
 )
 
 type QPkt struct {
@@ -45,13 +69,13 @@ const (
 type Action struct {
 	rule   *InternalClassRule
 	reason Violation
-	action conf.PoliceAction
+	action PoliceAction
 }
 
 type ActionProfile struct {
-	FillLevel int               `yaml:"fill-level"`
-	Prob      int               `yaml:"prob"`
-	Action    conf.PoliceAction `yaml:"action"`
+	FillLevel int          `yaml:"fill-level"`
+	Prob      int          `yaml:"prob"`
+	Action    PoliceAction `yaml:"action"`
 }
 
 type PacketQueue struct {
@@ -72,23 +96,60 @@ type PacketQueueInterface interface {
 	PopMultiple(number int) []*QPkt
 	GetFillLevel() int
 	GetLength() int
-	CheckAction() conf.PoliceAction
-	Police(qp *QPkt) conf.PoliceAction
+	CheckAction() PoliceAction
+	Police(qp *QPkt) PoliceAction
 	GetPriority() int
 	GetMinBandwidth() int
 	GetMaxBandwidth() int
 	GetPacketQueue() PacketQueue
 }
 
-// ReturnAction merges both PoliceAction together and returns the merged result.
-func ReturnAction(pol conf.PoliceAction, prof conf.PoliceAction) conf.PoliceAction {
-	// check if any of pol or prof actions are DROPNOTIFY, DROP, NOTIFY OR PASS, in this order
-	if pol == conf.DROPNOTIFY || prof == conf.DROPNOTIFY {
-		return conf.DROPNOTIFY
-	} else if pol == conf.DROP || prof == conf.DROP {
-		return conf.DROP
-	} else if pol == conf.NOTIFY || prof == conf.NOTIFY {
-		return conf.NOTIFY
+func ReturnActionOld(polAction PoliceAction, profAction PoliceAction) PoliceAction {
+
+	if polAction == DROPNOTIFY || profAction == DROPNOTIFY {
+		return DROPNOTIFY
 	}
-	return conf.PASS
+
+	if polAction == DROP || profAction == DROP {
+		return DROP
+	}
+
+	if polAction == NOTIFY || profAction == NOTIFY {
+		return NOTIFY
+	}
+
+	return PASS
+}
+
+func ReturnAction(polAction PoliceAction, profAction PoliceAction) PoliceAction {
+
+	pol, prof := 3-polAction, 3-profAction
+	if pol*prof == 0 {
+		return DROPNOTIFY
+	}
+	pol--
+	prof--
+	if pol*prof == 0 {
+		return DROP
+	}
+	pol--
+	prof--
+	if pol*prof == 0 {
+		return NOTIFY
+	}
+	return PASS
+}
+
+func ReturnActionPrime(polAction PrimePoliceAction, profAction PrimePoliceAction) PrimePoliceAction {
+
+	if polAction*profAction%PrimeDROPNOTIFY == 0 {
+		return PrimeDROPNOTIFY
+	}
+	if polAction*profAction%PrimeDROP == 0 {
+		return PrimeDROPNOTIFY
+	}
+	if polAction*profAction%PrimeDROPNOTIFY == 0 {
+		return PrimePASS
+	}
+	return PrimePASS
 }
