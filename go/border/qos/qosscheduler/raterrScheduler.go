@@ -113,11 +113,11 @@ func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig qosqueues.InternalR
 			log.Debug("STAT Available cirTokens", "1", sched.cirBuckets[1].GetAvailable(), "2", sched.cirBuckets[2].GetAvailable(), "3", sched.cirBuckets[3].GetAvailable())
 			log.Debug("STAT Available pirTokens", "1", sched.pirBuckets[1].GetAvailable(), "2", sched.pirBuckets[2].GetAvailable(), "3", sched.pirBuckets[3].GetAvailable())
 			log.Debug("STAT", "tokensUsed", tokensUsed, "forceTake", forceTake, "cirTokens", cirTokens, "pirTokens", pirTokens, "payedIntoSurplus", payedIntoSurplus)
-			queue0 := float64(tokensUsed[0]+forceTake[0]) / 5.0 / 1000000.0
-			queue1 := float64(tokensUsed[1]+forceTake[1]) / 5.0 / 1000000.0
-			queue2 := float64(tokensUsed[2]+forceTake[2]) / 5.0 / 1000000.0
-			queue3 := float64(tokensUsed[3]+forceTake[3]) / 5.0 / 1000000.0
-			queue4 := float64(tokensUsed[4]+forceTake[4]) / 5.0 / 1000000.0
+			queue0 := float64(tokensUsed[0]+forceTake[0]) / 5.0 / 1000000.0 * 8.0
+			queue1 := float64(tokensUsed[1]+forceTake[1]) / 5.0 / 1000000.0 * 8.0
+			queue2 := float64(tokensUsed[2]+forceTake[2]) / 5.0 / 1000000.0 * 8.0
+			queue3 := float64(tokensUsed[3]+forceTake[3]) / 5.0 / 1000000.0 * 8.0
+			queue4 := float64(tokensUsed[4]+forceTake[4]) / 5.0 / 1000000.0 * 8.0
 			overall := float64(overallTokensUsed) / 5.0 / 1000000.0
 			log.Debug("STAT", "overall", overall, "maxOverall", 2, "0", queue0, "1", queue1, "2", queue2, "3", queue3, "4", queue4)
 
@@ -155,7 +155,8 @@ func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig qosqueues.InternalR
 }
 
 func (sched *RateRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
-	no := queue.GetMinBandwidth()
+	// no := queue.GetMinBandwidth()
+	no := 5
 	attempted[queueNo] += no
 	sched.dequeuePackets(queue, no, forwarder, queueNo)
 }
@@ -179,6 +180,7 @@ func (sched *RateRoundRobinScheduler) dequeuePackets(queue qosqueues.PacketQueue
 		if !(sched.takeFromBuckets(qp.Rp.Bytes().Len(), queueNo)) {
 			// log.Debug("We had to force take!", "queueNO", queueNo)
 			sched.cirBuckets[queueNo].ForceTake(qp.Rp.Bytes().Len())
+			sched.pirBuckets[queueNo].ForceTake(qp.Rp.Bytes().Len())
 			forwarder(qp.Rp)
 			break
 		}
@@ -221,7 +223,7 @@ func (sched *RateRoundRobinScheduler) takeFromBuckets(packetLength int, queueNo 
 
 		if sched.cirBuckets[queueNo].Take(packetLength) {
 			sched.pirBuckets[queueNo].ForceTake(packetLength)
-			sched.tb.Take(packetLength)
+			sched.tb.ForceTake(packetLength)
 			overallTokensUsed += packetLength
 			tokensUsed[queueNo] += packetLength
 			cirTokens[queueNo] += packetLength
@@ -231,7 +233,7 @@ func (sched *RateRoundRobinScheduler) takeFromBuckets(packetLength int, queueNo 
 		if sched.pirBuckets[queueNo].Available(packetLength) {
 			if sched.takeSurplus(packetLength) {
 				sched.pirBuckets[queueNo].Take(packetLength)
-				sched.tb.Take(packetLength)
+				sched.tb.ForceTake(packetLength)
 				overallTokensUsed += packetLength
 				tokensUsed[queueNo] += packetLength
 				pirTokens[queueNo] += packetLength
@@ -240,6 +242,7 @@ func (sched *RateRoundRobinScheduler) takeFromBuckets(packetLength int, queueNo 
 		}
 	}
 
+	overallTokensUsed += packetLength
 	forceTake[queueNo] += packetLength
 
 	return false
