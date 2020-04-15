@@ -50,12 +50,18 @@ type ExternalClassRule struct {
 	QueueNumber          int    `yaml:"queueNumber"`
 }
 
+type SchedulerConfig struct {
+	Latency   int    `yaml:"Latency"`
+	Bandwidth string `yaml:"Bandwidth"`
+}
+
 const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml"
 
 // ExternalConfig is what I am loading from the config file
 type ExternalConfig struct {
-	ExternalQueues []ExternalPacketQueue `yaml:"Queues"`
-	ExternalRules  []ExternalClassRule   `yaml:"Rules"`
+	SchedulerConfig SchedulerConfig       `yaml:"Scheduler"`
+	ExternalQueues  []ExternalPacketQueue `yaml:"Queues"`
+	ExternalRules   []ExternalClassRule   `yaml:"Rules"`
 }
 
 func LoadConfig(path string) (ExternalConfig, error) {
@@ -64,8 +70,8 @@ func LoadConfig(path string) (ExternalConfig, error) {
 	var yamlFile []byte
 	var err error
 
-	// yamlFile, err = ioutil.ReadFile(configFileLocation)
-	yamlFile, err = ioutil.ReadFile(path)
+	yamlFile, err = ioutil.ReadFile(configFileLocation)
+	// yamlFile, err = ioutil.ReadFile(path)
 
 	if err != nil {
 		yamlFile, err = ioutil.ReadFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml")
@@ -80,6 +86,8 @@ func LoadConfig(path string) (ExternalConfig, error) {
 		log.Error("Loading the config file has failed", "error", err)
 		return ExternalConfig{}, err
 	}
+
+	log.Info("Config File is", "ec", ec)
 
 	return ec, nil
 

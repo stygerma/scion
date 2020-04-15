@@ -10,8 +10,8 @@ import (
 type RoundRobinScheduler struct {
 	totalLength   int
 	messages      chan bool
-	sleepTime     int
-	sleptLastTime bool
+	sleepDuration int
+	tb            qosqueues.TokenBucket
 }
 
 var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
@@ -21,8 +21,9 @@ var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
 func (sched *RoundRobinScheduler) Init(routerConfig qosqueues.InternalRouterConfig) {
 	sched.totalLength = len(routerConfig.Queues)
 	sched.messages = make(chan bool)
-	sched.sleepTime = 2
-	sched.sleptLastTime = true
+
+	sched.tb.Init(routerConfig.Scheduler.Bandwidth)
+	sched.sleepDuration = routerConfig.Scheduler.Latency
 }
 
 func (sched *RoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
@@ -35,6 +36,11 @@ func (sched *RoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInterface, 
 		if qp == nil {
 			continue
 		}
+
+		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
+			time.Sleep(50 * time.Millisecond)
+		}
+
 		forwarder(qp.Rp)
 	}
 }
@@ -44,20 +50,16 @@ func (sched *RoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouter
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
 	for {
+		t0 := time.Now()
 		for i := 0; i < sched.totalLength; i++ {
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
-		time.Sleep(500 * time.Nanosecond)
+		for time.Now().Sub(t0) < time.Duration(time.Duration(sched.sleepDuration)*time.Microsecond) {
+			time.Sleep(time.Duration(sched.sleepDuration/10) * time.Microsecond)
+		}
 	}
 }
 
 func (sched *RoundRobinScheduler) GetMessages() *chan bool {
 	return &sched.messages
 }
-
-// func max(a, b int) int {
-// 	if a > b {
-// 		return a
-// 	}
-// 	return b
-// }

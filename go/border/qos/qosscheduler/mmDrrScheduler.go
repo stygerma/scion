@@ -19,7 +19,8 @@ type MinMaxDeficitRoundRobinScheduler struct {
 	messages            chan bool
 	jobs                chan int
 
-	tb qosqueues.TokenBucket
+	sleepDuration int
+	tb            qosqueues.TokenBucket
 }
 
 type surplus struct {
@@ -49,14 +50,8 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig qosqueues.Inter
 		sched.schedulerSurplus.MaxSurplus += routerConfig.Queues[i].GetMinBandwidth()
 	}
 
-	if len(routerConfig.Queues) == 5 {
-		log.Debug("Priorities", "0", routerConfig.Queues[0].GetPriority(), "1", routerConfig.Queues[1].GetPriority(), "2", routerConfig.Queues[2].GetPriority())
-
-		sched.tb.Init(2 * 1250000) // 20 Mbit
-	} else {
-		sched.tb.Init(125000000) // 1000 Mbit
-	}
-
+	sched.tb.Init(routerConfig.Scheduler.Bandwidth)
+	sched.sleepDuration = routerConfig.Scheduler.Latency
 }
 
 func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
@@ -64,6 +59,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.I
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
 	for {
+		t0 := time.Now()
 		for i := 0; i < sched.totalLength; i++ {
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
@@ -71,6 +67,10 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig qosqueues.I
 			_ = <-sched.jobs
 		}
 		sched.LogUpdate(routerConfig)
+
+		for time.Now().Sub(t0) < time.Duration(time.Duration(sched.sleepDuration)*time.Microsecond) {
+			time.Sleep(time.Duration(sched.sleepDuration/10) * time.Microsecond)
+		}
 	}
 }
 
