@@ -37,7 +37,8 @@ type MinMaxDeficitRoundRobinScheduler struct {
 	messages            chan bool
 	jobs                chan int
 
-	tb qosqueues.TokenBucket
+	sleepDuration int
+	tb            qosqueues.TokenBucket
 }
 
 type surplus struct {
@@ -62,6 +63,9 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig queues.Internal
 	for i := 0; i < sched.totalLength; i++ {
 		sched.schedulerSurplus.MaxSurplus += routerConfig.Queues[i].GetMinBandwidth()
 	}
+
+	sched.tb.Init(routerConfig.Scheduler.Bandwidth)
+	sched.sleepDuration = routerConfig.Scheduler.Latency
 }
 
 func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig,
@@ -71,6 +75,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig queues.Inte
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
 	for {
+		t0 := time.Now()
 		for i := 0; i < sched.totalLength; i++ {
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
@@ -78,6 +83,10 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig queues.Inte
 			_ = <-sched.jobs
 		}
 		sched.LogUpdate(routerConfig)
+
+		for time.Now().Sub(t0) < time.Duration(time.Duration(sched.sleepDuration)*time.Microsecond) {
+			time.Sleep(time.Duration(sched.sleepDuration/10) * time.Microsecond)
+		}
 	}
 }
 

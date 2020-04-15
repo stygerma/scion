@@ -55,8 +55,9 @@ type ExternalClassRule struct {
 
 // ExternalConfig is what I am loading from the config file
 type ExternalConfig struct {
-	ExternalQueues []ExternalPacketQueue `yaml:"Queues"`
-	ExternalRules  []ExternalClassRule   `yaml:"Rules"`
+	SchedulerConfig SchedulerConfig       `yaml:"Scheduler"`
+	ExternalQueues  []ExternalPacketQueue `yaml:"Queues"`
+	ExternalRules   []ExternalClassRule   `yaml:"Rules"`
 }
 
 func LoadConfig(path string) (ExternalConfig, error) {
@@ -64,8 +65,8 @@ func LoadConfig(path string) (ExternalConfig, error) {
 	var yamlFile []byte
 	var err error
 
-	// yamlFile, err = ioutil.ReadFile(configFileLocation)
-	yamlFile, err = ioutil.ReadFile(path)
+	yamlFile, err = ioutil.ReadFile(configFileLocation)
+	// yamlFile, err = ioutil.ReadFile(path)
 
 	yamlFile, err := ioutil.ReadFile(path)
 	if err != nil {
