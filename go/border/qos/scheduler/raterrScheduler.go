@@ -87,13 +87,6 @@ func (sched *RateRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRoute
 	}
 }
 
-var tokensUsed [5]int
-var cirTokens [5]int
-var pirTokens [5]int
-var payedIntoSurplus [5]int
-var forceTake [5]int
-var overallTokensUsed int
-
 func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRouterConfig) {
 
 	iterations++
@@ -161,19 +154,15 @@ func (sched *RateRoundRobinScheduler) dequeuePackets(queue queues.PacketQueueInt
 	j := 0
 
 	for i := 0; i < pktToDequeue; i++ {
-
 		if !sched.availableFromBuckets(1500, queueNo) {
 			break
 		}
-
 		qp = queue.Pop()
 		if qp == nil {
 			break
 		}
-		// log.Debug("Packet size is", "qp.Rp.Bytes().Len()", qp.Rp.Bytes().Len(), "queueNo", queueNo)
 		j++
 		if !(sched.takeFromBuckets(qp.Rp.Bytes().Len(), queueNo)) {
-			// log.Debug("We had to force take!", "queueNO", queueNo)
 			sched.cirBuckets[queueNo].ForceTake(qp.Rp.Bytes().Len())
 			sched.pirBuckets[queueNo].ForceTake(qp.Rp.Bytes().Len())
 			forwarder(qp.Rp)
@@ -239,8 +228,6 @@ func (sched *RateRoundRobinScheduler) takeFromBuckets(packetLength int, queueNo 
 	return false
 }
 func (sched *RateRoundRobinScheduler) availableSurplus(amount int) bool {
-	// sched.schedulerSurplusMtx.Lock()
-	// defer sched.schedulerSurplusMtx.Unlock()
 
 	if sched.schedulerSurplus.Surplus > amount {
 		return true
@@ -249,9 +236,6 @@ func (sched *RateRoundRobinScheduler) availableSurplus(amount int) bool {
 }
 
 func (sched *RateRoundRobinScheduler) takeSurplus(amount int) bool {
-	// sched.schedulerSurplusMtx.Lock()
-	// defer sched.schedulerSurplusMtx.Unlock()
-
 	if sched.schedulerSurplus.Surplus > amount {
 		sched.schedulerSurplus.Surplus -= amount
 		return true
@@ -260,10 +244,6 @@ func (sched *RateRoundRobinScheduler) takeSurplus(amount int) bool {
 }
 
 func (sched *RateRoundRobinScheduler) payIntoSurplus(queue queues.PacketQueueInterface, queueNo int, payment int) {
-
-	// sched.schedulerSurplusMtx.Lock()
-	// defer sched.schedulerSurplusMtx.Unlock()
-
 	sched.schedulerSurplus.Surplus = min(sched.schedulerSurplus.Surplus+payment, sched.schedulerSurplus.MaxSurplus)
 	sched.schedulerSurplus.Payments[queueNo] = sched.schedulerSurplus.Surplus
 }
