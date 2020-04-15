@@ -19,16 +19,37 @@ func BenchmarkScheduler28191(b *testing.B) {
 	qp := queues.QPkt{Rp: pkt, QueueNo: 0}
 
 	queue1 := queues.ChannelPacketQueue{}
-	queue1.InitQueue(queues.PacketQueue{MaxLength: 1024, MinBandwidth: 30, MaxBandWidth: 40}, &sync.Mutex{}, &sync.Mutex{})
+	queue1.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    1024,
+			MinBandwidth: 30,
+			MaxBandWidth: 40},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	queue2 := queues.ChannelPacketQueue{}
-	queue2.InitQueue(queues.PacketQueue{MaxLength: 1024, MinBandwidth: 60, MaxBandWidth: 80}, &sync.Mutex{}, &sync.Mutex{})
+	queue2.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    1024,
+			MinBandwidth: 60,
+			MaxBandWidth: 80},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	for n := 0; n < b.N; n++ {
 		mockSched := &RateRoundRobinScheduler{}
-		mockSched.Init(queues.InternalRouterConfig{Queues: []queues.PacketQueueInterface{&queue1, &queue2}})
+		mockSched.Init(
+			queues.InternalRouterConfig{
+				Queues: []queues.PacketQueueInterface{
+					&queue1,
+					&queue2}})
 
-		go mockSched.Dequeuer(queues.InternalRouterConfig{Queues: []queues.PacketQueueInterface{&queue1, &queue2}}, forwardPacketByDrop)
+		go mockSched.Dequeuer(
+			queues.InternalRouterConfig{
+				Queues: []queues.PacketQueueInterface{
+					&queue1,
+					&queue2}},
+			forwardPacketByDrop)
 
 		for n := 0; n < 800; n++ {
 			queue1.Enqueue(&qp)
@@ -51,13 +72,29 @@ func TestEnAndDequeuePackets(T *testing.T) {
 	qp := queues.QPkt{Rp: pkt, QueueNo: 0}
 
 	queue1 := queues.ChannelPacketQueue{}
-	queue1.InitQueue(queues.PacketQueue{MaxLength: 1024, MinBandwidth: 30, MaxBandWidth: 40}, &sync.Mutex{}, &sync.Mutex{})
+	queue1.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    1024,
+			MinBandwidth: 30,
+			MaxBandWidth: 40},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	queue2 := queues.ChannelPacketQueue{}
-	queue2.InitQueue(queues.PacketQueue{MaxLength: 1024, MinBandwidth: 60, MaxBandWidth: 80}, &sync.Mutex{}, &sync.Mutex{})
+	queue2.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    1024,
+			MinBandwidth: 60,
+			MaxBandWidth: 80},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	mockSched := &RateRoundRobinScheduler{}
-	mockSched.Init(queues.InternalRouterConfig{Queues: []queues.PacketQueueInterface{&queue1, &queue2}})
+	mockSched.Init(
+		queues.InternalRouterConfig{
+			Queues: []queues.PacketQueueInterface{
+				&queue1,
+				&queue2}})
 
 	j := 100
 

@@ -71,7 +71,8 @@ func (qosConfig *QosConfiguration) GetLegacyConfig() *conf.ExternalConfig {
 	return &qosConfig.legacyConfig
 }
 
-// SetAndInitSchedul is necessary to set up a mock scheduler for testing. Do not use for anything else.
+// SetAndInitSchedul is necessary to set up
+// a mock scheduler for testing. Do not use for anything else.
 func (qosConfig *QosConfiguration) SetAndInitSchedul(sched scheduler.SchedulerInterface) {
 	qosConfig.schedul = sched
 	qosConfig.schedul.Init(qosConfig.config)
@@ -82,7 +83,7 @@ func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
 
 	qConfig := QosConfiguration{}
 	var err error
-	if err = ConvertExternalToInternalConfig(&qConfig, extConf); err != nil {
+	if err = ConvExternalToInternalConfig(&qConfig, extConf); err != nil {
 		log.Error("Initialising the classification data structures has failed", "error", err)
 	}
 	if err = InitClassification(&qConfig); err != nil {
@@ -98,7 +99,7 @@ func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
 	return qConfig, nil
 }
 
-func ConvertExternalToInternalConfig(qConfig *QosConfiguration, extConf conf.ExternalConfig) error {
+func ConvExternalToInternalConfig(qConfig *QosConfiguration, extConf conf.ExternalConfig) error {
 	var err error
 	qConfig.config, err = convertExternalToInteral(extConf)
 	qConfig.legacyConfig = extConf
@@ -241,7 +242,11 @@ func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRoute
 
 	sc := queues.SchedulerConfig{Latency: rc.SchedulerConfig.Latency, Bandwidth: bw}
 
-	return queues.InternalRouterConfig{Scheduler: sc, Queues: internalQueues, Rules: queues.MapRules{RulesList: internalRules}}, nil
+	return queues.InternalRouterConfig{
+		Scheduler: sc,
+		Queues:    internalQueues,
+		Rules: queues.MapRules{
+			RulesList: internalRules}}, nil
 
 }
 

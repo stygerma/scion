@@ -23,6 +23,10 @@ import (
 	"github.com/scionproto/scion/go/lib/common"
 )
 
+type ClassRuleInterface interface {
+	GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule
+}
+
 type InternalClassRule struct {
 	// This is currently means the ID of the sending border router
 	Name          string
@@ -66,7 +70,11 @@ func ConvClassRuleToInternal(cr conf.ExternalClassRule) (InternalClassRule, erro
 	if err != nil {
 		return InternalClassRule{}, err
 	}
-	destinationMatch, err := getMatchRuleTypeFromRule(cr, cr.DestinationMatchMode, cr.DestinationAs)
+	destinationMatch, err := getMatchRuleTypeFromRule(
+		cr,
+		cr.DestinationMatchMode,
+		cr.DestinationAs)
+
 	if err != nil {
 		return InternalClassRule{}, err
 	}
@@ -113,44 +121,68 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 
 			for i := lowLimI; i <= upLimI; i++ {
 				for j := lowLimA; j <= upLimA; j++ {
-					sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(sourceRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[k])
+					address := addr.IA{I: addr.ISD(i), A: addr.AS(j)}
+					sourceRules[address] = append(
+						sourceRules[addr.IA{
+							I: addr.ISD(i),
+							A: addr.AS(j)}],
+						&crs[k])
 				}
 			}
 		case ASONLY:
-			asOnlySourceRules[cr.SourceAs.IA.A] = append(asOnlySourceRules[cr.SourceAs.IA.A], &crs[k])
+			address := cr.SourceAs.IA.A
+			asOnlySourceRules[address] = append(
+				asOnlySourceRules[address],
+				&crs[k])
 		case ISDONLY:
-			isdOnlySourceRules[cr.SourceAs.IA.I] = append(isdOnlySourceRules[cr.SourceAs.IA.I], &crs[k])
+			address := cr.SourceAs.IA.I
+			isdOnlySourceRules[address] = append(
+				isdOnlySourceRules[address],
+				&crs[k])
 		case ANY:
-			destinationAnySourceRules[cr.DestinationAs.IA] = append(destinationAnySourceRules[cr.DestinationAs.IA], &crs[k])
+			address := cr.DestinationAs.IA
+			destinationAnySourceRules[address] = append(
+				destinationAnySourceRules[address],
+				&crs[k])
 		}
 
 		switch cr.DestinationAs.matchMode {
 		case EXACT:
-			destinationRules[cr.DestinationAs.IA] = append(destinationRules[cr.DestinationAs.IA], &crs[k])
+			address := cr.DestinationAs.IA
+			destinationRules[address] = append(
+				destinationRules[address],
+				&crs[k])
 		case RANGE:
 			lowLimI := uint16(cr.DestinationAs.lowLim.I)
 			upLimI := uint16(cr.DestinationAs.upLim.I)
 			lowLimA := uint64(cr.DestinationAs.lowLim.A)
 			upLimA := uint64(cr.DestinationAs.upLim.A)
 
-			//log.Debug("lowLimI", "lowLimI", lowLimI)
-			//log.Debug("upLimI", "upLimI", upLimI)
-			//log.Debug("lowLimA", "lowLimA", lowLimA)
-			//log.Debug("upLimA", "upLimA", upLimA)
-
 			for i := lowLimI; i <= upLimI; i++ {
 				for j := lowLimA; j <= upLimA; j++ {
-					//log.Debug("Adding", "I", i, "AS", j)
-					destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}] = append(destinationRules[addr.IA{I: addr.ISD(i), A: addr.AS(j)}], &crs[k])
+					address := addr.IA{I: addr.ISD(i), A: addr.AS(j)}
+					destinationRules[address] = append(
+						destinationRules[addr.IA{
+							I: addr.ISD(i),
+							A: addr.AS(j)}],
+						&crs[k])
 				}
 			}
 		case ASONLY:
-			asOnlyDestRules[cr.DestinationAs.IA.A] = append(asOnlyDestRules[cr.DestinationAs.IA.A], &crs[k])
+			address := cr.DestinationAs.IA.A
+			asOnlyDestRules[address] = append(
+				asOnlyDestRules[address],
+				&crs[k])
 		case ISDONLY:
-			//log.Debug("Adding ISDONLY Destination Rule", "IA.I", cr.DestinationAs.IA.I)
-			isdOnlyDestRules[cr.DestinationAs.IA.I] = append(isdOnlyDestRules[cr.DestinationAs.IA.I], &crs[k])
+			address := cr.DestinationAs.IA.I
+			isdOnlyDestRules[address] = append(
+				isdOnlyDestRules[address],
+				&crs[k])
 		case ANY:
-			sourceAnyDestinationRules[cr.SourceAs.IA] = append(sourceAnyDestinationRules[cr.SourceAs.IA], &crs[k])
+			address := cr.SourceAs.IA
+			sourceAnyDestinationRules[address] = append(
+				sourceAnyDestinationRules[address],
+				&crs[k])
 		}
 	}
 
@@ -170,20 +202,29 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 
 }
 
-func getMatchRuleTypeFromRule(cr conf.ExternalClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
+func getMatchRuleTypeFromRule(
+	cr conf.ExternalClassRule, matchModeField int, matchRuleField string) (matchRule, error) {
 	switch matchMode(matchModeField) {
 	case EXACT, ASONLY, ISDONLY, ANY:
 		IA, err := addr.IAFromString(matchRuleField)
 		if err != nil {
 			return matchRule{}, err
 		}
-		m := matchRule{IA: IA, lowLim: addr.IA{}, upLim: addr.IA{}, matchMode: matchMode(matchModeField)}
+		m := matchRule{
+			IA:        IA,
+			lowLim:    addr.IA{},
+			upLim:     addr.IA{},
+			matchMode: matchMode(matchModeField)}
 		return m, nil
 	case RANGE:
 		if matchMode(matchModeField) == RANGE {
 			parts := strings.Split(matchRuleField, "||")
 			if len(parts) != 2 {
-				return matchRule{}, common.NewBasicError("Invalid Class", nil, "raw", matchModeField)
+				return matchRule{}, common.NewBasicError(
+					"Invalid Class",
+					nil,
+					"raw",
+					matchModeField)
 			}
 			lowLim, err := addr.IAFromString(parts[0])
 			if err != nil {
@@ -193,16 +234,29 @@ func getMatchRuleTypeFromRule(cr conf.ExternalClassRule, matchModeField int, mat
 			if err != nil {
 				return matchRule{}, err
 			}
-			m := matchRule{IA: addr.IA{}, lowLim: lowLim, upLim: upLim, matchMode: matchMode(matchModeField)}
+			m := matchRule{
+				IA:        addr.IA{},
+				lowLim:    lowLim,
+				upLim:     upLim,
+				matchMode: matchMode(matchModeField)}
 			return m, nil
 		}
 	}
 
-	return matchRule{}, common.NewBasicError("Invalid matchMode declared", nil, "matchMode", matchModeField)
+	return matchRule{}, common.NewBasicError(
+		"Invalid matchMode declared",
+		nil,
+		"matchMode",
+		matchModeField)
 }
 
 var returnRule *InternalClassRule
-var exactAndRangeSourceMatches, exactAndRangeDestinationMatches, sourceAnyDestinationMatches, destinationAnySourceRules, asOnlySourceRules, asOnlyDestinationRules []*InternalClassRule
+var exactAndRangeSourceMatches []*InternalClassRule
+var exactAndRangeDestinationMatches []*InternalClassRule
+var sourceAnyDestinationMatches []*InternalClassRule
+var destinationAnySourceRules []*InternalClassRule
+var asOnlySourceRules []*InternalClassRule
+var asOnlyDestinationRules []*InternalClassRule
 var isdOnlySourceRules, isdOnlyDestinationRules, matched []*InternalClassRule
 
 var emptyRule = &InternalClassRule{
@@ -211,7 +265,8 @@ var emptyRule = &InternalClassRule{
 	QueueNumber: 0,
 }
 
-func (*RegularClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
+func (*RegularClassRule) GetRuleForPacket(
+	config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule {
 
 	var sources [3][]*InternalClassRule
 	var destinations [3][]*InternalClassRule
@@ -220,8 +275,6 @@ func (*RegularClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt
 	dstAddr, _ := rp.DstIA()
 	l4h, _ := rp.L4Hdr(false)
 	var l4t common.L4ProtocolType
-
-	// log.Debug("Adresses", "srcAddr", srcAddr, "dstAddr", dstAddr, "l4t", l4t)
 
 	if l4h == nil {
 		l4t = 0
@@ -266,9 +319,9 @@ func (*RegularClassRule) GetRuleForPacket(config *InternalRouterConfig, rp *rpkt
 	max := -1
 	max, returnRule = getRuleWithPrevMax(returnRule, matched, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, sourceAnyDestinationMatches, max)
-	max, returnRule = getRuleWithPrevMax(returnRule, destinationAnySourceRules, max)
+	_, returnRule = getRuleWithPrevMax(returnRule, destinationAnySourceRules, max)
 
-	// config.Rules.CrCache.Put(entry, returnRule)
+	config.Rules.CrCache.Put(entry, returnRule)
 
 	return returnRule
 }
@@ -293,7 +346,10 @@ func matchL4Type(list *[]*InternalClassRule, l4t common.L4ProtocolType) {
 
 }
 
-func getRuleWithPrevMax(returnRule *InternalClassRule, list []*InternalClassRule, prevMax int) (int, *InternalClassRule) {
+func getRuleWithPrevMax(
+	returnRule *InternalClassRule,
+	list []*InternalClassRule,
+	prevMax int) (int, *InternalClassRule) {
 
 	if list == nil {
 		return prevMax, returnRule
@@ -319,14 +375,13 @@ func unionRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalClass
 	return append(a, b...)
 }
 
-func intersectListsRules(a [3][]*InternalClassRule, b [3][]*InternalClassRule) []*InternalClassRule {
+func intersectListsRules(
+	a [3][]*InternalClassRule,
+	b [3][]*InternalClassRule) []*InternalClassRule {
 	for i := 0; i < len(matches); i++ {
 		matches[i] = nil
 	}
 	k := 0
-
-	// log.Debug("A", "a", a)
-	// log.Debug("b", "b", b) // I have a nil pointer dereference here
 
 	for l := 0; l < 3; l++ {
 		for m := 0; m < 3; m++ {
@@ -334,8 +389,6 @@ func intersectListsRules(a [3][]*InternalClassRule, b [3][]*InternalClassRule) [
 			la := len(a[l])
 			for i := 0; i < la; i++ {
 				for j := 0; j < lb; j++ {
-
-					// This should not be necessary
 					if a[l] == nil {
 						break
 					}
@@ -369,8 +422,3 @@ func intersectRules(a []*InternalClassRule, b []*InternalClassRule) []*InternalC
 	}
 	return matches
 }
-
-// func GetQueueNumberForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) int {
-
-// 	return GetRuleForPacket(config, rp).QueueNumber
-// }
