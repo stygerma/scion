@@ -47,28 +47,28 @@ type workerConfiguration struct {
 	workLength int
 }
 
-func (qosConfig *QosConfiguration) SendToWorker(i int, qpkt *queues.QPkt) {
-	qosConfig.workerChannels[i] <- qpkt
+func (q *QosConfiguration) SendToWorker(i int, qpkt *queues.QPkt) {
+	q.workerChannels[i] <- qpkt
 }
 
-func (qosConfig *QosConfiguration) GetWorkerChannels() *[](chan *queues.QPkt) {
-	return &qosConfig.workerChannels
+func (q *QosConfiguration) GetWorkerChannels() *[](chan *queues.QPkt) {
+	return &q.workerChannels
 }
 
-func (qosConfig *QosConfiguration) GetQueues() *[]queues.PacketQueueInterface {
-	return &qosConfig.config.Queues
+func (q *QosConfiguration) GetQueues() *[]queues.PacketQueueInterface {
+	return &q.config.Queues
 }
 
-func (qosConfig *QosConfiguration) GetQueue(ind int) *queues.PacketQueueInterface {
-	return &qosConfig.config.Queues[ind]
+func (q *QosConfiguration) GetQueue(ind int) *queues.PacketQueueInterface {
+	return &q.config.Queues[ind]
 }
 
-func (qosConfig *QosConfiguration) GetConfig() *queues.InternalRouterConfig {
-	return &qosConfig.config
+func (q *QosConfiguration) GetConfig() *queues.InternalRouterConfig {
+	return &q.config
 }
 
-func (qosConfig *QosConfiguration) GetLegacyConfig() *conf.ExternalConfig {
-	return &qosConfig.legacyConfig
+func (q *QosConfiguration) GetLegacyConfig() *conf.ExternalConfig {
+	return &q.legacyConfig
 }
 
 // SetAndInitSchedul is necessary to set up a mock scheduler for testing. Do not use for anything else.

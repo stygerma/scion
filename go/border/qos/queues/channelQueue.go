@@ -70,7 +70,6 @@ func (pq *ChannelPacketQueue) GetLength() int {
 }
 
 func (pq *ChannelPacketQueue) peek() *QPkt {
-
 	return nil
 }
 
@@ -90,13 +89,10 @@ func (pq *ChannelPacketQueue) Pop() *QPkt {
 }
 
 func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
-
 	pkts := make([]*QPkt, number)
-
 	for i := 0; i < number; i++ {
 		pkts[i] = <-pq.queue
 	}
-
 	return pkts
 }
 
