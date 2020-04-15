@@ -75,4 +75,5 @@ func LoadConfig(path string) (ExternalConfig, error) {
 	log.Info("Config File is", "ec", ec)
 
 	return ec, nil
+
 }

@@ -79,6 +79,5 @@ func prepareRtrPacketDetailedSample(sourceIA addr.IA, destinationIA addr.IA,
 	r.L4Type = L4Type // L4SCMP
 	r.Ctx = rctx.New(config)
 	r.refCnt = -1
-
 	return r
 }
