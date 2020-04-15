@@ -25,7 +25,7 @@ type PacketSliceQueue struct {
 	pktQue PacketQueue
 	mutex  *sync.Mutex
 	queue  []*QPkt
-	tb     tokenBucket
+	tb     TokenBucket
 }
 
 var _ PacketQueueInterface = (*PacketSliceQueue)(nil)
@@ -34,7 +34,7 @@ func (pq *PacketSliceQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.queue = make([]*QPkt, 0)
-	pq.tb = tokenBucket{}
+	pq.tb = TokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
 }
 
