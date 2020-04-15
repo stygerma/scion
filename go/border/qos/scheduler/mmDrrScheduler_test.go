@@ -12,13 +12,28 @@ import (
 func TestDequeueMM(t *testing.T) {
 
 	queue1 := queues.ChannelPacketQueue{}
-	queue1.InitQueue(queues.PacketQueue{MaxLength: 1024, MinBandwidth: 30, MaxBandWidth: 40}, &sync.Mutex{}, &sync.Mutex{})
+	queue1.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    1024,
+			MinBandwidth: 30,
+			MaxBandWidth: 40},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	queue2 := queues.ChannelPacketQueue{}
-	queue2.InitQueue(queues.PacketQueue{MaxLength: 1024, MinBandwidth: 60, MaxBandWidth: 80}, &sync.Mutex{}, &sync.Mutex{})
+	queue2.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    1024,
+			MinBandwidth: 60,
+			MaxBandWidth: 80},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	mockSched := &MinMaxDeficitRoundRobinScheduler{}
-	mockSched.Init(queues.InternalRouterConfig{Queues: []queues.PacketQueueInterface{&queue1, &queue2}})
+	mockSched.Init(
+		queues.InternalRouterConfig{
+			Queues: []queues.PacketQueueInterface{&queue1,
+				&queue2}})
 	mockSched.quantumSum = 90
 
 	fmt.Println("Before dequeue")
@@ -75,13 +90,29 @@ func TestDequeueMM(t *testing.T) {
 func TestDequeueMM2(t *testing.T) {
 
 	queue1 := queues.ChannelPacketQueue{}
-	queue1.InitQueue(queues.PacketQueue{MaxLength: 1024, MinBandwidth: 20, MaxBandWidth: 90}, &sync.Mutex{}, &sync.Mutex{})
+	queue1.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    1024,
+			MinBandwidth: 20,
+			MaxBandWidth: 90},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	queue2 := queues.ChannelPacketQueue{}
-	queue2.InitQueue(queues.PacketQueue{MaxLength: 1024, MinBandwidth: 60, MaxBandWidth: 80}, &sync.Mutex{}, &sync.Mutex{})
+	queue2.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    1024,
+			MinBandwidth: 60,
+			MaxBandWidth: 80},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	mockSched := &MinMaxDeficitRoundRobinScheduler{}
-	mockSched.Init(queues.InternalRouterConfig{Queues: []queues.PacketQueueInterface{&queue1, &queue2}})
+	mockSched.Init(
+		queues.InternalRouterConfig{
+			Queues: []queues.PacketQueueInterface{
+				&queue1,
+				&queue2}})
 	mockSched.quantumSum = 90
 
 	fmt.Println("Before dequeue")
@@ -162,13 +193,31 @@ func TestSurplusMM(t *testing.T) {
 	mockSched.schedulerSurplus = surplus{0, make([]int, 3), 100}
 
 	alice := queues.ChannelPacketQueue{}
-	alice.InitQueue(queues.PacketQueue{MaxLength: 100, MinBandwidth: 25, MaxBandWidth: 50}, &sync.Mutex{}, &sync.Mutex{})
+	alice.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    100,
+			MinBandwidth: 25,
+			MaxBandWidth: 50},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	bob := queues.ChannelPacketQueue{}
-	bob.InitQueue(queues.PacketQueue{MaxLength: 100, MinBandwidth: 15, MaxBandWidth: 25}, &sync.Mutex{}, &sync.Mutex{})
+	bob.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    100,
+			MinBandwidth: 15,
+			MaxBandWidth: 25},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	charlie := queues.ChannelPacketQueue{}
-	charlie.InitQueue(queues.PacketQueue{MaxLength: 100, MinBandwidth: 10, MaxBandWidth: 25}, &sync.Mutex{}, &sync.Mutex{})
+	charlie.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    100,
+			MinBandwidth: 10,
+			MaxBandWidth: 25},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	// Round 1
 
@@ -265,11 +314,34 @@ func TestAdjustForQuantum(t *testing.T) {
 	mockSched.quantumSum = 125
 
 	alice := queues.ChannelPacketQueue{}
-	alice.InitQueue(queues.PacketQueue{MaxLength: 100, MinBandwidth: 25, MaxBandWidth: 50, Priority: 5}, &sync.Mutex{}, &sync.Mutex{})
+	alice.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    100,
+			MinBandwidth: 25,
+			MaxBandWidth: 50,
+			Priority:     5},
+		&sync.Mutex{},
+		&sync.Mutex{})
+
 	bob := queues.ChannelPacketQueue{}
-	bob.InitQueue(queues.PacketQueue{MaxLength: 100, MinBandwidth: 75, MaxBandWidth: 50, Priority: 15}, &sync.Mutex{}, &sync.Mutex{})
+	bob.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    100,
+			MinBandwidth: 75,
+			MaxBandWidth: 50,
+			Priority:     15},
+		&sync.Mutex{},
+		&sync.Mutex{})
+
 	charlie := queues.ChannelPacketQueue{}
-	charlie.InitQueue(queues.PacketQueue{MaxLength: 100, MinBandwidth: 25, MaxBandWidth: 50, Priority: 5}, &sync.Mutex{}, &sync.Mutex{})
+	charlie.InitQueue(
+		queues.PacketQueue{
+			MaxLength:    100,
+			MinBandwidth: 25,
+			MaxBandWidth: 50,
+			Priority:     5},
+		&sync.Mutex{},
+		&sync.Mutex{})
 
 	adj := mockSched.adjustForQuantum(&alice)
 	if adj != 20 {
