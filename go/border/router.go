@@ -185,6 +185,7 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
 	defer rp.Release()
+
 	// Forward the packet. Packets destined to self are forwarded to the local dispatcher.
 	if err := rp.Route(); err != nil {
 		r.handlePktError(rp, err, "Error routing packet")
