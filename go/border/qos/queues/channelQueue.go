@@ -44,28 +44,21 @@ func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mut
 
 func (pq *ChannelPacketQueue) Enqueue(rp *QPkt) {
 	pq.queue <- rp
-
-	// atomic.AddUint64(&pq.length, 1)
-
 }
 
 func (pq *ChannelPacketQueue) canEnqueue() bool {
-
 	return int(len(pq.queue)) < pq.pktQue.MaxLength
 }
 
 func (pq *ChannelPacketQueue) canDequeue() bool {
-
 	return true
 }
 
 func (pq *ChannelPacketQueue) GetFillLevel() int {
-
 	return int(len(pq.queue)) / int(pq.pktQue.MaxLength)
 }
 
 func (pq *ChannelPacketQueue) GetLength() int {
-
 	return int(len(pq.queue))
 }
 
@@ -74,7 +67,6 @@ func (pq *ChannelPacketQueue) peek() *QPkt {
 }
 
 func (pq *ChannelPacketQueue) Pop() *QPkt {
-
 	var pkt *QPkt
 
 	select {
@@ -82,14 +74,10 @@ func (pq *ChannelPacketQueue) Pop() *QPkt {
 	default:
 		pkt = nil
 	}
-
-	// pkt = <-pq.queue
-
 	return pkt
 }
 
 func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
-
 	pkts := make([]*QPkt, number)
 	for i := 0; i < number; i++ {
 		pkts[i] = <-pq.queue
