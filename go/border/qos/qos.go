@@ -141,15 +141,8 @@ func InitWorkers(qConfig *QosConfiguration) error {
 }
 
 func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
-
-	//log.Trace("preRouteStep")
-	//log.Trace("We have rules: ", "len(Rules)", len(qosConfig.GetConfig().Rules))
-
 	rc := queues.RegularClassRule{}
-
-	// queueNo := queues.GetQueueNumberForPacket(qosConfig.GetConfig(), rp)
 	config := qosConfig.GetConfig()
-	// queueNo := rc.GetRuleForPacket(config, rp).QueueNumber
 
 	rule := rc.GetRuleForPacket(config, rp)
 
@@ -164,15 +157,7 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	case *qosConfig.schedul.GetMessages() <- true:
 	default:
 	}
-
-	// sch := qosConfig.schedul.(*scheduler.DeficitRoundRobinScheduler)
-	// sch.UpdateIncoming(queueNo)
 	qosConfig.SendToWorker(queueNo, &qp)
-
-	// putOnQueue(qosConfig, queueNo, &qp)
-
-	//log.Trace("Finished QueuePacket")
-
 }
 
 func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
@@ -197,13 +182,12 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 		qosConfig.SendNotification(qp)
 	case conf.DROPNOTIFY:
-		qosConfig.dropPacket(qp.Rp)
+		qosConfig.dropPacket(qp)
 		qosConfig.SendNotification(qp)
 	case conf.DROP:
-		qosConfig.dropPacket(qp.Rp)
+		qosConfig.dropPacket(qp)
 	default:
-		qosConfig.dropPacket(qp.Rp)
-		// qosConfig.config.Queues[queueNo].Enqueue(qp)
+		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	}
 }
 
@@ -233,13 +217,11 @@ func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 	}
 }
 
-func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
-	defer qp.Rp.Release()
-	qosConfig.SendNotification(qp)
+func (qosConfig *QosConfiguration) dropPacket(qp *queues.QPkt) {
+	defer qp.rp.Release()
+    qosConfig.SendNotification(qp)
 	qosConfig.droppedPackets++
-	log.Debug("Dropping packet", "qosConfig.droppedPackets", qosConfig.droppedPackets)
-	// panic("Do not drop packets")
-
+	log.Info("Dropping packet", "qosConfig.droppedPackets", qosConfig.droppedPackets)
 }
 
 func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRouterConfig, error) {
