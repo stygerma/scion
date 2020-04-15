@@ -1,4 +1,4 @@
-package scheduler
+package qosscheduler
 
 import (
 	"fmt"
@@ -65,11 +65,7 @@ func updateTable(queueNo int, removed int, arrived int) {
 func printTable(step int) {
 	fmt.Print(step)
 	for i := 0; i < 3; i++ {
-		fmt.Printf(" Queue %d len %d deq %d arr %d;",
-			i,
-			simTable[i].length,
-			simTable[i].lastPeriodDequeued,
-			simTable[i].lastPeriodArrived)
+		fmt.Printf(" Queue %d len %d deq %d arr %d;", i, simTable[i].length, simTable[i].lastPeriodDequeued, simTable[i].lastPeriodArrived)
 	}
 	fmt.Print("\n")
 }
@@ -85,9 +81,7 @@ func TestSimtable(t *testing.T) {
 		printTable(i)
 	}
 
-	fmt.Println("Queue 0", simTable[0].totalDequeued,
-		"Queue 1", simTable[1].totalDequeued,
-		"Queue 2", simTable[2].totalDequeued)
+	fmt.Println("Queue 0", simTable[0].totalDequeued, "Queue 1", simTable[1].totalDequeued, "Queue 2", simTable[2].totalDequeued)
 
 	t.Errorf("Show log")
 }

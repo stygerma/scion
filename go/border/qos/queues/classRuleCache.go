@@ -1,4 +1,4 @@
-package queues
+package qosqueues
 
 import (
 	"github.com/scionproto/scion/go/lib/addr"
@@ -9,7 +9,6 @@ type cacheEntry struct {
 	srcAddress addr.IA
 	dstAddress addr.IA
 	l4type     common.L4ProtocolType
-	extTYpe    string
 }
 
 type ClassRuleCacheInterface interface {
