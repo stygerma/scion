@@ -24,8 +24,6 @@ go_test(
         "drrScheduler_test.go",
         "mmDrrScheduler_test.go",
         "raterrScheduler_test.go",
-        "rrScheduler_test.go",
-        "scheduler_test.go",
     ],
     embed = [":go_default_library"],
     deps = [
