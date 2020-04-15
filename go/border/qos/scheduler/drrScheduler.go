@@ -96,8 +96,6 @@ func (sched *DeficitRoundRobinScheduler) UpdateIncoming(queueNo int) {
 	incoming[queueNo]++
 }
 
-var iterations int
-
 func (sched *DeficitRoundRobinScheduler) showLog(routerConfig queues.InternalRouterConfig) {
 
 	iterations++
