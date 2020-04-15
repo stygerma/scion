@@ -50,34 +50,34 @@ type workerConfiguration struct {
 	workLength int
 }
 
-func (q *QosConfiguration) SendToWorker(i int, qpkt *qosqueues.QPkt) {
-	q.workerChannels[i] <- qpkt
+func (qosConfig *QosConfiguration) SendToWorker(i int, qpkt *qosqueues.QPkt) {
+	qosConfig.workerChannels[i] <- qpkt
 }
 
-func (q *QosConfiguration) GetWorkerChannels() *[](chan *qosqueues.QPkt) {
-	return &q.workerChannels
+func (qosConfig *QosConfiguration) GetWorkerChannels() *[](chan *qosqueues.QPkt) {
+	return &qosConfig.workerChannels
 }
 
-func (q *QosConfiguration) GetQueues() *[]qosqueues.PacketQueueInterface {
-	return &q.config.Queues
+func (qosConfig *QosConfiguration) GetQueues() *[]qosqueues.PacketQueueInterface {
+	return &qosConfig.config.Queues
 }
 
-func (q *QosConfiguration) GetQueue(ind int) *qosqueues.PacketQueueInterface {
-	return &q.config.Queues[ind]
+func (qosConfig *QosConfiguration) GetQueue(ind int) *qosqueues.PacketQueueInterface {
+	return &qosConfig.config.Queues[ind]
 }
 
-func (q *QosConfiguration) GetConfig() *qosqueues.InternalRouterConfig {
-	return &q.config
+func (qosConfig *QosConfiguration) GetConfig() *qosqueues.InternalRouterConfig {
+	return &qosConfig.config
 }
 
-func (q *QosConfiguration) GetLegacyConfig() *qosconf.ExternalConfig {
-	return &q.legacyConfig
+func (qosConfig *QosConfiguration) GetLegacyConfig() *qosconf.ExternalConfig {
+	return &qosConfig.legacyConfig
 }
 
 // SetAndInitSchedul is necessary to set up a mock scheduler for testing. Do not use for anything else.
-func (q *QosConfiguration) SetAndInitSchedul(sched qosscheduler.SchedulerInterface) {
-	q.schedul = sched
-	q.schedul.Init(q.config)
+func (qosConfig *QosConfiguration) SetAndInitSchedul(sched qosscheduler.SchedulerInterface) {
+	qosConfig.schedul = sched
+	qosConfig.schedul.Init(qosConfig.config)
 }
 
 func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {
@@ -216,18 +216,8 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *qosqueues.QPkt) {
 	}
 }
 
+// SendNotification might be needed for the part of @stygerma
 func (qosConfig *QosConfiguration) SendNotification(qp *qosqueues.QPkt) {
-
-	// TODO: Readd this
-	// rc := qosqueues.RegularClassRule{}
-
-	// queueNo := qosqueues.GetQueueNumberForPacket(qosConfig.GetConfig(), rp)
-	// config := qosConfig.GetConfig()
-	// rule := rc.GetRuleForPacket(config, qp.Rp)
-
-	// np := qosqueues.NPkt{Rule: rule, Qpkt: qp}
-
-	// qosConfig.notifications <- &np
 }
 
 func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
