@@ -89,6 +89,12 @@ func (pq *ChannelPacketQueue) Pop() *QPkt {
 }
 
 func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
+<<<<<<< HEAD
+=======
+
+	pkts := make([]*QPkt, number)
+
+>>>>>>> b358d878ecb28431f30bab21bef435bea102bae0
 	pkts := make([]*QPkt, number)
 	for i := 0; i < number; i++ {
 		pkts[i] = <-pq.queue
