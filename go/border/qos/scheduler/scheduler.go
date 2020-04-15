@@ -76,3 +76,12 @@ func min(a, b int) int {
 	}
 	return b
 }
+
+var iterations int
+var t0 time.Time
+var tokensUsed [5]int
+var cirTokens [5]int
+var pirTokens [5]int
+var payedIntoSurplus [5]int
+var forceTake [5]int
+var overallTokensUsed int
