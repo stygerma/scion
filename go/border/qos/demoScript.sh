@@ -31,6 +31,9 @@ printUseage() {
   echo "-q for quiet mode to suppress explanations for each of the steps"
   echo "-r will output the ratio to ratio.csv"
   echo "-i for interactive mode. Requires some keypresses to continue."
+
+  echo "This expects a spcial version of netcat to exist an a folder called scion-apps right next to the scion folder.
+  Please clone scion-apps from github.com/joelfischerr/scion-apps/tree/demo to run the demo and the associated test in qos_test.go."
   exit 0
 }
 
@@ -78,6 +81,11 @@ transferFileTo() {
 }
 
 printBlue "Starting the demo"
+
+if [ ! -f ../scion-apps/netcat/netcat ]; then
+    echo "Netcat does not exist at the expected path: ../scion-apps/netcat/netcat. Please clone netcat from github.com/joelfischerr/scion-apps/tree/demo"
+    exit 1
+fi
 
 # Generate topology and copy configuration files
 
