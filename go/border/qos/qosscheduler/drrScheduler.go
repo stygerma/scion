@@ -34,7 +34,7 @@ func (sched *DeficitRoundRobinScheduler) Init(routerConfig qosqueues.InternalRou
 	if len(routerConfig.Queues) == 5 {
 		log.Debug("Priorities", "0", routerConfig.Queues[0].GetPriority(), "1", routerConfig.Queues[1].GetPriority(), "2", routerConfig.Queues[2].GetPriority())
 
-		sched.tb.Init(2 * 1250000) // 20 Mbit
+		sched.tb.Init(2000000) // 20 Mbit
 	} else {
 		sched.tb.Init(125000000) // 1000 Mbit
 	}
@@ -72,8 +72,6 @@ func (sched *DeficitRoundRobinScheduler) Dequeue(queue qosqueues.PacketQueueInte
 		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
 			time.Sleep(50 * time.Millisecond)
 		}
-
-		log.Info("Packet length is:", "qp.Rp.Bytes().Len()", qp.Rp.Bytes().Len())
 
 		lastRound[queueNo]++
 		total[queueNo]++
