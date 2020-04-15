@@ -19,10 +19,10 @@ type RateRoundRobinScheduler struct {
 	messages            chan bool
 	jobs                chan int
 
-	cirBuckets []qosqueues.TokenBucket
-	pirBuckets []qosqueues.TokenBucket
-
-	tb qosqueues.TokenBucket
+	sleepDuration int
+	cirBuckets    []qosqueues.TokenBucket
+	pirBuckets    []qosqueues.TokenBucket
+	tb            qosqueues.TokenBucket
 }
 
 var _ SchedulerInterface = (*RateRoundRobinScheduler)(nil)
@@ -41,15 +41,10 @@ func (sched *RateRoundRobinScheduler) Init(routerConfig qosqueues.InternalRouter
 		sched.quantumSum = sched.quantumSum + routerConfig.Queues[i].GetMinBandwidth()
 	}
 
-	maxBW := 2000000 // 2MB
+	maxBW := routerConfig.Scheduler.Bandwidth
 
-	if len(routerConfig.Queues) == 5 {
-		log.Debug("Priorities", "0", routerConfig.Queues[0].GetPriority(), "1", routerConfig.Queues[1].GetPriority(), "2", routerConfig.Queues[2].GetPriority())
-
-		sched.tb.Init(maxBW) // 20 Mbit
-	} else {
-		sched.tb.Init(125000000) // 1000 Mbit
-	}
+	sched.tb.Init(maxBW)
+	sched.sleepDuration = routerConfig.Scheduler.Latency
 
 	sched.schedulerSurplus.MaxSurplus = maxBW
 
@@ -86,8 +81,8 @@ func (sched *RateRoundRobinScheduler) Dequeuer(routerConfig qosqueues.InternalRo
 		}
 		sched.LogUpdate(routerConfig)
 
-		for time.Now().Sub(t0) < time.Duration(250*time.Microsecond) {
-			time.Sleep(100 * time.Microsecond)
+		for time.Now().Sub(t0) < time.Duration(time.Duration(sched.sleepDuration)*time.Microsecond) {
+			time.Sleep(time.Duration(sched.sleepDuration/10) * time.Microsecond)
 		}
 	}
 }
