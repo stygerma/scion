@@ -72,9 +72,9 @@ func (q *QosConfiguration) GetLegacyConfig() *conf.ExternalConfig {
 }
 
 // SetAndInitSchedul is necessary to set up a mock scheduler for testing. Do not use for anything else.
-func (q *QosConfiguration) SetAndInitSchedul(sched qosscheduler.SchedulerInterface) {
-	q.schedul = sched
-	q.schedul.Init(q.config)
+func (qosConfig *QosConfiguration) SetAndInitSchedul(sched qosscheduler.SchedulerInterface) {
+	qosConfig.schedul = sched
+	qosConfig.schedul.Init(qosConfig.config)
 }
 
 func InitQos(extConf qosconf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (QosConfiguration, error) {

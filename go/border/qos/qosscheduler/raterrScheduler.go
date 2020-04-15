@@ -194,21 +194,17 @@ func (sched *RateRoundRobinScheduler) dequeuePackets(queue qosqueues.PacketQueue
 	return j
 }
 
-// TODO: This does not respect the overall information rate
 func (sched *RateRoundRobinScheduler) availableFromBuckets(packetLength int, queueNo int) bool {
-
 	if sched.tb.Available(packetLength) {
 		if sched.cirBuckets[queueNo].Available(packetLength) {
 			return true
 		}
-
 		if sched.pirBuckets[queueNo].Available(packetLength) {
 			if sched.availableSurplus(packetLength) {
 				return true
 			}
 		}
 	}
-
 	return false
 }
 
