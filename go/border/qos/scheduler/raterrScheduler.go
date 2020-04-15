@@ -9,7 +9,11 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
-// This is also a deficit round robin dequeuer. But instead of the priority field it uses the min-bandwidth field for the minimum number of packets to dequeue. If there are fewer than the minimal value of packets to dequeue, the remaining min-bandwidth will be put onto a surplus counter and another queue might use more than its min-bandwidth (but still less than its max-bandwidth).
+// This is also a deficit round robin dequeuer. But instead of the priority
+// field it uses the min-bandwidth field for the minimum number of packets to dequeue.
+// If there are fewer than the minimal value of packets to dequeue, the remaining min-bandwidth
+// will be put onto a surplus counter and another queue might use more than its min-bandwidth
+// (but still less than its max-bandwidth).
 
 type RateRoundRobinScheduler struct {
 	quantumSum          int
@@ -67,10 +71,12 @@ func (sched *RateRoundRobinScheduler) Init(routerConfig queues.InternalRouterCon
 
 }
 
-func (sched *RateRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt)) {
+func (sched *RateRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig,
+	forwarder func(rp *rpkt.RtrPkt)) {
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
+	sleepDuration := time.Duration(time.Duration(sched.sleepDuration) * time.Microsecond)
 	for {
 		t0 := time.Now()
 		for i := 0; i < sched.totalLength; i++ {
@@ -81,7 +87,7 @@ func (sched *RateRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRoute
 		}
 		sched.LogUpdate(routerConfig)
 
-		for time.Now().Sub(t0) < time.Duration(time.Duration(sched.sleepDuration)*time.Microsecond) {
+		for time.Now().Sub(t0) < sleepDuration {
 			time.Sleep(time.Duration(sched.sleepDuration/10) * time.Microsecond)
 		}
 	}
@@ -96,18 +102,43 @@ func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRout
 		for i := 0; i < sched.totalLength; i++ {
 			queLen[i] = routerConfig.Queues[i].GetLength()
 		}
-		log.Debug("STAT", "iterations", iterations, "incoming", incoming, "deqLastRound", lastRound, "deqAttempted", attempted, "deqTotal", total, "currQueueLen", queLen, "surplus", sched.schedulerSurplus.Surplus)
+		log.Debug("STAT", "iterations", iterations,
+			"incoming", incoming,
+			"deqLastRound", lastRound,
+			"deqAttempted", attempted,
+			"deqTotal", total,
+			"currQueueLen", queLen,
+			"surplus", sched.schedulerSurplus.Surplus)
+
 		if len(sched.cirBuckets) > 3 {
-			log.Debug("STAT Available cirTokens", "1", sched.cirBuckets[1].GetAvailable(), "2", sched.cirBuckets[2].GetAvailable(), "3", sched.cirBuckets[3].GetAvailable())
-			log.Debug("STAT Available pirTokens", "1", sched.pirBuckets[1].GetAvailable(), "2", sched.pirBuckets[2].GetAvailable(), "3", sched.pirBuckets[3].GetAvailable())
-			log.Debug("STAT", "tokensUsed", tokensUsed, "forceTake", forceTake, "cirTokens", cirTokens, "pirTokens", pirTokens, "payedIntoSurplus", payedIntoSurplus)
+			log.Debug("STAT Available cirTokens",
+				"1", sched.cirBuckets[1].GetAvailable(),
+				"2", sched.cirBuckets[2].GetAvailable(),
+				"3", sched.cirBuckets[3].GetAvailable())
+			log.Debug("STAT Available pirTokens",
+				"1", sched.pirBuckets[1].GetAvailable(),
+				"2", sched.pirBuckets[2].GetAvailable(),
+				"3", sched.pirBuckets[3].GetAvailable())
+			log.Debug("STAT",
+				"tokensUsed", tokensUsed,
+				"forceTake", forceTake,
+				"cirTokens", cirTokens,
+				"pirTokens", pirTokens,
+				"payedIntoSurplus", payedIntoSurplus)
 			queue0 := float64(tokensUsed[0]+forceTake[0]) / 5.0 / 1000000.0 * 8.0
 			queue1 := float64(tokensUsed[1]+forceTake[1]) / 5.0 / 1000000.0 * 8.0
 			queue2 := float64(tokensUsed[2]+forceTake[2]) / 5.0 / 1000000.0 * 8.0
 			queue3 := float64(tokensUsed[3]+forceTake[3]) / 5.0 / 1000000.0 * 8.0
 			queue4 := float64(tokensUsed[4]+forceTake[4]) / 5.0 / 1000000.0 * 8.0
 			overall := float64(overallTokensUsed) / 5.0 / 1000000.0
-			log.Debug("STAT", "overall", overall, "maxOverall", 2, "0", queue0, "1", queue1, "2", queue2, "3", queue3, "4", queue4)
+			log.Debug("STAT",
+				"overall", overall,
+				"maxOverall", 2,
+				"0", queue0,
+				"1", queue1,
+				"2", queue2,
+				"3", queue3,
+				"4", queue4)
 
 		}
 		for i := 0; i < len(lastRound); i++ {
@@ -142,14 +173,16 @@ func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRout
 
 }
 
-func (sched *RateRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int) {
+func (sched *RateRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
+	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 	// no := queue.GetMinBandwidth()
 	no := 5
 	attempted[queueNo] += no
 	sched.dequeuePackets(queue, no, forwarder, queueNo)
 }
 
-func (sched *RateRoundRobinScheduler) dequeuePackets(queue queues.PacketQueueInterface, pktToDequeue int, forwarder func(rp *rpkt.RtrPkt), queueNo int) int {
+func (sched *RateRoundRobinScheduler) dequeuePackets(queue queues.PacketQueueInterface,
+	pktToDequeue int, forwarder func(rp *rpkt.RtrPkt), queueNo int) int {
 	var qp *queues.QPkt
 	j := 0
 
@@ -243,8 +276,14 @@ func (sched *RateRoundRobinScheduler) takeSurplus(amount int) bool {
 	return false
 }
 
-func (sched *RateRoundRobinScheduler) payIntoSurplus(queue queues.PacketQueueInterface, queueNo int, payment int) {
-	sched.schedulerSurplus.Surplus = min(sched.schedulerSurplus.Surplus+payment, sched.schedulerSurplus.MaxSurplus)
+
+func (sched *RateRoundRobinScheduler) payIntoSurplus(queue queues.PacketQueueInterface,
+	queueNo int, payment int) {
+
+	a := sched.schedulerSurplus.Surplus + payment
+	b := sched.schedulerSurplus.MaxSurplus
+	sched.schedulerSurplus.Surplus = min(a, b)
+
 	sched.schedulerSurplus.Payments[queueNo] = sched.schedulerSurplus.Surplus
 }
 
