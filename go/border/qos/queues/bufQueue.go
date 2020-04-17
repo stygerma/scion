@@ -27,7 +27,7 @@ type PacketBufQueue struct {
 	mutex    *sync.Mutex
 	bufQueue *ringbuf.Ring
 	length   int
-	tb       tokenBucket
+	tb       TokenBucket
 }
 
 var _ PacketQueueInterface = (*PacketBufQueue)(nil)
@@ -36,7 +36,7 @@ func (pq *PacketBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
-	pq.tb = tokenBucket{}
+	pq.tb = TokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
 	pq.bufQueue = ringbuf.New(pq.pktQue.MaxLength, func() interface{} {
 		return &QPkt{}
@@ -75,8 +75,14 @@ func (pq *PacketBufQueue) PopMultiple(number int) []*QPkt {
 	return retArr
 }
 
-// TODO(joelfischerr): I suspect that rand.Intn isn't very fast.
-// We can probably get by with worse random numbers
+// CheckAction checks how full the queue is and whether a profile
+// has been configured for this fullness.
+// If the rule should only be applied with a certain probability
+// (for fairness reasons) the random number will be
+// used to determine whether it should match or not.
+// In some benchmarks rand.Intn() has shown up as bottleneck
+// in this function.
+// A faster but less random random number might be fine as well.
 func (pq *PacketBufQueue) CheckAction() conf.PoliceAction {
 	level := pq.GetFillLevel()
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
@@ -95,6 +101,10 @@ func (pq *PacketBufQueue) Police(qp *QPkt) conf.PoliceAction {
 
 func (pq *PacketBufQueue) GetMinBandwidth() int {
 	return pq.pktQue.MinBandwidth
+}
+
+func (pq *PacketBufQueue) GetMaxBandwidth() int {
+	return pq.pktQue.MaxBandWidth
 }
 
 func (pq *PacketBufQueue) GetPriority() int {

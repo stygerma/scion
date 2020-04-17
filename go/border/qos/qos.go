@@ -27,7 +27,7 @@ import (
 	"github.com/scionproto/scion/go/lib/log"
 )
 
-const maxNotificationCount = 512
+const maxNotificationCount = 1024
 
 type QosConfiguration struct {
 	worker workerConfiguration
@@ -71,53 +71,64 @@ func (q *QosConfiguration) GetLegacyConfig() *conf.ExternalConfig {
 	return &q.legacyConfig
 }
 
+// SetAndInitSchedul is necessary to set up
+// a mock scheduler for testing. Do not use for anything else.
+func (qosConfig *QosConfiguration) SetAndInitSchedul(sched scheduler.SchedulerInterface) {
+	qosConfig.schedul = sched
+	qosConfig.schedul.Init(qosConfig.config)
+}
+
 func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
 	QosConfiguration, error) {
 
 	qConfig := QosConfiguration{}
 	var err error
-	if err = convertExternalToInternalConfig(&qConfig, extConf); err != nil {
+	if err = ConvExternalToInternalConfig(&qConfig, extConf); err != nil {
 		log.Error("Initialising the classification data structures has failed", "error", err)
 	}
-	if err = initClassification(&qConfig); err != nil {
+	if err = InitClassification(&qConfig); err != nil {
 		log.Error("Initialising the classification data structures has failed", "error", err)
 	}
-	if err = initScheduler(&qConfig, forwarder); err != nil {
+	if err = InitScheduler(&qConfig, forwarder); err != nil {
 		log.Error("Initialising the scheduler has failed", "error", err)
 	}
-	if err = initWorkers(&qConfig); err != nil {
+	if err = InitWorkers(&qConfig); err != nil {
 		log.Error("Initialising the workers has failed", "error", err)
 	}
 
 	return qConfig, nil
 }
 
-func convertExternalToInternalConfig(qConfig *QosConfiguration, extConf conf.ExternalConfig) error {
+func ConvExternalToInternalConfig(qConfig *QosConfiguration, extConf conf.ExternalConfig) error {
 	var err error
 	qConfig.config, err = convertExternalToInteral(extConf)
 	qConfig.legacyConfig = extConf
 	return err
 }
 
-func initClassification(qConfig *QosConfiguration) error {
-	qConfig.config.SourceRules, qConfig.config.DestinationRules = queues.RulesToMap(qConfig.config.Rules)
+func InitClassification(qConfig *QosConfiguration) error {
+	qConfig.config.Rules = *queues.RulesToMap(qConfig.config.Rules.RulesList)
+	qConfig.config.Rules.CrCache.Init(256)
 
 	return nil
 }
 
-func initScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
+func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *queues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
-	qConfig.schedul = &scheduler.RoundRobinScheduler{}
+	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
+	qConfig.schedul = &scheduler.DeficitRoundRobinScheduler{}
+	// qConfig.schedul = &scheduler.MinMaxDeficitRoundRobinScheduler{}
+	// qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
 
 	return nil
 }
 
-func initWorkers(qConfig *QosConfiguration) error {
-	noWorkers := max(1, min(3, len(qConfig.config.Queues)))
-	qConfig.worker = workerConfiguration{noWorkers, 64}
+func InitWorkers(qConfig *QosConfiguration) error {
+	noWorkers := len(qConfig.config.Queues)
+	qConfig.worker = workerConfiguration{noWorkers, 256}
 	qConfig.workerChannels = make([]chan *queues.QPkt, qConfig.worker.noWorker)
 
 	for i := range qConfig.workerChannels {
@@ -130,14 +141,23 @@ func initWorkers(qConfig *QosConfiguration) error {
 }
 
 func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
-	queueNo := queues.GetQueueNumberWithHashFor(qosConfig.GetConfig(), rp)
+	rc := queues.RegularClassRule{}
+	config := qosConfig.GetConfig()
+
+	rule := rc.GetRuleForPacket(config, rp)
+
+	queueNo := 0
+	if rule != nil {
+		queueNo = rule.QueueNumber
+	}
+
 	qp := queues.QPkt{Rp: rp, QueueNo: queueNo}
 
 	select {
 	case *qosConfig.schedul.GetMessages() <- true:
 	default:
 	}
-	putOnQueue(qosConfig, queueNo, &qp)
+	qosConfig.SendToWorker(queueNo, &qp)
 }
 
 func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
@@ -161,26 +181,24 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 		qosConfig.SendNotification(qp)
 	case conf.DROPNOTIFY:
-		qosConfig.dropPacket(qp.Rp)
+		qosConfig.dropPacket(qp)
 		qosConfig.SendNotification(qp)
 	case conf.DROP:
-		qosConfig.dropPacket(qp.Rp)
+		qosConfig.dropPacket(qp)
 	default:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	}
 }
 
+// SendNotification might be needed for the part of @stygerma
 func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
-	np := queues.NPkt{Rule: queues.GetRuleWithHashFor(&qosConfig.config, qp.Rp), Qpkt: qp}
-	select {
-	case qosConfig.notifications <- &np:
-	default:
-	}
 }
 
-func (qosConfig *QosConfiguration) dropPacket(rp *rpkt.RtrPkt) {
-	defer rp.Release()
+func (qosConfig *QosConfiguration) dropPacket(qp *queues.QPkt) {
+	defer qp.Rp.Release()
+	qosConfig.SendNotification(qp)
 	qosConfig.droppedPackets++
+	log.Info("Dropping packet", "qosConfig.droppedPackets", qosConfig.droppedPackets)
 }
 
 func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRouterConfig, error) {
@@ -208,7 +226,7 @@ func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRoute
 		muta := &sync.Mutex{}
 		mutb := &sync.Mutex{}
 
-		queueToUse := &queues.PacketSliceQueue{}
+		queueToUse := &queues.ChannelPacketQueue{}
 
 		intQue = convertExternalToInteralQueue(extQue)
 		queueToUse.InitQueue(intQue, muta, mutb)
@@ -219,7 +237,17 @@ func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRoute
 	for _, iq := range internalQueues {
 		log.Trace("We have gotten the queue", "queue", iq.GetPacketQueue().Name)
 	}
-	return queues.InternalRouterConfig{Queues: internalQueues, Rules: internalRules}, nil
+
+	bw := convStringToNumber(rc.SchedulerConfig.Bandwidth)
+
+	sc := queues.SchedulerConfig{Latency: rc.SchedulerConfig.Latency, Bandwidth: bw}
+
+	return queues.InternalRouterConfig{
+		Scheduler: sc,
+		Queues:    internalQueues,
+		Rules: queues.MapRules{
+			RulesList: internalRules}}, nil
+
 }
 
 func convertExternalToInteralQueue(extQueue conf.ExternalPacketQueue) queues.PacketQueue {

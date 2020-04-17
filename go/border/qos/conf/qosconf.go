@@ -3,6 +3,7 @@ package conf
 import (
 	"io/ioutil"
 
+	"github.com/scionproto/scion/go/lib/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -46,10 +47,16 @@ type ExternalClassRule struct {
 	QueueNumber          int    `yaml:"queueNumber"`
 }
 
+type SchedulerConfig struct {
+	Latency   int    `yaml:"Latency"`
+	Bandwidth string `yaml:"Bandwidth"`
+}
+
 // ExternalConfig is what I am loading from the config file
 type ExternalConfig struct {
-	ExternalQueues []ExternalPacketQueue `yaml:"Queues"`
-	ExternalRules  []ExternalClassRule   `yaml:"Rules"`
+	SchedulerConfig SchedulerConfig       `yaml:"Scheduler"`
+	ExternalQueues  []ExternalPacketQueue `yaml:"Queues"`
+	ExternalRules   []ExternalClassRule   `yaml:"Rules"`
 }
 
 func LoadConfig(path string) (ExternalConfig, error) {
@@ -61,7 +68,12 @@ func LoadConfig(path string) (ExternalConfig, error) {
 	}
 	err = yaml.Unmarshal(yamlFile, &ec)
 	if err != nil {
+		log.Error("Loading the config file has failed", "error", err)
 		return ExternalConfig{}, err
 	}
+
+	log.Info("Config File is", "ec", ec)
+
 	return ec, nil
+
 }

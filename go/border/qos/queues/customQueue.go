@@ -26,7 +26,7 @@ type CustomPacketQueue struct {
 	mutex  *sync.Mutex
 	queue  []*QPkt
 	length int
-	tb     tokenBucket
+	tb     TokenBucket
 	head   int
 	tail   int
 	mask   int
@@ -38,7 +38,7 @@ func (pq *CustomPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutT
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.length = 0
-	pq.tb = tokenBucket{}
+	pq.tb = TokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
 	pq.queue = make([]*QPkt, pq.pktQue.MaxLength)
 	pq.head = 0
@@ -47,7 +47,8 @@ func (pq *CustomPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutT
 }
 
 func (pq *CustomPacketQueue) Enqueue(rp *QPkt) {
-	// TODO(joelfischerr): Making this lockfree makes it 10 times faster
+
+	// Making this lockfree makes it 10 times faster
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
 
@@ -88,7 +89,6 @@ func (pq *CustomPacketQueue) Pop() *QPkt {
 }
 
 func (pq *CustomPacketQueue) PopMultiple(number int) []*QPkt {
-	// TODO(joelfischerr): Readd this as soon as popMultiple works as standalone
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
 
@@ -132,6 +132,10 @@ func (pq *CustomPacketQueue) Police(qp *QPkt) conf.PoliceAction {
 
 func (pq *CustomPacketQueue) GetMinBandwidth() int {
 	return pq.pktQue.MinBandwidth
+}
+
+func (pq *CustomPacketQueue) GetMaxBandwidth() int {
+	return pq.pktQue.MaxBandWidth
 }
 
 func (pq *CustomPacketQueue) GetPriority() int {

@@ -21,42 +21,58 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 )
 
-// RoundRobinScheduler is a standard round robin dequeue ignoring things like priority
 type RoundRobinScheduler struct {
-	totalLength int
-	messages    chan bool
+	totalLength   int
+	messages      chan bool
+	sleepDuration int
+	tb            queues.TokenBucket
 }
 
 var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
 
+// This is a standard round robin dequeue ignoring things like priority
+
 func (sched *RoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
 	sched.totalLength = len(routerConfig.Queues)
 	sched.messages = make(chan bool)
+
+	sched.tb.Init(routerConfig.Scheduler.Bandwidth)
+	sched.sleepDuration = routerConfig.Scheduler.Latency
 }
 
-func (sched *RoundRobinScheduler) dequeue(routerConfig queues.InternalRouterConfig,
+func (sched *RoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
 	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
-	length := routerConfig.Queues[queueNo].GetLength()
-	if length > 0 {
-		qps := routerConfig.Queues[queueNo].PopMultiple(length)
-		for _, qp := range qps {
-			forwarder(qp.Rp)
+	length := queue.GetLength()
+	var qp *queues.QPkt
+
+	for i := 0; i < length; i++ {
+		qp = queue.Pop()
+		if qp == nil {
+			continue
 		}
+
+		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
+			time.Sleep(50 * time.Millisecond)
+		}
+
+		forwarder(qp.Rp)
 	}
 }
 
 func (sched *RoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig,
 	forwarder func(rp *rpkt.RtrPkt)) {
-
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
+	sleepDuration := time.Duration(time.Duration(sched.sleepDuration) * time.Microsecond)
 	for {
-		<-sched.messages
-		time.Sleep(100 * time.Millisecond)
+		t0 := time.Now()
 		for i := 0; i < sched.totalLength; i++ {
-			sched.dequeue(routerConfig, forwarder, i)
+			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
+		}
+		for time.Now().Sub(t0) < sleepDuration {
+			time.Sleep(time.Duration(sched.sleepDuration/10) * time.Microsecond)
 		}
 	}
 }

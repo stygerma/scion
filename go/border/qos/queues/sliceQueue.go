@@ -25,7 +25,7 @@ type PacketSliceQueue struct {
 	pktQue PacketQueue
 	mutex  *sync.Mutex
 	queue  []*QPkt
-	tb     tokenBucket
+	tb     TokenBucket
 }
 
 var _ PacketQueueInterface = (*PacketSliceQueue)(nil)
@@ -34,7 +34,7 @@ func (pq *PacketSliceQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb
 	pq.pktQue = que
 	pq.mutex = mutQue
 	pq.queue = make([]*QPkt, 0)
-	pq.tb = tokenBucket{}
+	pq.tb = TokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
 }
 
@@ -97,6 +97,10 @@ func (pq *PacketSliceQueue) Police(qp *QPkt) conf.PoliceAction {
 
 func (pq *PacketSliceQueue) GetMinBandwidth() int {
 	return pq.pktQue.MinBandwidth
+}
+
+func (pq *PacketSliceQueue) GetMaxBandwidth() int {
+	return pq.pktQue.MaxBandWidth
 }
 
 func (pq *PacketSliceQueue) GetPriority() int {

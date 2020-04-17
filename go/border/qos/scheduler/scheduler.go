@@ -15,6 +15,8 @@
 package scheduler
 
 import (
+	"time"
+
 	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
 )
@@ -22,7 +24,7 @@ import (
 type SchedulerInterface interface {
 	Init(routerConfig queues.InternalRouterConfig)
 	Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt))
-	dequeue(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt), queueNo int)
+	Dequeue(queue queues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int)
 	GetMessages() *chan bool
 }
 
@@ -39,3 +41,12 @@ func min(a, b int) int {
 	}
 	return b
 }
+
+var iterations int
+var t0 time.Time
+var tokensUsed [5]int
+var cirTokens [5]int
+var pirTokens [5]int
+var payedIntoSurplus [5]int
+var forceTake [5]int
+var overallTokensUsed int

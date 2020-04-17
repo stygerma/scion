@@ -76,6 +76,7 @@ type PacketQueueInterface interface {
 	Police(qp *QPkt) conf.PoliceAction
 	GetPriority() int
 	GetMinBandwidth() int
+	GetMaxBandwidth() int
 	GetPacketQueue() PacketQueue
 }
 

@@ -17,20 +17,18 @@ package queues
 import (
 	"math/rand"
 	"sync"
-	"sync/atomic"
 
 	"github.com/scionproto/scion/go/border/qos/conf"
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 type ChannelPacketQueue struct {
 	pktQue PacketQueue
-	mutex  *sync.Mutex
-	queue  chan *QPkt
-	length uint64
-	tb     tokenBucket
-	head   int
-	tail   int
-	mask   int
+
+	mutex *sync.Mutex
+
+	queue chan *QPkt
+	tb    TokenBucket
 }
 
 var _ PacketQueueInterface = (*ChannelPacketQueue)(nil)
@@ -38,34 +36,30 @@ var _ PacketQueueInterface = (*ChannelPacketQueue)(nil)
 func (pq *ChannelPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
 	pq.pktQue = que
 	pq.mutex = mutQue
-	pq.length = 0
-	pq.tb = tokenBucket{}
+	// pq.length = 0
+	pq.tb = TokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
-	pq.queue = make(chan *QPkt, pq.pktQue.MaxLength)
-	pq.head = 0
-	pq.tail = 0
-	pq.mask = pq.pktQue.MaxLength - 1
+	pq.queue = make(chan *QPkt, pq.pktQue.MaxLength+100)
 }
 
 func (pq *ChannelPacketQueue) Enqueue(rp *QPkt) {
 	pq.queue <- rp
-	atomic.AddUint64(&pq.length, 1)
 }
 
 func (pq *ChannelPacketQueue) canEnqueue() bool {
-	return int(pq.length) < pq.pktQue.MaxLength
+	return int(len(pq.queue)) < pq.pktQue.MaxLength
 }
 
 func (pq *ChannelPacketQueue) canDequeue() bool {
-	return pq.head < pq.tail
+	return true
 }
 
 func (pq *ChannelPacketQueue) GetFillLevel() int {
-	return int(pq.length) / int(pq.pktQue.MaxLength)
+	return int(len(pq.queue)) / int(pq.pktQue.MaxLength)
 }
 
 func (pq *ChannelPacketQueue) GetLength() int {
-	return int(pq.length)
+	return int(len(pq.queue))
 }
 
 func (pq *ChannelPacketQueue) peek() *QPkt {
@@ -73,15 +67,17 @@ func (pq *ChannelPacketQueue) peek() *QPkt {
 }
 
 func (pq *ChannelPacketQueue) Pop() *QPkt {
-	c := 1
-	atomic.AddUint64(&pq.length, ^uint64(c-1))
-	return <-pq.queue
+	var pkt *QPkt
+
+	select {
+	case pkt = <-pq.queue:
+	default:
+		pkt = nil
+	}
+	return pkt
 }
 
 func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
-	c := number
-	atomic.AddUint64(&pq.length, ^uint64(c-1))
-
 	pkts := make([]*QPkt, number)
 	for i := 0; i < number; i++ {
 		pkts[i] = <-pq.queue
@@ -90,7 +86,14 @@ func (pq *ChannelPacketQueue) PopMultiple(number int) []*QPkt {
 }
 
 func (pq *ChannelPacketQueue) CheckAction() conf.PoliceAction {
+
+	if pq.pktQue.MaxLength-100 <= pq.GetLength() {
+		log.Debug("Queue is at max capacity", "queueNo", pq.pktQue.ID)
+		return conf.DROPNOTIFY
+	}
+
 	level := pq.GetFillLevel()
+
 	for j := len(pq.pktQue.Profile) - 1; j >= 0; j-- {
 		if level >= pq.pktQue.Profile[j].FillLevel {
 			if rand.Intn(100) < (pq.pktQue.Profile[j].Prob) {
@@ -103,6 +106,10 @@ func (pq *ChannelPacketQueue) CheckAction() conf.PoliceAction {
 
 func (pq *ChannelPacketQueue) Police(qp *QPkt) conf.PoliceAction {
 	return pq.tb.PoliceBucket(qp)
+}
+
+func (pq *ChannelPacketQueue) GetMaxBandwidth() int {
+	return pq.pktQue.MaxBandWidth
 }
 
 func (pq *ChannelPacketQueue) GetMinBandwidth() int {

@@ -1,5 +1,4 @@
 // Copyright 2020 ETH Zurich
-// Copyright 2020 ETH Zurich, Anapaya Systems
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,25 +21,26 @@ import (
 	"github.com/scionproto/scion/go/border/qos/conf"
 )
 
-type tokenBucket struct {
+type TokenBucket struct {
 	maxBandWidth int // In Bps
-	tokens       int // One token is 1 B
+	tokens       int // One token is 1B
 	lastRefill   time.Time
 	mutex        *sync.Mutex
 }
 
-func (tb *tokenBucket) Init(maxBandwidth int) {
+func (tb *TokenBucket) Init(maxBandwidth int) {
 	tb.maxBandWidth = maxBandwidth
 	tb.tokens = maxBandwidth
 	tb.lastRefill = time.Now()
 	tb.mutex = &sync.Mutex{}
 }
 
-func (tb *tokenBucket) refill() {
+func (tb *TokenBucket) refill() {
+
 	now := time.Now()
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
-	if timeSinceLastUpdate > 100 {
+	if timeSinceLastUpdate > 20 {
 
 		newTokens := ((tb.maxBandWidth) * int(timeSinceLastUpdate)) / (1000)
 		tb.lastRefill = now
@@ -53,9 +53,39 @@ func (tb *tokenBucket) refill() {
 	}
 }
 
-func (tb *tokenBucket) PoliceBucket(qp *QPkt) conf.PoliceAction {
-	tb.mutex.Lock()
-	defer tb.mutex.Unlock()
+func (tb *TokenBucket) Available(amount int) bool {
+	tb.refill()
+	if tb.tokens > amount {
+		return true
+	}
+	return false
+}
+
+func (tb *TokenBucket) GetAvailable() int {
+	tb.refill()
+	return tb.tokens
+}
+
+func (tb *TokenBucket) GetAll() int {
+	val := tb.tokens
+	tb.tokens = 0
+	return val
+}
+
+func (tb *TokenBucket) ForceTake(no int) {
+	tb.tokens -= no
+}
+
+func (tb *TokenBucket) Take(no int) bool {
+	tb.refill()
+	if tb.tokens-no > 0 {
+		tb.tokens -= no
+		return true
+	}
+	return false
+}
+
+func (tb *TokenBucket) PoliceBucket(qp *QPkt) conf.PoliceAction {
 
 	tokenForPacket := (qp.Rp.Bytes().Len()) // In byte
 

@@ -1,3 +1,6 @@
+Scheduler:
+    Latency: 0
+    Bandwidth: 20Mbps
 Queues:
     -
         name: 'General Queue'
@@ -5,7 +8,7 @@ Queues:
         CIR: 30
         PIR: 70
         policeRate: 50000000
-        maxLength: 1024
+        maxLength: 4096
         priority: 5
         congestionWarning: {approach: 0, informationContent: 25}
         profile:
@@ -17,8 +20,8 @@ Queues:
         id: 1
         CIR: 0
         PIR: 70
-        policeRate: 5Mbps
-        maxLength: 1024
+        policeRate: 50Mbps
+        maxLength: 4096
         priority: 1
         congestionWarning: {approach: 11, informationContent: 27}
         profile:
@@ -31,7 +34,7 @@ Queues:
         CIR: 50
         PIR: 80
         policeRate: 5000000
-        maxLength: 1024
+        maxLength: 4096
         priority: 1
         congestionWarning: {approach: 22, informationContent: 29}
         profile:
@@ -55,5 +58,9 @@ Rules:
         sourceAs: '1-ff00:0:110'
         destinationAs: '1-ff00:0:111'
         L4Type:
+            - 0
             - 1
+            - 6
+            - 17
+            - 222
         queueNumber: 2
