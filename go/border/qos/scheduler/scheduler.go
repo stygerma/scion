@@ -28,6 +28,41 @@ type SchedulerInterface interface {
 	GetMessages() *chan bool
 }
 
+type ScheduleLogger struct {
+	incoming  []int
+	lastRound []int
+	attempted []int
+	total     []int
+
+	iterations        int
+	t0                time.Time
+	tokensUsed        []int
+	cirTokens         []int
+	pirTokens         []int
+	payedIntoSurplus  []int
+	forceTake         []int
+	overallTokensUsed int
+}
+
+func initLogger(length int) ScheduleLogger {
+	logger := ScheduleLogger{}
+	logger.incoming = make([]int, length)
+	logger.lastRound = make([]int, length)
+	logger.attempted = make([]int, length)
+	logger.total = make([]int, length)
+	logger.iterations = 0
+	logger.t0 = time.Now()
+
+	logger.tokensUsed = make([]int, length)
+	logger.cirTokens = make([]int, length)
+	logger.pirTokens = make([]int, length)
+	logger.payedIntoSurplus = make([]int, length)
+	logger.forceTake = make([]int, length)
+	logger.overallTokensUsed = 0
+
+	return logger
+}
+
 func max(a, b int) int {
 	if a > b {
 		return a
@@ -41,12 +76,3 @@ func min(a, b int) int {
 	}
 	return b
 }
-
-var iterations int
-var t0 time.Time
-var tokensUsed [5]int
-var cirTokens [5]int
-var pirTokens [5]int
-var payedIntoSurplus [5]int
-var forceTake [5]int
-var overallTokensUsed int

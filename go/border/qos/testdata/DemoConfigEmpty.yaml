@@ -22,8 +22,8 @@ Rules:
         destinationAs: '100-ff00:0:989'
         destinationMatchMode: 1
         L4Type:
-            - 0
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 2

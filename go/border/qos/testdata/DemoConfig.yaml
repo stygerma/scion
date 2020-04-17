@@ -72,10 +72,10 @@ Rules:
         destinationAs: '100-ff00:0:989'
         destinationMatchMode: 4
         L4Type:
-            - 0
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
         name: 'FROM ANY TO AS110 ON Queue=1'
@@ -85,10 +85,10 @@ Rules:
         destinationAs: '1-ff00:0:110'
         destinationMatchMode: 0
         L4Type:
-            - 0
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
         name: 'FROM AS112 ON Queue=2'
@@ -98,10 +98,10 @@ Rules:
         destinationAs: '100-ff00:0:989'
         destinationMatchMode: 4
         L4Type:
-            - 0
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 2
     -
         name: 'TO AS112 ON Queue=2'
@@ -111,10 +111,10 @@ Rules:
         destinationAs: '1-ff00:0:112'
         destinationMatchMode: 0
         L4Type:
-            - 0
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 2
     -
         name: 'FROM AS113 ON Queue=2'
@@ -124,10 +124,10 @@ Rules:
         destinationAs: '100-ff00:0:989'
         destinationMatchMode: 4
         L4Type:
-            - 0
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
         name: 'TO AS113 ON Queue=2'
@@ -137,8 +137,8 @@ Rules:
         destinationAs: '1-ff00:0:113'
         destinationMatchMode: 0
         L4Type:
-            - 0
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 1

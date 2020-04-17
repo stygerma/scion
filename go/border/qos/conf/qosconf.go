@@ -34,17 +34,22 @@ type ExternalPacketQueue struct {
 	Profile      []ActionProfile `yaml:"profile"`
 }
 
+type ExternalProtocolMatchType struct {
+	BaseProtocol int `yaml:"Protocol"`
+	Extension    int `yaml:"Extension"`
+}
+
 // ExternalClassRule contains a rule for matching packets
 type ExternalClassRule struct {
 	// This is currently means the ID of the sending border router
-	Name                 string `yaml:"name"`
-	Priority             int    `yaml:"priority"`
-	SourceAs             string `yaml:"sourceAs"`
-	SourceMatchMode      int    `yaml:"sourceMatchMode"`
-	DestinationAs        string `yaml:"destinationAs"`
-	DestinationMatchMode int    `yaml:"destinationMatchMode"`
-	L4Type               []int  `yaml:"L4Type"`
-	QueueNumber          int    `yaml:"queueNumber"`
+	Name                 string                      `yaml:"name"`
+	Priority             int                         `yaml:"priority"`
+	SourceAs             string                      `yaml:"sourceAs"`
+	SourceMatchMode      int                         `yaml:"sourceMatchMode"`
+	DestinationAs        string                      `yaml:"destinationAs"`
+	DestinationMatchMode int                         `yaml:"destinationMatchMode"`
+	L4Type               []ExternalProtocolMatchType `yaml:"L4Type"`
+	QueueNumber          int                         `yaml:"queueNumber"`
 }
 
 type SchedulerConfig struct {

@@ -25,6 +25,8 @@ type MinMaxDeficitRoundRobinScheduler struct {
 
 	sleepDuration int
 	tb            queues.TokenBucket
+
+	logger ScheduleLogger
 }
 
 type surplus struct {
@@ -39,6 +41,8 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Init(routerConfig queues.Internal
 
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
+
+	sched.logger = initLogger(sched.totalLength)
 
 	sched.schedulerSurplusMtx = &sync.Mutex{}
 	sched.schedulerSurplus = surplus{0, make([]int, sched.totalLength), -1}
@@ -78,36 +82,36 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeuer(routerConfig queues.Inte
 	}
 }
 
-
 func (sched *MinMaxDeficitRoundRobinScheduler) LogUpdate(
 	routerConfig queues.InternalRouterConfig) {
 
-	iterations++
-	if time.Now().Sub(t0) > time.Duration(5*time.Second) {
+	sched.logger.iterations++
+	if time.Now().Sub(sched.logger.t0) > time.Duration(5*time.Second) {
 
 		var queLen [5]int
 		for i := 0; i < sched.totalLength; i++ {
 			queLen[i] = routerConfig.Queues[i].GetLength()
 		}
 		log.Debug("STAT",
-			"iterations", iterations,
-			"incoming", incoming,
-			"deqLastRound", lastRound,
-			"deqAttempted", attempted,
-			"deqTotal", total, "currQueueLen", queLen)
-		for i := 0; i < len(lastRound); i++ {
-			lastRound[i] = 0
+			"iterations", sched.logger.iterations,
+			"incoming", sched.logger.incoming,
+			"deqLastRound", sched.logger.lastRound,
+			"deqAttempted", sched.logger.attempted,
+			"deqTotal", sched.logger.total, "currQueueLen", queLen)
+		for i := 0; i < len(sched.logger.lastRound); i++ {
+			sched.logger.lastRound[i] = 0
 		}
-		for i := 0; i < len(attempted); i++ {
+		for i := 0; i < len(sched.logger.attempted); i++ {
 
-			attempted[i] = 0
+			sched.logger.attempted[i] = 0
 		}
-		for i := 0; i < len(incoming); i++ {
-			incoming[i] = 0
+		for i := 0; i < len(sched.logger.incoming); i++ {
+			sched.logger.incoming[i] = 0
 		}
-		t0 = time.Now()
-		iterations = 0
+		sched.logger.t0 = time.Now()
+		sched.logger.iterations = 0
 	}
+
 }
 
 func (sched *MinMaxDeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
@@ -116,7 +120,7 @@ func (sched *MinMaxDeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueI
 	pktToDequeue := sched.adjustForQuantum(queue)
 	pktToDequeue = sched.adjustForSurplus(queue, pktToDequeue, queueNo)
 
-	attempted[queueNo] += pktToDequeue
+	sched.logger.attempted[queueNo] += pktToDequeue
 
 	sched.dequeuePackets(queue, pktToDequeue, forwarder, queueNo)
 
@@ -139,8 +143,8 @@ func (sched *MinMaxDeficitRoundRobinScheduler) dequeuePackets(queue queues.Packe
 		j++
 		forwarder(qp.Rp)
 	}
-	lastRound[queueNo] += j
-	total[queueNo] += j
+	sched.logger.lastRound[queueNo] += j
+	sched.logger.total[queueNo] += j
 	sched.jobs <- j
 	return j
 }
