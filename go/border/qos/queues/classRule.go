@@ -386,6 +386,33 @@ func matchL4Type(
 	}
 }
 
+// func matchL4Type(
+// 	list *[]*InternalClassRule,
+// 	l4t common.L4ProtocolType,
+// 	extensions []common.ExtnType) {
+
+// 	for i := 0; i < len(*list); i++ {
+// 		matched := false
+// 		if (*list)[i] == nil {
+// 			break
+// 		}
+// 		for j := 0; j < len((*list)[i].L4Type); j++ {
+// 			if (*list)[i].L4Type[j].baseProtocol == l4t {
+// 				for k := 0; k < len(extensions); k++ {
+// 					if (*list)[i].L4Type[j].extension == extensions[k] {
+// 						matched = true
+// 						break
+// 					}
+// 				}
+// 			}
+// 		}
+// 		if !matched {
+// 			(*list)[i] = nil
+// 		}
+// 	}
+
+// }
+
 func getRuleWithPrevMax(
 	returnRule *InternalClassRule,
 	list []*InternalClassRule,
