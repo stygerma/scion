@@ -27,6 +27,8 @@ type RateRoundRobinScheduler struct {
 	cirBuckets    []queues.TokenBucket
 	pirBuckets    []queues.TokenBucket
 	tb            queues.TokenBucket
+
+	logger ScheduleLogger
 }
 
 var _ SchedulerInterface = (*RateRoundRobinScheduler)(nil)
@@ -35,6 +37,8 @@ func (sched *RateRoundRobinScheduler) Init(routerConfig queues.InternalRouterCon
 
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
+
+	sched.logger = initLogger(sched.totalLength)
 
 	sched.schedulerSurplus = surplus{0, make([]int, sched.totalLength), -1}
 	sched.schedulerSurplusMtx = &sync.Mutex{}
@@ -95,18 +99,18 @@ func (sched *RateRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRoute
 
 func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRouterConfig) {
 
-	iterations++
-	if time.Now().Sub(t0) > time.Duration(5*time.Second) {
+	sched.logger.iterations++
+	if time.Now().Sub(sched.logger.t0) > time.Duration(5*time.Second) {
 
 		var queLen [5]int
 		for i := 0; i < sched.totalLength; i++ {
 			queLen[i] = routerConfig.Queues[i].GetLength()
 		}
-		log.Debug("STAT", "iterations", iterations,
-			"incoming", incoming,
-			"deqLastRound", lastRound,
-			"deqAttempted", attempted,
-			"deqTotal", total,
+		log.Debug("STAT", "iterations", sched.logger.iterations,
+			"incoming", sched.logger.incoming,
+			"deqLastRound", sched.logger.lastRound,
+			"deqAttempted", sched.logger.attempted,
+			"deqTotal", sched.logger.total,
 			"currQueueLen", queLen,
 			"surplus", sched.schedulerSurplus.Surplus)
 
@@ -120,17 +124,22 @@ func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRout
 				"2", sched.pirBuckets[2].GetAvailable(),
 				"3", sched.pirBuckets[3].GetAvailable())
 			log.Debug("STAT",
-				"tokensUsed", tokensUsed,
-				"forceTake", forceTake,
-				"cirTokens", cirTokens,
-				"pirTokens", pirTokens,
-				"payedIntoSurplus", payedIntoSurplus)
-			queue0 := float64(tokensUsed[0]+forceTake[0]) / 5.0 / 1000000.0 * 8.0
-			queue1 := float64(tokensUsed[1]+forceTake[1]) / 5.0 / 1000000.0 * 8.0
-			queue2 := float64(tokensUsed[2]+forceTake[2]) / 5.0 / 1000000.0 * 8.0
-			queue3 := float64(tokensUsed[3]+forceTake[3]) / 5.0 / 1000000.0 * 8.0
-			queue4 := float64(tokensUsed[4]+forceTake[4]) / 5.0 / 1000000.0 * 8.0
-			overall := float64(overallTokensUsed) / 5.0 / 1000000.0
+				"tokensUsed", sched.logger.tokensUsed,
+				"forceTake", sched.logger.forceTake,
+				"cirTokens", sched.logger.cirTokens,
+				"pirTokens", sched.logger.pirTokens,
+				"payedIntoSurplus", sched.logger.payedIntoSurplus)
+			amount0 := float64(sched.logger.tokensUsed[0] + sched.logger.forceTake[0])
+			amount1 := float64(sched.logger.tokensUsed[1] + sched.logger.forceTake[1])
+			amount2 := float64(sched.logger.tokensUsed[2] + sched.logger.forceTake[2])
+			amount3 := float64(sched.logger.tokensUsed[3] + sched.logger.forceTake[3])
+			amount4 := float64(sched.logger.tokensUsed[4] + sched.logger.forceTake[4])
+			queue0 := float64(amount0) / 5.0 / 1000000.0 * 8.0
+			queue1 := float64(amount1) / 5.0 / 1000000.0 * 8.0
+			queue2 := float64(amount2) / 5.0 / 1000000.0 * 8.0
+			queue3 := float64(amount3) / 5.0 / 1000000.0 * 8.0
+			queue4 := float64(amount4) / 5.0 / 1000000.0 * 8.0
+			overall := float64(sched.logger.overallTokensUsed) / 5.0 / 1000000.0
 			log.Debug("STAT",
 				"overall", overall,
 				"maxOverall", 2,
@@ -141,34 +150,34 @@ func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRout
 				"4", queue4)
 
 		}
-		for i := 0; i < len(lastRound); i++ {
-			lastRound[i] = 0
+		for i := 0; i < len(sched.logger.lastRound); i++ {
+			sched.logger.lastRound[i] = 0
 		}
-		for i := 0; i < len(attempted); i++ {
+		for i := 0; i < len(sched.logger.attempted); i++ {
 
-			attempted[i] = 0
+			sched.logger.attempted[i] = 0
 		}
-		for i := 0; i < len(incoming); i++ {
-			incoming[i] = 0
+		for i := 0; i < len(sched.logger.incoming); i++ {
+			sched.logger.incoming[i] = 0
 		}
-		for i := 0; i < len(tokensUsed); i++ {
-			tokensUsed[i] = 0
+		for i := 0; i < len(sched.logger.tokensUsed); i++ {
+			sched.logger.tokensUsed[i] = 0
 		}
-		for i := 0; i < len(cirTokens); i++ {
-			cirTokens[i] = 0
+		for i := 0; i < len(sched.logger.cirTokens); i++ {
+			sched.logger.cirTokens[i] = 0
 		}
-		for i := 0; i < len(pirTokens); i++ {
-			pirTokens[i] = 0
+		for i := 0; i < len(sched.logger.pirTokens); i++ {
+			sched.logger.pirTokens[i] = 0
 		}
-		for i := 0; i < len(payedIntoSurplus); i++ {
-			payedIntoSurplus[i] = 0
+		for i := 0; i < len(sched.logger.payedIntoSurplus); i++ {
+			sched.logger.payedIntoSurplus[i] = 0
 		}
-		for i := 0; i < len(forceTake); i++ {
-			forceTake[i] = 0
+		for i := 0; i < len(sched.logger.forceTake); i++ {
+			sched.logger.forceTake[i] = 0
 		}
-		overallTokensUsed = 0
-		t0 = time.Now()
-		iterations = 0
+		sched.logger.overallTokensUsed = 0
+		sched.logger.t0 = time.Now()
+		sched.logger.iterations = 0
 	}
 
 }
@@ -177,7 +186,7 @@ func (sched *RateRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
 	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 	// no := queue.GetMinBandwidth()
 	no := 5
-	attempted[queueNo] += no
+	sched.logger.attempted[queueNo] += no
 	sched.dequeuePackets(queue, no, forwarder, queueNo)
 }
 
@@ -204,12 +213,12 @@ func (sched *RateRoundRobinScheduler) dequeuePackets(queue queues.PacketQueueInt
 		forwarder(qp.Rp)
 	}
 
-	lastRound[queueNo] += j
-	total[queueNo] += j
+	sched.logger.lastRound[queueNo] += j
+	sched.logger.total[queueNo] += j
 	sched.jobs <- j
 	for i := 0; i < 5; i++ {
 		if sched.cirBuckets[queueNo].Take(1500) {
-			payedIntoSurplus[queueNo] += 1500
+			sched.logger.payedIntoSurplus[queueNo] += 1500
 			sched.payIntoSurplus(queue, queueNo, 1500)
 		}
 	}
@@ -237,9 +246,9 @@ func (sched *RateRoundRobinScheduler) takeFromBuckets(packetLength int, queueNo 
 		if sched.cirBuckets[queueNo].Take(packetLength) {
 			sched.pirBuckets[queueNo].ForceTake(packetLength)
 			sched.tb.ForceTake(packetLength)
-			overallTokensUsed += packetLength
-			tokensUsed[queueNo] += packetLength
-			cirTokens[queueNo] += packetLength
+			sched.logger.overallTokensUsed += packetLength
+			sched.logger.tokensUsed[queueNo] += packetLength
+			sched.logger.cirTokens[queueNo] += packetLength
 			return true
 		}
 
@@ -247,16 +256,16 @@ func (sched *RateRoundRobinScheduler) takeFromBuckets(packetLength int, queueNo 
 			if sched.takeSurplus(packetLength) {
 				sched.pirBuckets[queueNo].Take(packetLength)
 				sched.tb.ForceTake(packetLength)
-				overallTokensUsed += packetLength
-				tokensUsed[queueNo] += packetLength
-				pirTokens[queueNo] += packetLength
+				sched.logger.overallTokensUsed += packetLength
+				sched.logger.tokensUsed[queueNo] += packetLength
+				sched.logger.pirTokens[queueNo] += packetLength
 				return true
 			}
 		}
 	}
 
-	overallTokensUsed += packetLength
-	forceTake[queueNo] += packetLength
+	sched.logger.overallTokensUsed += packetLength
+	sched.logger.forceTake[queueNo] += packetLength
 
 	return false
 }
@@ -276,14 +285,12 @@ func (sched *RateRoundRobinScheduler) takeSurplus(amount int) bool {
 	return false
 }
 
-
 func (sched *RateRoundRobinScheduler) payIntoSurplus(queue queues.PacketQueueInterface,
 	queueNo int, payment int) {
 
 	a := sched.schedulerSurplus.Surplus + payment
 	b := sched.schedulerSurplus.MaxSurplus
 	sched.schedulerSurplus.Surplus = min(a, b)
-
 	sched.schedulerSurplus.Payments[queueNo] = sched.schedulerSurplus.Surplus
 }
 
