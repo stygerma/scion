@@ -27,6 +27,11 @@ type ClassRuleInterface interface {
 	GetRuleForPacket(config *InternalRouterConfig, rp *rpkt.RtrPkt) *InternalClassRule
 }
 
+type ProtocolMatchType struct {
+	baseProtocol common.L4ProtocolType
+	extension    int
+}
+
 type InternalClassRule struct {
 	// This is currently means the ID of the sending border router
 	Name          string
@@ -34,7 +39,7 @@ type InternalClassRule struct {
 	SourceAs      matchRule
 	NextHopAs     matchRule
 	DestinationAs matchRule
-	L4Type        []common.L4ProtocolType
+	L4Type        []ProtocolMatchType
 	QueueNumber   int
 }
 
@@ -79,11 +84,12 @@ func ConvClassRuleToInternal(cr conf.ExternalClassRule) (InternalClassRule, erro
 		return InternalClassRule{}, err
 	}
 
-	l4t := make([]common.L4ProtocolType, 0)
+	l4t := make([]ProtocolMatchType, 0)
 
 	for _, l4pt := range cr.L4Type {
-		l4t = append(l4t, common.L4ProtocolType(l4pt))
-
+		l4t = append(l4t, ProtocolMatchType{
+			baseProtocol: common.L4ProtocolType(l4pt.BaseProtocol),
+			extension:    l4pt.Extension})
 	}
 
 	rule := InternalClassRule{
@@ -274,12 +280,23 @@ func (*RegularClassRule) GetRuleForPacket(
 	srcAddr, _ := rp.SrcIA()
 	dstAddr, _ := rp.DstIA()
 	l4h, _ := rp.L4Hdr(false)
+	var extensions []common.ExtnType
 	var l4t common.L4ProtocolType
 
 	if l4h == nil {
 		l4t = 0
 	} else {
 		l4t = l4h.L4Type()
+		hbhext := rp.HBHExt
+		e2eext := rp.E2EExt
+		for k := 0; k < len(hbhext); k++ {
+			ext, _ := hbhext[k].GetExtn()
+			extensions = append(extensions, ext.Type())
+		}
+		for k := 0; k < len(e2eext); k++ {
+			ext, _ := e2eext[k].GetExtn()
+			extensions = append(extensions, ext.Type())
+		}
 	}
 
 	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, l4type: l4t}
@@ -287,7 +304,9 @@ func (*RegularClassRule) GetRuleForPacket(
 	returnRule = config.Rules.CrCache.Get(entry)
 
 	if returnRule != nil {
-		return returnRule
+		if matchRuleL4Type(returnRule, extensions) {
+			return returnRule
+		}
 	}
 
 	returnRule = emptyRule
@@ -314,7 +333,7 @@ func (*RegularClassRule) GetRuleForPacket(
 
 	matched = intersectListsRules(sources, destinations)
 
-	matchL4Type(&matched, l4t)
+	matchL4Type(&matched, l4t, extensions)
 
 	max := -1
 	max, returnRule = getRuleWithPrevMax(returnRule, matched, max)
@@ -326,24 +345,45 @@ func (*RegularClassRule) GetRuleForPacket(
 	return returnRule
 }
 
-func matchL4Type(list *[]*InternalClassRule, l4t common.L4ProtocolType) {
+func matchRuleL4Type(rule *InternalClassRule, extensions []common.ExtnType) bool {
+
+	for i := 0; i < len(rule.L4Type); i++ {
+		if rule.L4Type[i].extension == -1 {
+			return true
+		}
+		for k := 0; k < len(extensions); k++ {
+			if uint8(rule.L4Type[i].extension) == extensions[k].Type {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func matchL4Type(
+	list *[]*InternalClassRule,
+	l4t common.L4ProtocolType,
+	extensions []common.ExtnType) {
 
 	for i := 0; i < len(*list); i++ {
 		matched := false
 		if (*list)[i] == nil {
 			break
 		}
+
 		for j := 0; j < len((*list)[i].L4Type); j++ {
-			if (*list)[i].L4Type[j] == l4t {
-				matched = true
-				break
+			if (*list)[i].L4Type[j].baseProtocol == l4t {
+				if matchRuleL4Type((*list)[i], extensions) {
+					matched = true
+					break
+				}
 			}
 		}
 		if !matched {
 			(*list)[i] = nil
 		}
 	}
-
 }
 
 func getRuleWithPrevMax(

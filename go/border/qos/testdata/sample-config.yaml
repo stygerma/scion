@@ -46,11 +46,11 @@ Rules:
         sourceAs: '2-ff00:0:212'
         destinationAs: '1-ff00:0:110'
         L4Type:
-            - 0
-            - 1
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 1, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
         name: 'Drop Test Rule'
@@ -58,9 +58,9 @@ Rules:
         sourceAs: '1-ff00:0:110'
         destinationAs: '1-ff00:0:111'
         L4Type:
-            - 0
-            - 1
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 1, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 2
