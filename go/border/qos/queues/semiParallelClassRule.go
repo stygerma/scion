@@ -24,6 +24,7 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 
 	var srcAddr addr.IA
 	var dstAddr addr.IA
+	var extensions []common.ExtnType
 	var l4t common.L4ProtocolType
 
 	go func(dun chan bool) {
@@ -42,6 +43,16 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 			l4t = 0
 		} else {
 			l4t = l4h.L4Type()
+			hbhext := rp.HBHExt
+			e2eext := rp.E2EExt
+			for k := 0; k < len(hbhext); k++ {
+				ext, _ := hbhext[k].GetExtn()
+				extensions = append(extensions, ext.Type())
+			}
+			for k := 0; k < len(e2eext); k++ {
+				ext, _ := e2eext[k].GetExtn()
+				extensions = append(extensions, ext.Type())
+			}
 		}
 
 		dun <- true
@@ -56,7 +67,9 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 	returnRule = config.Rules.CrCache.Get(entry)
 
 	if returnRule != nil {
-		return returnRule
+		if matchRuleL4Type(returnRule, extensions) {
+			return returnRule
+		}
 	}
 
 	returnRule = emptyRule
@@ -139,7 +152,7 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 
 	matched = intersectLongListsRules(pcr.sources, pcr.destinations)
 
-	matchL4Type(&matched, l4t)
+	matchL4Type(&matched, l4t, extensions)
 
 	var result [3]*InternalClassRule
 
