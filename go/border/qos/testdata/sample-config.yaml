@@ -49,7 +49,11 @@ Rules:
             - {Protocol: 0, Extension: -1}
             - {Protocol: 1, Extension: -1}
             - {Protocol: 6, Extension: -1}
+<<<<<<< e1756c009f1c4d77cb17c71d93e7c483954b050f
             - {Protocol: 17, Extension: -1}
+=======
+            - {Protocol: 7, Extension: -1}
+>>>>>>> Extension matching (#31)
             - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -

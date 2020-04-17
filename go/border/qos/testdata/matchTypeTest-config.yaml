@@ -119,11 +119,11 @@ Rules:
         destinationAs: '22-ff00:0:188'
         destinationMatchMode: 0
         L4Type:
-            - 0
-            - 1
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 1, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
         name: 'Exact - ISDONLY'
@@ -133,11 +133,11 @@ Rules:
         destinationAs: '44-ff00:0:166'
         destinationMatchMode: 1
         L4Type:
-            - 0
-            - 1
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 1, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 2
     -
         name: 'Exact - ASONLY'
@@ -147,11 +147,11 @@ Rules:
         destinationAs: '66-ff00:0:344'
         destinationMatchMode: 2
         L4Type:
-            - 0
-            - 1
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 1, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 3
     -
         name: 'Exact - RANGE'
@@ -161,11 +161,11 @@ Rules:
         destinationAs: '85-ff00:0:222||89-ff00:0:222'
         destinationMatchMode: 3
         L4Type:
-            - 0
-            - 1
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 1, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 4
     -
         name: 'Exact - ANY'
@@ -175,11 +175,11 @@ Rules:
         destinationAs: '100-ff00:0:989'
         destinationMatchMode: 4
         L4Type:
-            - 0
-            - 1
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 1, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 5
     -
         name: 'ANY - Exact'
@@ -189,9 +189,9 @@ Rules:
         destinationAs: '2-ff00:0:011'
         destinationMatchMode: 0
         L4Type:
-            - 0
-            - 1
-            - 6
-            - 17
-            - 222
+            - {Protocol: 0, Extension: -1}
+            - {Protocol: 1, Extension: -1}
+            - {Protocol: 6, Extension: -1}
+            - {Protocol: 7, Extension: -1}
+            - {Protocol: 222, Extension: -1}
         queueNumber: 6
