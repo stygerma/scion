@@ -1,6 +1,6 @@
 Scheduler:
     Latency: 0
-    Bandwidth: 20Mbps
+    Bandwidth: 50Mbps
 Queues:
     -
         name: 'General Queue, all SCMP lives here'
@@ -42,8 +42,8 @@ Queues:
     -
         name: 'TO AS112'
         id: 3
-        CIR: 20
-        PIR: 20
+        CIR: 30
+        PIR: 30
         policeRate: 500Mbps
         maxLength: 512
         priority: 2
