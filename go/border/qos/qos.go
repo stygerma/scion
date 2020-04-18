@@ -177,6 +177,7 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 	switch act {
 	case conf.PASS:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
+		qosConfig.SendNotification(qp) //MS: remove later
 	case conf.NOTIFY:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 		qosConfig.SendNotification(qp)
@@ -192,6 +193,26 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 
 // SendNotification might be needed for the part of @stygerma
 func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
+	rc := queues.RegularClassRule{}
+	config := qosConfig.GetConfig()
+
+	rule := rc.GetRuleForPacket(config, qp.Rp)
+	np := queues.NPkt{Rule: rule, Qpkt: qp}
+	log.Debug("Send notification method in router")
+
+	queueNo := 0
+	if rule != nil {
+		queueNo = rule.QueueNumber
+	}
+
+	restriction := qosConfig.config.Queues[queueNo].GetCongestionWarning().InformationContent
+	log.Debug("restrictions on information content", "restriction", restriction)
+	np.Qpkt.Rp.RefInc(1) //should avoid the packet being dropped before we can create the scmp notification
+
+	select {
+	case qosConfig.notifications <- &np:
+	default:
+	}
 }
 
 func (qosConfig *QosConfiguration) dropPacket(qp *queues.QPkt) {
