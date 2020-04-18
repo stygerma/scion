@@ -175,7 +175,6 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		metrics.Process.Pkts(l).Inc()
 		return
 	}
-
 	r.qosConfig.QueuePacket(rp)
 }
 
