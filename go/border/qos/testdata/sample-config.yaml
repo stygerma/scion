@@ -49,7 +49,7 @@ Rules:
             - {Protocol: 0, Extension: -1}
             - {Protocol: 1, Extension: -1}
             - {Protocol: 6, Extension: -1}
-            - {Protocol: 7, Extension: -1}
+            - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
@@ -61,6 +61,6 @@ Rules:
             - {Protocol: 0, Extension: -1}
             - {Protocol: 1, Extension: -1}
             - {Protocol: 6, Extension: -1}
-            - {Protocol: 7, Extension: -1}
+            - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 2
