@@ -19,7 +19,6 @@ import (
 
 	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 // This is a deficit round robin dequeuer.
@@ -133,16 +132,13 @@ func (sched *WeightedRoundRobinScheduler) showLog(routerConfig queues.InternalRo
 		for i := 0; i < sched.totalLength; i++ {
 			queLen[i] = routerConfig.Queues[i].GetLength()
 		}
-		log.Debug("STAT",
-			"iterations", sched.logger.iterations,
-			"incoming", sched.logger.incoming,
-			"deqLastRound",
-			sched.logger.lastRound, "deqAttempted",
-			sched.logger.attempted, "deqTotal",
-			sched.logger.total, "currQueueLen", queLen)
-		log.Debug("SPEED", "Mbps", float64(amount0)/1000000.0*8.0, "MBps", float64(amount0)/1000000.0)
-		amount0 = 0
-		log.Debug("Bucket", "tokens Mbps", float64(sched.tb.GetAvailable())/1000000.0*8.0, "MBps", float64(sched.tb.GetAvailable())/1000000.0, "allwed MBps", float64(sched.tb.GetMaxBandwidth())/1000000.0)
+		// log.Debug("STAT",
+		// 	"iterations", sched.logger.iterations,
+		// 	"incoming", sched.logger.incoming,
+		// 	"deqLastRound",
+		// 	sched.logger.lastRound, "deqAttempted",
+		// 	sched.logger.attempted, "deqTotal",
+		// 	sched.logger.total, "currQueueLen", queLen)
 		for i := 0; i < len(sched.logger.lastRound); i++ {
 			sched.logger.lastRound[i] = 0
 		}
