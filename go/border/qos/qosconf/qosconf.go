@@ -55,7 +55,7 @@ type SchedulerConfig struct {
 	Bandwidth string `yaml:"Bandwidth"`
 }
 
-const configFileLocation = "/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml"
+const configFileLocation = "/home/marc/go/src/github.com/scionproto/scion/go/border/qos/sample-config.yaml"
 
 // ExternalConfig is what I am loading from the config file
 type ExternalConfig struct {
@@ -74,7 +74,7 @@ func LoadConfig(path string) (ExternalConfig, error) {
 	// yamlFile, err = ioutil.ReadFile(path)
 
 	if err != nil {
-		yamlFile, err = ioutil.ReadFile("/home/fischjoe/go/src/github.com/joelfischerr/scion/go/border/qos/sample-config.yaml")
+		yamlFile, err = ioutil.ReadFile("/home/marc/go/src/github.com/scionproto/scion/go/border/qos/sample-config.yaml")
 	}
 
 	if err != nil {
