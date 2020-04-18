@@ -116,6 +116,21 @@ printBlue "AS111 to AS112"
 
 waitForEnter
 
+printBlue "BWTester"
+
+SCION_DAEMON_ADDRESS='127.0.0.19:30255'
+export SCION_DAEMON_ADDRESS
+./../scion-apps/bwtester/bwtestserver/bwtestserver -p 40101 &
+pid0=$!
+
+SCION_DAEMON_ADDRESS='127.0.0.11:30255'
+export SCION_DAEMON_ADDRESS
+./../scion-apps/bwtester/bwtestclient/bwtestclient -s 1-ff00:0:111,[127.0.0.1]:40101 -cs 10,1000,?,50Mbps -sc 1,1000,?,1Mbps
+
+kill -9 $pid0
+
+waitForEnter
+
 # Make sure that no netcat processes are left running
 killall netcat
 
@@ -169,9 +184,11 @@ output "AS110 1: $result1 s, AS111 2: $result2 s"
 result3=$(printf %.2f $(echo "800/$result1"| bc -l))
 result4=$(printf %.2f $(echo "$txMbit/$result2"| bc -l))
 ratio=$(printf %.2f $(echo "$result3/$result4"| bc -l))
+total=$(printf %.2f $(echo "$result3+$result4"| bc -l))
 
 output "Speed AS110 $result3 Mbit/s"
 output "Speed AS111 $result4 Mbit/s"
+output "Total Speed $total"
 output "Ratio $ratio"
 
 if (( $(echo "$ratio < 2.5" |bc -l) )) && (( $(echo "$ratio > 1.5" |bc -l) )); then
