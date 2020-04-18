@@ -50,7 +50,6 @@ Rules:
             - {Protocol: 1, Extension: -1}
             - {Protocol: 6, Extension: -1}
             - {Protocol: 17, Extension: -1}
-            - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
