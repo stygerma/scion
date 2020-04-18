@@ -240,6 +240,10 @@ func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRoute
 
 	bw := convStringToNumber(rc.SchedulerConfig.Bandwidth)
 
+	bw = bw / 8 // Convert bits to bytes
+
+	log.Debug("We have bandwidth", "bw", bw)
+
 	sc := queues.SchedulerConfig{Latency: rc.SchedulerConfig.Latency, Bandwidth: bw}
 
 	return queues.InternalRouterConfig{
