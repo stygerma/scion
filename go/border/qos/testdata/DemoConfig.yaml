@@ -74,7 +74,7 @@ Rules:
         L4Type:
             - {Protocol: 0, Extension: -1}
             - {Protocol: 6, Extension: -1}
-            - {Protocol: 7, Extension: -1}
+            - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
@@ -87,7 +87,7 @@ Rules:
         L4Type:
             - {Protocol: 0, Extension: -1}
             - {Protocol: 6, Extension: -1}
-            - {Protocol: 7, Extension: -1}
+            - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
@@ -100,7 +100,7 @@ Rules:
         L4Type:
             - {Protocol: 0, Extension: -1}
             - {Protocol: 6, Extension: -1}
-            - {Protocol: 7, Extension: -1}
+            - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 2
     -
@@ -113,7 +113,7 @@ Rules:
         L4Type:
             - {Protocol: 0, Extension: -1}
             - {Protocol: 6, Extension: -1}
-            - {Protocol: 7, Extension: -1}
+            - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 2
     -
@@ -126,7 +126,7 @@ Rules:
         L4Type:
             - {Protocol: 0, Extension: -1}
             - {Protocol: 6, Extension: -1}
-            - {Protocol: 7, Extension: -1}
+            - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 1
     -
@@ -139,6 +139,6 @@ Rules:
         L4Type:
             - {Protocol: 0, Extension: -1}
             - {Protocol: 6, Extension: -1}
-            - {Protocol: 7, Extension: -1}
+            - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 1
