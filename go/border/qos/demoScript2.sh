@@ -97,17 +97,32 @@ printBlue "Start SCION"
 ./scion.sh status
 sleep 5
 
-# # # # # Do PING for 5 seconds AS110 to AS111
-# printBlue "AS110 to AS111"
-# ./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:111,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
-# # # # # Do PING for 5 seconds AS110 to AS112
-# printBlue "AS110 to AS112"
-# ./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.11:30255 -c 5
-# # # # # Do PING for 5 seconds AS111 to AS112
-# printBlue "AS111 to AS112"
-# ./bin/scmp echo -local 1-ff00:0:111,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.19:30255 -c 5
+# # # # Do PING for 5 seconds AS110 to AS111
+printBlue "AS110 to AS111"
+./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:111,[0.0.0.0] -sciond 127.0.0.19:30255 -c 5
+# # # # Do PING for 5 seconds AS110 to AS112
+printBlue "AS110 to AS112"
+./bin/scmp echo -local 1-ff00:0:110,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.19:30255 -c 5
+# # # # Do PING for 5 seconds AS111 to AS112
+printBlue "AS111 to AS112"
+./bin/scmp echo -local 1-ff00:0:111,[127.0.0.1] -remote 1-ff00:0:112,[0.0.0.0] -sciond 127.0.0.27:30255 -c 5
 
-# waitForEnter
+waitForEnter
+
+printBlue "BWTester"
+
+SCION_DAEMON_ADDRESS='127.0.0.27:30255'
+export SCION_DAEMON_ADDRESS
+./../scion-apps/bwtester/bwtestserver/bwtestserver -p 40101 &
+pid0=$!
+
+SCION_DAEMON_ADDRESS='127.0.0.19:30255'
+export SCION_DAEMON_ADDRESS
+./../scion-apps/bwtester/bwtestclient/bwtestclient -s 1-ff00:0:111,[127.0.0.1]:40101 -cs 10,1000,?,100Mbps -sc 1,1000,?,1Mbps
+
+kill -9 $pid0
+
+waitForEnter
 
 # Make sure that no netcat processes are left running
 killall netcat
@@ -122,12 +137,12 @@ pid2=$!
 startNetcatListener 36234 3 &
 pid3=$!
 
-# # # Transfer File from AS110 to AS111 to show that 10 Mbit/s can be reached
-# SCION_DAEMON_ADDRESS='127.0.0.11:30255'
-# export SCION_DAEMON_ADDRESS
-# pv ../scion-apps/netcat/data/test100Mb.db | ./../scion-apps/netcat/netcat -vv 1-ff00:0:111,[127.0.0.1]:34234
+# # Transfer File from AS110 to AS111 to show that 10 Mbit/s can be reached
+SCION_DAEMON_ADDRESS='127.0.0.19:30255'
+export SCION_DAEMON_ADDRESS
+pv ../scion-apps/netcat/data/test100Mb.db | ./../scion-apps/netcat/netcat -vv 1-ff00:0:111,[127.0.0.1]:34234
 
-# waitForEnter
+waitForEnter
 
 # Transfer File from AS110 to AS111 to show that the transfer is two times faster
 transferFileTo 43 35234 &

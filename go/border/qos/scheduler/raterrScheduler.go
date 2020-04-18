@@ -182,9 +182,10 @@ func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRout
 
 }
 
+var pktLen int
+
 func (sched *RateRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
 	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
-	// no := queue.GetMinBandwidth()
 	no := 5
 	sched.logger.attempted[queueNo] += no
 	sched.dequeuePackets(queue, no, forwarder, queueNo)
@@ -204,9 +205,14 @@ func (sched *RateRoundRobinScheduler) dequeuePackets(queue queues.PacketQueueInt
 			break
 		}
 		j++
-		if !(sched.takeFromBuckets(qp.Rp.Bytes().Len(), queueNo)) {
-			sched.cirBuckets[queueNo].ForceTake(qp.Rp.Bytes().Len())
-			sched.pirBuckets[queueNo].ForceTake(qp.Rp.Bytes().Len())
+
+		pktLen = len(qp.Rp.Raw)
+
+		if !(sched.takeFromBuckets(pktLen, queueNo)) {
+
+			sched.cirBuckets[queueNo].ForceTake(pktLen)
+
+			sched.pirBuckets[queueNo].ForceTake(pktLen)
 			forwarder(qp.Rp)
 			break
 		}
