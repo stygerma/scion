@@ -17,6 +17,11 @@ const (
 	DROPNOTIFY
 )
 
+type CongestionWarning struct {
+	Approach           int `yaml:"approach"`
+	InformationContent int `yaml:"informationContent"`
+}
+
 type ActionProfile struct {
 	FillLevel int          `yaml:"fill-level"`
 	Prob      int          `yaml:"prob"`
@@ -24,14 +29,15 @@ type ActionProfile struct {
 }
 
 type ExternalPacketQueue struct {
-	Name         string          `yaml:"name"`
-	ID           int             `yaml:"id"`
-	MinBandwidth int             `yaml:"CIR"`
-	MaxBandWidth int             `yaml:"PIR"`
-	PoliceRate   string          `yaml:"policeRate"`
-	MaxLength    int             `yaml:"maxLength"`
-	Priority     int             `yaml:"priority"`
-	Profile      []ActionProfile `yaml:"profile"`
+	Name              string            `yaml:"name"`
+	ID                int               `yaml:"id"`
+	MinBandwidth      int               `yaml:"CIR"`
+	MaxBandWidth      int               `yaml:"PIR"`
+	PoliceRate        string            `yaml:"policeRate"`
+	MaxLength         int               `yaml:"maxLength"`
+	Priority          int               `yaml:"priority"`
+	CongestionWarning CongestionWarning `yaml:"congestionWarning"`
+	Profile           []ActionProfile   `yaml:"profile"`
 }
 
 type ExternalProtocolMatchType struct {
