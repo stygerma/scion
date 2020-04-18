@@ -305,18 +305,8 @@ func convertActionProfile(externalActionProfile conf.ActionProfile) queues.Actio
 	return ap
 }
 
-<<<<<<< b1d6b0e713ca0d6d2f8566e3bd4ca71eec0a29cf
-<<<<<<< 0739361da5826c9f873326135d2115d9a3bc4d58
 func convertPoliceAction(externalPoliceAction conf.PoliceAction) conf.PoliceAction {
 	return conf.PoliceAction(externalPoliceAction)
-=======
-func convertPoliceAction(externalPoliceAction qosconf.PoliceAction) qosconf.PoliceAction {
-	return qosconf.PoliceAction(externalPoliceAction)
->>>>>>> Remove duplicate PoliceAction
-=======
-func convertPoliceAction(externalPoliceAction conf.PoliceAction) conf.PoliceAction {
-	return conf.PoliceAction(externalPoliceAction)
->>>>>>> refactor.
 }
 
 func convStringToNumber(bandwidthstring string) int {
