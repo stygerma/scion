@@ -157,3 +157,7 @@ func (pq *CustomPacketQueue) GetPacketQueue() PacketQueue {
 func (pq *CustomPacketQueue) GetCongestionWarning() *CongestionWarning {
 	return &pq.pktQue.CongestionWarning
 }
+
+func (pq *CustomPacketQueue) GetTockenBucket() *TokenBucket {
+	return &pq.tb
+}
