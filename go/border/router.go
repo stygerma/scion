@@ -76,6 +76,10 @@ func (r *Router) Start() {
 		defer log.HandlePanic()
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
 	}()
+	go func() {
+		defer log.HandlePanic()
+		r.bscNotify()
+	}()
 }
 
 // TODO: Do we want to we also want to reload the queue config
