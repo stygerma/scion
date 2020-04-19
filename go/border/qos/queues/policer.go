@@ -42,7 +42,6 @@ func (tb *TokenBucket) refill() {
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
 	if timeSinceLastUpdate > 20 {
-
 		newTokens := ((tb.maxBandWidth) * int(timeSinceLastUpdate)) / (1000)
 		tb.CurrBW = newTokens //TODO: assign correct value
 		tb.lastRefill = now
