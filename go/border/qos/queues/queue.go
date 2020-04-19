@@ -85,6 +85,7 @@ type PacketQueueInterface interface {
 	GetMaxBandwidth() int
 	GetPacketQueue() PacketQueue
 	GetCongestionWarning() *CongestionWarning
+	GetTockenBucket() *TokenBucket
 }
 
 // ReturnAction merges both PoliceAction together and returns the merged result.
