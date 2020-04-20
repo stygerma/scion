@@ -71,8 +71,13 @@ func (r *Router) sendBscNotificationSCMP(qp *queues.QPkt, info *scmp.InfoBscCW) 
 			srcHost, "DstIA", DstIA, "DstHost", DstHost, "\n RtrAddr", routerAddr,
 			"CurrBW", r.qosConfig.GetQueue(qp.QueueNo).GetTokenBucket().CurrBW,
 			"Pkt ID", id,
+<<<<<<< b18c7c071e0929984311851fabdaf4d31d9766f3
 			"\n L4", l4hdr,
 			"\n Congestion Warning", pld, "\n L4Hdr", quotedl4) //,
+=======
+			"\n L4", l4,
+			"\n Congestion Warning", pld) //
+>>>>>>> minor changes for demo
 	}
 	notification.Route()
 
@@ -96,10 +101,13 @@ func (r *Router) createBscSCMPNotification(qp *queues.QPkt,
 	if err != nil {
 		return nil, err, ""
 	}
+	// log.Debug("We getting here???????????????????????? 1")
 	sp.HBHExt = make([]common.Extension, 0, common.ExtnMaxHBH+1)
 	/*MS: We classify the congestion warning as not erroneous and don't need the
 	Basic congestion warning to be HBH*/
+	// log.Debug("We getting here???????????????????????? 2")
 	ext := &layers.ExtnSCMP{Error: false, HopByHop: false}
+	// log.Debug("We getting here???????????????????????? 3")
 	sp.HBHExt = append(sp.HBHExt, ext)
 
 	//TODO (stygerma): Add SPSE with DRKey

@@ -60,8 +60,8 @@ func (q *QosConfiguration) GetQueues() *[]queues.PacketQueueInterface {
 	return &q.config.Queues
 }
 
-func (q *QosConfiguration) GetQueue(ind int) *queues.PacketQueueInterface {
-	return &q.config.Queues[ind]
+func (q *QosConfiguration) GetQueue(ind int) queues.PacketQueueInterface {
+	return q.config.Queues[ind]
 }
 
 func (q *QosConfiguration) GetConfig() *queues.InternalRouterConfig {
@@ -215,7 +215,6 @@ func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 	restriction := qosConfig.config.Queues[queueNo].GetCongestionWarning().InformationContent
 	fmt.Printf("restrictions on information content restriction %v", restriction)
 
-	// TODO: Remove later
 	select {
 	case qosConfig.notifications <- &np:
 	default:
