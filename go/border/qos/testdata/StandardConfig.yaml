@@ -15,9 +15,22 @@ Queues:
             - {fill-level: 50, prob: 10, action: 3}
             - {fill-level: 75, prob: 20, action: 3}
             - {fill-level: 80, prob: 50, action: 3}
+   -
+    name: 'SCMP Messages'
+    id: 0
+    CIR: 10
+    PIR: 25
+    policeRate: 500Mbps
+    maxLength: 1024
+    priority: 10
+    congestionWarning: {approach: 0, informationContent: 25}
+    profile:
+        - {fill-level: 50, prob: 10, action: 3}
+        - {fill-level: 75, prob: 20, action: 3}
+        - {fill-level: 80, prob: 50, action: 3}
 Rules:
     -
-        name: 'FROM AS110 TO ANY ON Queue=1'
+        name: 'SCMP on Queue 1'
         priority: 1
         sourceAs: '1-ff00:0:110'
         sourceMatchMode: 4
