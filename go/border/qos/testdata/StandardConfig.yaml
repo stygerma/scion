@@ -17,7 +17,7 @@ Queues:
             - {fill-level: 80, prob: 50, action: 3}
     -
       name: 'SCMP Messages'
-      id: 0
+      id: 1
       CIR: 10
       PIR: 25
       policeRate: 500Mbps
