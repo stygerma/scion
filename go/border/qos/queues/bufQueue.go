@@ -119,6 +119,6 @@ func (pq *PacketBufQueue) GetCongestionWarning() *CongestionWarning {
 	return &pq.pktQue.CongestionWarning
 }
 
-func (pq *PacketBufQueue) GetTockenBucket() *TokenBucket {
+func (pq *PacketBufQueue) GetTokenBucket() *TokenBucket {
 	return &pq.tb
 }
