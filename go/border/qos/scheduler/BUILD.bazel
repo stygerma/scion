@@ -4,7 +4,6 @@ go_library(
     name = "go_default_library",
     srcs = [
         "drrScheduler.go",
-        "mmDrrScheduler.go",
         "raterrScheduler.go",
         "rrScheduler.go",
         "scheduler.go",
@@ -22,7 +21,6 @@ go_test(
     name = "go_default_test",
     srcs = [
         "drrScheduler_test.go",
-        "mmDrrScheduler_test.go",
         "raterrScheduler_test.go",
     ],
     embed = [":go_default_library"],

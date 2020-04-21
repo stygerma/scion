@@ -118,7 +118,6 @@ func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) e
 	qConfig.Forwarder = forwarder
 	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
 	qConfig.schedul = &scheduler.DeficitRoundRobinScheduler{}
-	// qConfig.schedul = &scheduler.MinMaxDeficitRoundRobinScheduler{}
 	// qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)

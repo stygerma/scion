@@ -13,19 +13,19 @@ func TestNoPackets(t *testing.T) {
 		prioritySum    int
 		expectedResult int
 	}{
-		{100, 1, 10, 10},
-		{100, 2, 10, 20},
-		{100, 3, 10, 30},
-		{100, 4, 10, 40},
-		{100, 5, 10, 50},
-		{100, 6, 10, 60},
-		{100, 7, 10, 70},
-		{100, 8, 10, 80},
-		{100, 9, 10, 90},
-		{100, 10, 10, 100},
-		{100, 1, 11, 9},
-		{100, 8, 11, 72},
-		{100, 2, 11, 18},
+		{100, 1, 10, 1},
+		{100, 2, 10, 2},
+		{100, 3, 10, 3},
+		{100, 4, 10, 4},
+		{100, 5, 10, 5},
+		{100, 6, 10, 6},
+		{100, 7, 10, 7},
+		{100, 8, 10, 8},
+		{100, 9, 10, 9},
+		{100, 10, 10, 10},
+		{100, 1, 11, 1},
+		{100, 8, 11, 8},
+		{100, 2, 11, 2},
 	}
 	for _, test := range testTable {
 		result := getNoPacketsToDequeue(test.length, test.priority, test.prioritySum)
@@ -89,5 +89,5 @@ func TestSimtable(t *testing.T) {
 		"Queue 1", simTable[1].totalDequeued,
 		"Queue 2", simTable[2].totalDequeued)
 
-	t.Errorf("Show log")
+	// t.Errorf("Show log")
 }
