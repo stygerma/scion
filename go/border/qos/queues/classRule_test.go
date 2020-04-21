@@ -79,9 +79,8 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 
 func BenchmarkSingleMatchSequential(b *testing.B) {
 	disableLog(b)
-	// extConf, _ := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
+
 	extConf, _ := conf.LoadConfig("../testdata/matchBenchmark-config.yaml")
-	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
 
 	qConfig := qos.QosConfiguration{}
 
