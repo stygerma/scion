@@ -123,7 +123,6 @@ func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) e
 	qConfig.Forwarder = forwarder
 	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
 	qConfig.schedul = &scheduler.DeficitRoundRobinScheduler{}
-	// qConfig.schedul = &scheduler.MinMaxDeficitRoundRobinScheduler{}
 	// qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
 	qConfig.schedul.Init(qConfig.config)
 	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
@@ -158,11 +157,8 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 
 	qp := queues.QPkt{Rp: rp, QueueNo: queueNo}
 
-	select {
-	case *qosConfig.schedul.GetMessages() <- true:
-	default:
-	}
-	qosConfig.SendToWorker(queueNo, &qp)
+	// qosConfig.SendToWorker(queueNo, &qp)
+	putOnQueue(qosConfig, queueNo, &qp)
 }
 
 func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
@@ -194,9 +190,16 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 	default:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	}
+
+	// select {
+	// case *qosConfig.schedul.GetMessages() <- true:
+	// default:
+	// }
+	// log.Debug("Before send", "len(*qosConfig.schedul.GetMessages())", len(*qosConfig.schedul.GetMessages()))
+	*qosConfig.schedul.GetMessages() <- true
+	// log.Debug("After send", "len(*qosConfig.schedul.GetMessages())", len(*qosConfig.schedul.GetMessages()))
 }
 
-// SendNotification might be needed for the part of @stygerma //IMP:
 func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 	qp.Rp.RefInc(1) //should avoid the packet being dropped before we can create the scmp notification
 
