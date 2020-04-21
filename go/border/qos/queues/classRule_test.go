@@ -30,7 +30,7 @@ import (
 )
 
 func BenchmarkRuleMatchModes(b *testing.B) {
-	extConf, _ := conf.LoadConfig("../testdata/matchBenchmark-config.yaml")
+	extConf, _ := conf.LoadConfig("testdata/matchBenchmark-config.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
 	rc := queues.RegularClassRule{}
@@ -80,7 +80,7 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 func BenchmarkSingleMatchSequential(b *testing.B) {
 	disableLog(b)
 
-	extConf, _ := conf.LoadConfig("../testdata/matchBenchmark-config.yaml")
+	extConf, _ := conf.LoadConfig("testdata/matchBenchmark-config.yaml")
 
 	qConfig := qos.QosConfiguration{}
 
@@ -107,9 +107,7 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 
 func BenchmarkSingleMatchParallel(b *testing.B) {
 	disableLog(b)
-	// extConf, _ := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
-	extConf, _ := conf.LoadConfig("../testdata/matchBenchmark-config.yaml")
-	// qosConfig, _ := qos.InitQos(extConf, forwardPacketByDropAndWait)
+	extConf, _ := conf.LoadConfig("testdata/matchTypeTest-config.yaml")
 
 	qConfig := qos.QosConfiguration{}
 
@@ -140,7 +138,7 @@ func TestRuleMatchModes(t *testing.T) {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	fmt.Println(dir)
 
-	extConf, err := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
+	extConf, err := conf.LoadConfig("testdata/matchTypeTest-config.yaml")
 	if err != nil {
 		log.Debug("Load config file failed", "error", err)
 		log.Debug("The testdata folder from the parent folder should be available for this test but it isn't when running it with bazel. Just run it without Bazel and it will pass.")
@@ -203,7 +201,7 @@ func TestRuleMatchModes(t *testing.T) {
 
 func TestRuleMatchModesForDemo(t *testing.T) {
 
-	extConf, _ := conf.LoadConfig("../testdata/DemoConfig.yaml")
+	extConf, _ := conf.LoadConfig("testdata/DemoConfig.yaml")
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
 	rc := queues.RegularClassRule{}
