@@ -200,7 +200,6 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 	// log.Debug("After send", "len(*qosConfig.schedul.GetMessages())", len(*qosConfig.schedul.GetMessages()))
 }
 
-// SendNotification might be needed for the part of @stygerma //IMP:
 func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 	qp.Rp.RefInc(1) //should avoid the packet being dropped before we can create the scmp notification
 

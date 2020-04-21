@@ -342,6 +342,7 @@ func (*RegularClassRule) GetRuleForPacket(
 
 	// config.Rules.CrCache.Put(entry, returnRule)
 
+
 	return returnRule
 }
 
