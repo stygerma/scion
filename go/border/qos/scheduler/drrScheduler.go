@@ -117,7 +117,7 @@ func (sched *DeficitRoundRobinScheduler) showLog(routerConfig queues.InternalRou
 	sched.logger.iterations++
 	if time.Now().Sub(sched.logger.t0) > time.Duration(5*time.Second) {
 
-		var queLen [5]int
+		var queLen = make([]int, sched.totalLength)
 		for i := 0; i < sched.totalLength; i++ {
 			queLen[i] = routerConfig.Queues[i].GetLength()
 		}

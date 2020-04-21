@@ -31,6 +31,12 @@ type RateRoundRobinScheduler struct {
 	logger ScheduleLogger
 }
 
+type surplus struct {
+	Surplus    int
+	Payments   []int
+	MaxSurplus int
+}
+
 var _ SchedulerInterface = (*RateRoundRobinScheduler)(nil)
 
 func (sched *RateRoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
@@ -102,7 +108,7 @@ func (sched *RateRoundRobinScheduler) LogUpdate(routerConfig queues.InternalRout
 	sched.logger.iterations++
 	if time.Now().Sub(sched.logger.t0) > time.Duration(5*time.Second) {
 
-		var queLen [5]int
+		var queLen = make([]int, sched.totalLength)
 		for i := 0; i < sched.totalLength; i++ {
 			queLen[i] = routerConfig.Queues[i].GetLength()
 		}

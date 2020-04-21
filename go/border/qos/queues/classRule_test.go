@@ -17,6 +17,8 @@ package queues_test
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/inconshreveable/log15"
@@ -24,6 +26,7 @@ import (
 	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 func BenchmarkRuleMatchModes(b *testing.B) {
@@ -133,8 +136,16 @@ func BenchmarkSingleMatchParallel(b *testing.B) {
 }
 
 func TestRuleMatchModes(t *testing.T) {
+	log.Debug("func TestRuleMatchModes(t *testing.T) {")
 
-	extConf, _ := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	fmt.Println(dir)
+
+	extConf, err := conf.LoadConfig("../testdata/matchTypeTest-config.yaml")
+	if err != nil {
+		log.Debug("Load config file failed", "error", err)
+		log.Debug("The testdata folder from the parent folder should be available for this test but it isn't when running it with bazel. Just run it without Bazel and it will pass.")
+	}
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
 	rc := queues.RegularClassRule{}
