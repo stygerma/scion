@@ -31,6 +31,12 @@ type RateRoundRobinScheduler struct {
 	logger ScheduleLogger
 }
 
+type surplus struct {
+	Surplus    int
+	Payments   []int
+	MaxSurplus int
+}
+
 var _ SchedulerInterface = (*RateRoundRobinScheduler)(nil)
 
 func (sched *RateRoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
