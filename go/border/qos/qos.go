@@ -59,8 +59,8 @@ func (q *QosConfiguration) GetQueues() *[]queues.PacketQueueInterface {
 	return &q.config.Queues
 }
 
-func (q *QosConfiguration) GetQueue(ind int) *queues.PacketQueueInterface {
-	return &q.config.Queues[ind]
+func (q *QosConfiguration) GetQueue(ind int) queues.PacketQueueInterface {
+	return q.config.Queues[ind]
 }
 
 func (q *QosConfiguration) GetConfig() *queues.InternalRouterConfig {
@@ -71,11 +71,15 @@ func (q *QosConfiguration) GetLegacyConfig() *conf.ExternalConfig {
 	return &q.legacyConfig
 }
 
+func (q *QosConfiguration) GetNotification() chan *queues.NPkt {
+	return q.notifications
+}
+
 // SetAndInitSchedul is necessary to set up
 // a mock scheduler for testing. Do not use for anything else.
 func (qosConfig *QosConfiguration) SetAndInitSchedul(sched scheduler.SchedulerInterface) {
 	qosConfig.schedul = sched
-	qosConfig.schedul.Init(qosConfig.config)
+	qosConfig.schedul.Init(&qosConfig.config)
 }
 
 func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
@@ -119,8 +123,8 @@ func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) e
 	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
 	qConfig.schedul = &scheduler.DeficitRoundRobinScheduler{}
 	// qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
-	qConfig.schedul.Init(qConfig.config)
-	go qConfig.schedul.Dequeuer(qConfig.config, qConfig.Forwarder)
+	qConfig.schedul.Init(&qConfig.config)
+	go qConfig.schedul.Dequeuer(&qConfig.config, qConfig.Forwarder)
 
 	return nil
 }
@@ -152,11 +156,8 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 
 	qp := queues.QPkt{Rp: rp, QueueNo: queueNo}
 
-	select {
-	case *qosConfig.schedul.GetMessages() <- true:
-	default:
-	}
-	qosConfig.SendToWorker(queueNo, &qp)
+	// qosConfig.SendToWorker(queueNo, &qp)
+	putOnQueue(qosConfig, queueNo, &qp)
 }
 
 func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
@@ -187,9 +188,14 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 	default:
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	}
+
+	select {
+	case *qosConfig.schedul.GetMessages() <- true:
+	default:
+	}
 }
 
-// SendNotification might be needed for the part of @stygerma
+//  SendNotification might be needed for the part of @stygerma
 func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 }
 

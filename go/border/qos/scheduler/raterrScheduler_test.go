@@ -44,7 +44,7 @@ func TestEnAndDequeuePackets(T *testing.T) {
 
 	mockSched := &RateRoundRobinScheduler{}
 	mockSched.Init(
-		queues.InternalRouterConfig{
+		&queues.InternalRouterConfig{
 			Queues: []queues.PacketQueueInterface{
 				&queue1,
 				&queue2}})

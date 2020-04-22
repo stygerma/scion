@@ -22,8 +22,8 @@ import (
 )
 
 type SchedulerInterface interface {
-	Init(routerConfig queues.InternalRouterConfig)
-	Dequeuer(routerConfig queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt))
+	Init(routerConfig *queues.InternalRouterConfig)
+	Dequeuer(routerConfig *queues.InternalRouterConfig, forwarder func(rp *rpkt.RtrPkt))
 	Dequeue(queue queues.PacketQueueInterface, forwarder func(rp *rpkt.RtrPkt), queueNo int)
 	GetMessages() *chan bool
 }
