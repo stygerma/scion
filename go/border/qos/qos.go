@@ -29,13 +29,13 @@ import (
 
 const maxNotificationCount = 1024
 
+// QosConfiguration contains the configuration of the qos subsystem
 type QosConfiguration struct {
-	worker workerConfiguration
-
 	config         queues.InternalRouterConfig
 	schedul        scheduler.SchedulerInterface
 	legacyConfig   conf.ExternalConfig
 	notifications  chan *queues.NPkt
+	worker         workerConfiguration
 	workerChannels [](chan *queues.QPkt)
 	Forwarder      func(rp *rpkt.RtrPkt)
 
@@ -47,30 +47,34 @@ type workerConfiguration struct {
 	workLength int
 }
 
+// SendToWorker sends the Qpkt to the worker responsible for that queue
+// serialises all packets belonging to that queue
 func (qosConfig *QosConfiguration) SendToWorker(i int, qpkt *queues.QPkt) {
 	qosConfig.workerChannels[i] <- qpkt
 }
 
+// GetWorkerChannels returns a pointer to an array of all worker channels
 func (qosConfig *QosConfiguration) GetWorkerChannels() *[](chan *queues.QPkt) {
 	return &qosConfig.workerChannels
 }
 
+// GetQueues returns a pointer to an array with all queues
 func (qosConfig *QosConfiguration) GetQueues() *[]queues.PacketQueueInterface {
 	return &qosConfig.config.Queues
 }
 
+// GetQueue returns a pointer to the queue with number ind
 func (qosConfig *QosConfiguration) GetQueue(ind int) *queues.PacketQueueInterface {
 	return &qosConfig.config.Queues[ind]
 }
 
+// GetConfig returns the internal configuration of the border router
 func (qosConfig *QosConfiguration) GetConfig() *queues.InternalRouterConfig {
 	return &qosConfig.config
 }
 
-func (qosConfig *QosConfiguration) GetLegacyConfig() *conf.ExternalConfig {
-	return &qosConfig.legacyConfig
-}
-
+// GetNotification returns a pointer to the notification channel which contains
+// all messages caused by the profile configuration
 func (q *QosConfiguration) GetNotification() chan *queues.NPkt {
 	return q.notifications
 }
@@ -82,27 +86,30 @@ func (qosConfig *QosConfiguration) SetAndInitSchedul(sched scheduler.SchedulerIn
 	qosConfig.schedul.Init(&qosConfig.config)
 }
 
+// InitQos intialises the qos subsystem. It will log and return an error if an error occurs.
 func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
 	QosConfiguration, error) {
 
 	qConfig := QosConfiguration{}
 	var err error
 	if err = ConvExternalToInternalConfig(&qConfig, extConf); err != nil {
-		log.Error("Initialising the classification data structures has failed", "error", err)
+		log.Error("InitQos: Initialising the classification data structures has failed", "error", err)
 	}
 	if err = InitClassification(&qConfig); err != nil {
-		log.Error("Initialising the classification data structures has failed", "error", err)
+		log.Error("InitQos: Initialising the classification data structures has failed", "error", err)
 	}
-	if err = InitScheduler(&qConfig, forwarder); err != nil {
-		log.Error("Initialising the scheduler has failed", "error", err)
+	if err = initScheduler(&qConfig, forwarder); err != nil {
+		log.Error("InitQos: Initialising the scheduler has failed", "error", err)
 	}
-	if err = InitWorkers(&qConfig); err != nil {
-		log.Error("Initialising the workers has failed", "error", err)
+	if err = initWorkers(&qConfig); err != nil {
+		log.Error("InitQos: Initialising the workers has failed", "error", err)
 	}
 
-	return qConfig, nil
+	return qConfig, err
 }
 
+// ConvExternalToInternalConfig converts the configuration loaded from a file to the
+// internal configuration used by the qos subsystem
 func ConvExternalToInternalConfig(qConfig *QosConfiguration, extConf conf.ExternalConfig) error {
 	var err error
 	qConfig.config, err = convertExternalToInteral(extConf)
@@ -110,6 +117,8 @@ func ConvExternalToInternalConfig(qConfig *QosConfiguration, extConf conf.Extern
 	return err
 }
 
+// InitClassification converts the rules to the maps and initialises the cache for
+// frequently used rules
 func InitClassification(qConfig *QosConfiguration) error {
 	qConfig.config.Rules = *queues.RulesToMap(qConfig.config.Rules.RulesList)
 	qConfig.config.Rules.CrCache.Init(256)
@@ -117,7 +126,7 @@ func InitClassification(qConfig *QosConfiguration) error {
 	return nil
 }
 
-func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
+func initScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *queues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
 	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
@@ -129,7 +138,7 @@ func InitScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) e
 	return nil
 }
 
-func InitWorkers(qConfig *QosConfiguration) error {
+func initWorkers(qConfig *QosConfiguration) error {
 	noWorkers := len(qConfig.config.Queues)
 	qConfig.worker = workerConfiguration{noWorkers, 256}
 	qConfig.workerChannels = make([]chan *queues.QPkt, qConfig.worker.noWorker)
@@ -199,7 +208,7 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 	}
 }
 
-//  SendNotification might be needed for the part of @stygerma
+// SendNotification is needed for the part of @stygerma
 func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 }
 
