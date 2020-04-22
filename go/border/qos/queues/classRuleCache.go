@@ -1,6 +1,8 @@
 package queues
 
 import (
+	"sync"
+
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
 )
@@ -19,19 +21,21 @@ type ClassRuleCacheInterface interface {
 }
 
 type ClassRuleCache struct {
-	cacheMap map[cacheEntry]*InternalClassRule
+	cacheMap *sync.Map
 }
 
 func (crCache *ClassRuleCache) Init(maxEntries int) {
-	crCache.cacheMap = make(map[cacheEntry]*InternalClassRule, maxEntries)
+	crCache.cacheMap = new(sync.Map)
 }
 
 func (crCache *ClassRuleCache) Get(entry cacheEntry) *InternalClassRule {
-
-	return crCache.cacheMap[entry]
+	r, found := crCache.cacheMap.Load(entry)
+	if !found {
+		return nil
+	}
+	return r.(*InternalClassRule)
 }
 
 func (crCache *ClassRuleCache) Put(entry cacheEntry, rule *InternalClassRule) {
-
-	crCache.cacheMap[entry] = rule
+	crCache.cacheMap.Store(entry, rule)
 }
