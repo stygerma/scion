@@ -143,6 +143,8 @@ func InitWorkers(qConfig *QosConfiguration) error {
 	return nil
 }
 
+// QueuePacket is called from router.go and is the first step in the qos subsystem
+// it is thread safe (necessary bc. of multiple sockets in the border router).
 func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	rc := queues.RegularClassRule{}
 	config := qosConfig.GetConfig()
@@ -156,18 +158,20 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 
 	qp := queues.QPkt{Rp: rp, QueueNo: queueNo}
 
-	// qosConfig.SendToWorker(queueNo, &qp)
-	putOnQueue(qosConfig, queueNo, &qp)
+	qosConfig.SendToWorker(queueNo, &qp)
 }
 
 func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
+	var qp *queues.QPkt
 	for {
-		qp := <-*workChannel
+		qp = <-*workChannel
 		queueNo := qp.QueueNo
 		putOnQueue(qosConfig, queueNo, qp)
 	}
 }
 
+// putOnQueue puts the packet on the queue indicated by queueNo. This is not thread safe
+// (Police is not). Make sure that there is only ever one worker per queue.
 func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 	polAct := qosConfig.config.Queues[queueNo].Police(qp)
 	profAct := qosConfig.config.Queues[queueNo].CheckAction()
