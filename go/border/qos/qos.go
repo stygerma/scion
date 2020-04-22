@@ -75,8 +75,8 @@ func (qosConfig *Configuration) GetConfig() *queues.InternalRouterConfig {
 
 // GetNotification returns a pointer to the notification channel which contains
 // all messages caused by the profile configuration
-func (q *Configuration) GetNotification() chan *queues.NPkt {
-	return q.notifications
+func (qosConfig *Configuration) GetNotification() chan *queues.NPkt {
+	return qosConfig.notifications
 }
 
 // SetAndInitSchedul is necessary to set up
