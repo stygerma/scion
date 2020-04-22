@@ -37,10 +37,12 @@ type DeficitRoundRobinScheduler struct {
 
 var _ SchedulerInterface = (*DeficitRoundRobinScheduler)(nil)
 
-func (sched *DeficitRoundRobinScheduler) Init(routerConfig queues.InternalRouterConfig) {
+func (sched *DeficitRoundRobinScheduler) Init(routerConfig *queues.InternalRouterConfig) {
 
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
+
+	sched.messages = make(chan bool, 20)
 
 	sched.logger = initLogger(sched.totalLength)
 
@@ -83,13 +85,13 @@ func (sched *DeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterfa
 	}
 }
 
-func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRouterConfig,
+func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig *queues.InternalRouterConfig,
 	forwarder func(rp *rpkt.RtrPkt)) {
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
 	}
 	sleepDuration := time.Duration(time.Duration(sched.sleepDuration) * time.Microsecond)
-	for {
+	for <-sched.messages {
 		t0 := time.Now()
 		sched.totalQueueLength = 0
 		for i := 0; i < sched.totalLength; i++ {
@@ -100,7 +102,7 @@ func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig queues.InternalRo
 			sched.Dequeue(routerConfig.Queues[i], forwarder, i)
 		}
 
-		sched.showLog(routerConfig)
+		sched.showLog(*routerConfig)
 
 		for time.Now().Sub(t0) < sleepDuration {
 			time.Sleep(time.Duration(sched.sleepDuration/10) * time.Microsecond)
