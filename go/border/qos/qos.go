@@ -29,8 +29,8 @@ import (
 
 const maxNotificationCount = 1024
 
-// QosConfiguration contains the configuration of the qos subsystem
-type QosConfiguration struct {
+// Configuration contains the configuration of the qos subsystem
+type Configuration struct {
 	config         queues.InternalRouterConfig
 	schedul        scheduler.SchedulerInterface
 	legacyConfig   conf.ExternalConfig
@@ -49,48 +49,48 @@ type workerConfiguration struct {
 
 // SendToWorker sends the Qpkt to the worker responsible for that queue
 // serialises all packets belonging to that queue
-func (qosConfig *QosConfiguration) SendToWorker(i int, qpkt *queues.QPkt) {
+func (qosConfig *Configuration) SendToWorker(i int, qpkt *queues.QPkt) {
 	qosConfig.workerChannels[i] <- qpkt
 }
 
 // GetWorkerChannels returns a pointer to an array of all worker channels
-func (qosConfig *QosConfiguration) GetWorkerChannels() *[](chan *queues.QPkt) {
+func (qosConfig *Configuration) GetWorkerChannels() *[](chan *queues.QPkt) {
 	return &qosConfig.workerChannels
 }
 
 // GetQueues returns a pointer to an array with all queues
-func (qosConfig *QosConfiguration) GetQueues() *[]queues.PacketQueueInterface {
+func (qosConfig *Configuration) GetQueues() *[]queues.PacketQueueInterface {
 	return &qosConfig.config.Queues
 }
 
 // GetQueue returns a pointer to the queue with number ind
-func (qosConfig *QosConfiguration) GetQueue(ind int) *queues.PacketQueueInterface {
+func (qosConfig *Configuration) GetQueue(ind int) *queues.PacketQueueInterface {
 	return &qosConfig.config.Queues[ind]
 }
 
 // GetConfig returns the internal configuration of the border router
-func (qosConfig *QosConfiguration) GetConfig() *queues.InternalRouterConfig {
+func (qosConfig *Configuration) GetConfig() *queues.InternalRouterConfig {
 	return &qosConfig.config
 }
 
 // GetNotification returns a pointer to the notification channel which contains
 // all messages caused by the profile configuration
-func (q *QosConfiguration) GetNotification() chan *queues.NPkt {
+func (q *Configuration) GetNotification() chan *queues.NPkt {
 	return q.notifications
 }
 
 // SetAndInitSchedul is necessary to set up
 // a mock scheduler for testing. Do not use for anything else.
-func (qosConfig *QosConfiguration) SetAndInitSchedul(sched scheduler.SchedulerInterface) {
+func (qosConfig *Configuration) SetAndInitSchedul(sched scheduler.SchedulerInterface) {
 	qosConfig.schedul = sched
 	qosConfig.schedul.Init(&qosConfig.config)
 }
 
 // InitQos intialises the qos subsystem. It will log and return an error if an error occurs.
 func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
-	QosConfiguration, error) {
+	Configuration, error) {
 
-	qConfig := QosConfiguration{}
+	qConfig := Configuration{}
 	var err error
 	if err = ConvExternalToInternalConfig(&qConfig, extConf); err != nil {
 		log.Error("InitQos: Initialising the classification data structures has failed", "error", err)
@@ -110,7 +110,7 @@ func InitQos(extConf conf.ExternalConfig, forwarder func(rp *rpkt.RtrPkt)) (
 
 // ConvExternalToInternalConfig converts the configuration loaded from a file to the
 // internal configuration used by the qos subsystem
-func ConvExternalToInternalConfig(qConfig *QosConfiguration, extConf conf.ExternalConfig) error {
+func ConvExternalToInternalConfig(qConfig *Configuration, extConf conf.ExternalConfig) error {
 	var err error
 	qConfig.config, err = convertExternalToInteral(extConf)
 	qConfig.legacyConfig = extConf
@@ -119,14 +119,14 @@ func ConvExternalToInternalConfig(qConfig *QosConfiguration, extConf conf.Extern
 
 // InitClassification converts the rules to the maps and initialises the cache for
 // frequently used rules
-func InitClassification(qConfig *QosConfiguration) error {
+func InitClassification(qConfig *Configuration) error {
 	qConfig.config.Rules = *queues.RulesToMap(qConfig.config.Rules.RulesList)
 	qConfig.config.Rules.CrCache.Init(256)
 
 	return nil
 }
 
-func initScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) error {
+func initScheduler(qConfig *Configuration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *queues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
 	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
@@ -138,7 +138,7 @@ func initScheduler(qConfig *QosConfiguration, forwarder func(rp *rpkt.RtrPkt)) e
 	return nil
 }
 
-func initWorkers(qConfig *QosConfiguration) error {
+func initWorkers(qConfig *Configuration) error {
 	noWorkers := len(qConfig.config.Queues)
 	qConfig.worker = workerConfiguration{noWorkers, 256}
 	qConfig.workerChannels = make([]chan *queues.QPkt, qConfig.worker.noWorker)
@@ -154,7 +154,7 @@ func initWorkers(qConfig *QosConfiguration) error {
 
 // QueuePacket is called from router.go and is the first step in the qos subsystem
 // it is thread safe (necessary bc. of multiple sockets in the border router).
-func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
+func (qosConfig *Configuration) QueuePacket(rp *rpkt.RtrPkt) {
 	rc := queues.RegularClassRule{}
 	config := qosConfig.GetConfig()
 
@@ -170,7 +170,7 @@ func (qosConfig *QosConfiguration) QueuePacket(rp *rpkt.RtrPkt) {
 	qosConfig.SendToWorker(queueNo, &qp)
 }
 
-func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
+func worker(qosConfig *Configuration, workChannel *chan *queues.QPkt) {
 	var qp *queues.QPkt
 	for {
 		qp = <-*workChannel
@@ -181,7 +181,7 @@ func worker(qosConfig *QosConfiguration, workChannel *chan *queues.QPkt) {
 
 // putOnQueue puts the packet on the queue indicated by queueNo. This is not thread safe
 // (Police is not). Make sure that there is only ever one worker per queue.
-func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
+func putOnQueue(qosConfig *Configuration, queueNo int, qp *queues.QPkt) {
 	polAct := qosConfig.config.Queues[queueNo].Police(qp)
 	profAct := qosConfig.config.Queues[queueNo].CheckAction()
 
@@ -209,10 +209,10 @@ func putOnQueue(qosConfig *QosConfiguration, queueNo int, qp *queues.QPkt) {
 }
 
 // SendNotification is needed for the part of @stygerma
-func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
+func (qosConfig *Configuration) SendNotification(qp *queues.QPkt) {
 }
 
-func (qosConfig *QosConfiguration) dropPacket(qp *queues.QPkt) {
+func (qosConfig *Configuration) dropPacket(qp *queues.QPkt) {
 	defer qp.Rp.Release()
 	qosConfig.SendNotification(qp)
 	qosConfig.droppedPackets++

@@ -53,7 +53,7 @@ type Router struct {
 	setCtxMtx sync.Mutex
 	// qosConfig holds all data structures and state required for the quality of service
 	// subsystem in the router
-	qosConfig qos.QosConfiguration
+	qosConfig qos.Configuration
 }
 
 // NewRouter returns a new router

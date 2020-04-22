@@ -82,7 +82,7 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 
 	extConf, _ := conf.LoadConfig("testdata/matchBenchmark-config.yaml")
 
-	qConfig := qos.QosConfiguration{}
+	qConfig := qos.Configuration{}
 
 	var err error
 	if err = qos.ConvExternalToInternalConfig(&qConfig, extConf); err != nil {
@@ -109,7 +109,7 @@ func BenchmarkSingleMatchParallel(b *testing.B) {
 	disableLog(b)
 	extConf, _ := conf.LoadConfig("testdata/matchTypeTest-config.yaml")
 
-	qConfig := qos.QosConfiguration{}
+	qConfig := qos.Configuration{}
 
 	var err error
 	if err = qos.ConvExternalToInternalConfig(&qConfig, extConf); err != nil {
