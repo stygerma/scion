@@ -7,6 +7,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// PoliceAction is the action that will be taken depending on the fill level of the queue
+// is configured in qosConfig.yaml
 type PoliceAction uint8
 
 // Actions to execute on packets in queues.
@@ -17,12 +19,14 @@ const (
 	DROPNOTIFY
 )
 
+// ActionProfile specifies which actions are taken on which fill level of the queue
 type ActionProfile struct {
 	FillLevel int          `yaml:"fill-level"`
 	Prob      int          `yaml:"prob"`
 	Action    PoliceAction `yaml:"action"`
 }
 
+// ExternalPacketQueue is the configuration loaded from the configuraiton file
 type ExternalPacketQueue struct {
 	Name         string          `yaml:"name"`
 	ID           int             `yaml:"id"`
@@ -34,6 +38,7 @@ type ExternalPacketQueue struct {
 	Profile      []ActionProfile `yaml:"profile"`
 }
 
+// ExternalProtocolMatchType is the match type loaded from the configuration file
 type ExternalProtocolMatchType struct {
 	BaseProtocol int `yaml:"Protocol"`
 	Extension    int `yaml:"Extension"`
@@ -52,6 +57,7 @@ type ExternalClassRule struct {
 	QueueNumber          int                         `yaml:"queueNumber"`
 }
 
+// SchedulerConfig is the configuration for the scheduler loaded from the configuration file
 type SchedulerConfig struct {
 	Latency   int    `yaml:"Latency"`
 	Bandwidth string `yaml:"Bandwidth"`
@@ -64,6 +70,8 @@ type ExternalConfig struct {
 	ExternalRules   []ExternalClassRule   `yaml:"Rules"`
 }
 
+// LoadConfig reads the configuration file from path and returns the external configuration based
+// on this file.
 func LoadConfig(path string) (ExternalConfig, error) {
 	var ec ExternalConfig
 
