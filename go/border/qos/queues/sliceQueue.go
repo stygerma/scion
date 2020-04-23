@@ -33,7 +33,7 @@ var _ PacketQueueInterface = (*PacketSliceQueue)(nil)
 func (pq *PacketSliceQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *sync.Mutex) {
 	pq.pktQue = que
 	pq.mutex = mutQue
-	pq.queue = make([]*QPkt, 0)
+	pq.queue = make([]*QPkt, que.MaxLength)
 	pq.tb = TokenBucket{}
 	pq.tb.Init(pq.pktQue.PoliceRate)
 }
@@ -46,18 +46,26 @@ func (pq *PacketSliceQueue) Enqueue(rp *QPkt) {
 }
 
 func (pq *PacketSliceQueue) canDequeue() bool {
+	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
 	return len(pq.queue) > 0
 }
 
 func (pq *PacketSliceQueue) GetFillLevel() int {
+	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
 	return len(pq.queue) / pq.pktQue.MaxLength
 }
 
 func (pq *PacketSliceQueue) GetLength() int {
+	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
 	return len(pq.queue)
 }
 
 func (pq *PacketSliceQueue) peek() *QPkt {
+	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
 	return pq.queue[0]
 }
 
