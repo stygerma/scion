@@ -26,7 +26,7 @@ findAS() {
 scmpEcho() {
     findAS $2
     sourceAS=$?
-    ./bin/scmp "echo" -remote 1-ff00:0:11$1,[127.0.0.228] -sciond 127.0.0.$2:30255 -c 5 >> logs/Demo/echoFrom11${sourceAS}To11$1.txt & #-local 1-ff00:0:11$sourceAS,[127.0.0.228]
+    ./bin/scmp "echo" -remote 1-ff00:0:11$1,[127.0.0.228] -sciond 127.0.0.$2:30255 -c 5 >> logs/Demo/echoFrom11${sourceAS}To11$1.txt  #-local 1-ff00:0:11$sourceAS,[127.0.0.228]
     local pid=$!
     wait $pid
     firstLine=$(head -n 1 logs/Demo/echoFrom11${sourceAS}To11$1.txt)
@@ -111,7 +111,7 @@ for i in 0 1 2 3 4; do
             continue
         fi
         count=$((count+1))
-        scmpEcho $i $j &
+        scmpEcho $i $j 
     done
 done
 
