@@ -130,7 +130,7 @@ func initScheduler(qConfig *Configuration, forwarder func(rp *rpkt.RtrPkt)) erro
 	qConfig.notifications = make(chan *queues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
 	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
-	qConfig.schedul = &scheduler.DeficitRoundRobinScheduler{}
+	qConfig.schedul = &scheduler.WeightedRoundRobinScheduler{}
 	// qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
 	qConfig.schedul.Init(&qConfig.config)
 	go qConfig.schedul.Dequeuer(&qConfig.config, qConfig.Forwarder)
@@ -217,6 +217,11 @@ func (qosConfig *Configuration) dropPacket(qp *queues.QPkt) {
 	qosConfig.SendNotification(qp)
 	qosConfig.droppedPackets++
 	log.Info("Dropping packet", "qosConfig.droppedPackets", qosConfig.droppedPackets)
+	var queLen = make([]int, len(*qosConfig.GetQueues()))
+	for i := 0; i < len(*qosConfig.GetQueues()); i++ {
+		queLen[i] = (*qosConfig.GetQueue(i)).GetLength()
+	}
+	log.Info("DROPSTAT", "queueLengths", queLen)
 }
 
 func convertExternalToInteral(extConf conf.ExternalConfig) (queues.InternalRouterConfig, error) {
