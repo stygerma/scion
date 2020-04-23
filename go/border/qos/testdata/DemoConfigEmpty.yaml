@@ -26,4 +26,4 @@ Rules:
             - {Protocol: 6, Extension: -1}
             - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
-        queueNumber: 2
+        queueNumber: 0
