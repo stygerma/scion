@@ -28,7 +28,7 @@ import (
 	"github.com/scionproto/scion/go/lib/topology"
 )
 
-func PrepareRtrPacketWithStrings(sourceIA string, destinationIA string, L4Type int) *RtrPkt {
+func PrepareRtrPacketWithStrings(sourceIA string, destinationIA string, L4Type, intf int) *RtrPkt {
 	srcIA, err := addr.IAFromString(sourceIA)
 	if err != nil {
 		fmt.Println(err)
@@ -40,12 +40,13 @@ func PrepareRtrPacketWithStrings(sourceIA string, destinationIA string, L4Type i
 	pkt := prepareRtrPacketDetailedSample(
 		srcIA,
 		dstIA,
-		common.L4ProtocolType(L4Type))
+		common.L4ProtocolType(L4Type),
+		intf)
 	return pkt
 }
 
 func prepareRtrPacketDetailedSample(sourceIA addr.IA, destinationIA addr.IA,
-	L4Type common.L4ProtocolType) *RtrPkt {
+	L4Type common.L4ProtocolType, intf int) *RtrPkt {
 
 	r := NewRtrPkt()
 	// Set some other data that are required for the parsing to succeed:
@@ -68,7 +69,7 @@ func prepareRtrPacketDetailedSample(sourceIA addr.IA, destinationIA addr.IA,
 	r.DirFrom = -1 // I don't know what this is
 	r.Ingress = addrIFPair{Dst: sampleUDPAddr,
 		Src:  sampleUDPAddr,
-		IfID: 0, IfLabel: "TODO set all of this stuff correctly"}
+		IfID: common.IFIDType(intf), IfLabel: "TODO set all of this stuff correctly"}
 	r.Egress = []EgressPair{EgressPair{S: nil, Dst: sampleUDPAddr}}
 	r.CmnHdr = spkt.CmnHdr{NextHdr: common.L4ProtocolType(1)}
 	r.IncrementedPath = false

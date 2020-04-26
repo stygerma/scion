@@ -63,7 +63,7 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 	arr := make([]rpkt.RtrPkt, len(tables))
 
 	for k, tab := range tables {
-		arr[k] = *rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
+		arr[k] = *rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1, 1)
 	}
 
 	b.ResetTimer()
@@ -96,7 +96,7 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 
 	rc := queues.RegularClassRule{}
 
-	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
+	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1, 1)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -132,6 +132,27 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 // 	}
 // }
 
+func BenchmarkCachelessClassRule(b *testing.B) {
+
+	extConf, err := conf.LoadConfig("testdata/matchTypeTest-config.yaml")
+	if err != nil {
+		log.Debug("Load config file failed", "error", err)
+		log.Debug("The testdata folder from the parent folder should be available for this test but it isn't when running it with bazel. Just run it without Bazel and it will pass.")
+	}
+	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
+	classifier := queues.CachelessClassRule{}
+
+	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1, 1)
+
+	b.ResetTimer()
+	var rul *queues.InternalClassRule
+	for n := 0; n < b.N; n++ {
+		rul = classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
+		_ = rul
+	}
+
+}
+
 func BenchmarkStandardClassRule(b *testing.B) {
 
 	extConf, err := conf.LoadConfig("testdata/matchTypeTest-config.yaml")
@@ -142,7 +163,7 @@ func BenchmarkStandardClassRule(b *testing.B) {
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 	classifier := queues.RegularClassRule{}
 
-	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
+	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1, 1)
 
 	b.ResetTimer()
 	var rul *queues.InternalClassRule
@@ -167,11 +188,12 @@ func BenchmarkClassifier(b *testing.B) {
 		queueToUse queues.ClassRuleInterface
 	}{
 		{"Regular Class Rule", &queues.RegularClassRule{}},
+		{"Regular Class Rule w/o cache", &queues.CachelessClassRule{}},
 		{"Semi Parallel Class Rule", &queues.SemiParallelClassRule{}},
 		{"Parallel Class Rule", &queues.ParallelClassRule{}},
 	}
 
-	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
+	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1, 1)
 	for _, bench := range classifierImplementations {
 
 		b.Run(bench.name, func(b *testing.B) {
@@ -197,42 +219,49 @@ func TestRuleMatchModes(t *testing.T) {
 	}
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
-	classifiers := [3]queues.ClassRuleInterface{
+	classifiers := []queues.ClassRuleInterface{
 		&queues.RegularClassRule{},
+		&queues.CachelessClassRule{},
 		&queues.ParallelClassRule{},
 		&queues.SemiParallelClassRule{}}
+
+	// classifiers := [1]queues.ClassRuleInterface{
+	// 	&queues.RegularClassRule{}}
 
 	tables := []struct {
 		srcIA       string
 		dstIA       string
 		l4type      int
+		intf        int
 		ruleName    string
 		queueNumber int
 		shouldMatch bool
 	}{
-		{"11-ff00:0:299", "22-ff00:0:188", 6, "Exact - Exact", 1, true},
-		{"33-ff00:0:277", "44-ff00:0:166", 6, "Exact - ISDONLY", 2, true},
-		{"33-ff00:0:277", "44-ff00:0:165", 6, "Exact - ISDONLY", 2, true},
-		{"33-ff00:0:277", "44-ff00:0:000", 6, "Exact - ISDONLY", 2, true},
-		{"55-ff00:0:055", "66-ff00:0:344", 6, "Exact - ASONLY", 3, true},
-		{"55-ff00:0:055", "12-ff00:0:344", 6, "Exact - ASONLY", 3, true},
-		{"55-ff00:0:055", "13-ff00:0:344", 6, "Exact - ASONLY", 3, true},
-		{"55-ff00:0:055", "14-ff00:0:344", 6, "Exact - ASONLY", 3, true},
-		{"77-ff00:0:233", "85-ff00:0:222", 6, "Exact - RANGE", 4, true},
-		{"77-ff00:0:233", "89-ff00:0:222", 6, "Exact - RANGE", 4, true},
-		{"2-ff00:0:011", "89-ff00:0:222", 6, "Exact - RANGE", 4, false},
-		{"2-ff00:0:011", "89-ff00:0:222", 6, "Exact - ANY", 5, true},
-		{"2-ff00:0:011", "89-ff00:0:344", 6, "Exact - ANY", 5, true},
-		{"2-ff00:0:011", "344-ff00:0:222", 6, "Exact - ANY", 5, true},
-		{"2-ff00:0:011", "22-344:0:222", 6, "Exact - ANY", 5, true},
-		{"2-ff00:0:011", "123-ff00:344:222", 6, "Exact - ANY", 5, true},
-		{"123-ff00:344:222", "2-ff00:0:011", 6, "ANY - Exact", 6, true},
-		{"123-ff00:344:222", "2-ff00:0:011", 1, "ANY - ANY", 7, true},
+		{"11-ff00:0:299", "22-ff00:0:188", 6, 1, "Exact - Exact", 1, true},
+		{"33-ff00:0:277", "44-ff00:0:166", 6, 1, "Exact - ISDONLY", 2, true},
+		{"33-ff00:0:277", "44-ff00:0:165", 6, 1, "Exact - ISDONLY", 2, true},
+		{"33-ff00:0:277", "44-ff00:0:000", 6, 1, "Exact - ISDONLY", 2, true},
+		{"55-ff00:0:055", "66-ff00:0:344", 6, 1, "Exact - ASONLY", 3, true},
+		{"55-ff00:0:055", "12-ff00:0:344", 6, 1, "Exact - ASONLY", 3, true},
+		{"55-ff00:0:055", "13-ff00:0:344", 6, 1, "Exact - ASONLY", 3, true},
+		{"55-ff00:0:055", "14-ff00:0:344", 6, 1, "Exact - ASONLY", 3, true},
+		{"77-ff00:0:233", "85-ff00:0:222", 6, 1, "Exact - RANGE", 4, true},
+		{"77-ff00:0:233", "89-ff00:0:222", 6, 1, "Exact - RANGE", 4, true},
+		{"2-ff00:0:011", "89-ff00:0:222", 6, 1, "Exact - RANGE", 4, false},
+		{"2-ff00:0:011", "89-ff00:0:222", 6, 1, "Exact - ANY", 5, true},
+		{"2-ff00:0:011", "89-ff00:0:344", 6, 1, "Exact - ANY", 5, true},
+		{"2-ff00:0:011", "344-ff00:0:222", 6, 1, "Exact - ANY", 5, true},
+		{"2-ff00:0:011", "22-344:0:222", 6, 1, "Exact - ANY", 5, true},
+		{"2-ff00:0:011", "123-ff00:344:222", 6, 1, "Exact - ANY", 5, true},
+		{"123-ff00:344:222", "2-ff00:0:011", 6, 1, "ANY - Exact", 6, true},
+		{"123-ff00:344:222", "2-ff00:0:011", 1, 1, "ANY - ANY", 7, true},
+		{"123-ff00:344:222", "223-9f33:783:011", 6, 77, "ANY - ANY", 6, false},
+		{"123-ff00:344:222", "223-9f33:783:011", 1, 77, "INTF - Exact 77", 9, true},
 	}
 
 	for _, classifier := range classifiers {
 		for k, tab := range tables {
-			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, tab.l4type)
+			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, tab.l4type, tab.intf)
 
 			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 			// queue := queues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
@@ -282,7 +311,7 @@ func TestRuleMatchModesForDemo(t *testing.T) {
 
 	for _, classifier := range classifiers {
 		for k, tab := range tables {
-			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1)
+			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1, 1)
 
 			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 

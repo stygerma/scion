@@ -15,6 +15,8 @@
 package queues
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/scionproto/scion/go/border/qos/conf"
@@ -47,7 +49,6 @@ type InternalClassRule struct {
 	Name          string
 	Priority      int
 	SourceAs      matchRule
-	NextHopAs     matchRule
 	DestinationAs matchRule
 	L4Type        []ProtocolMatchType
 	QueueNumber   int
@@ -57,6 +58,7 @@ type matchRule struct {
 	IA        addr.IA
 	lowLim    addr.IA // Only set if matchMode is Range
 	upLim     addr.IA // Only set if matchMode is Range
+	intf      uint64
 	matchMode matchMode
 }
 
@@ -73,6 +75,8 @@ const (
 	RANGE matchMode = 3
 	// ANY match anything
 	ANY matchMode = 4
+	// INTF match interface
+	INTF matchMode = 5
 )
 
 // RegularClassRule implements ClassRuleInterface
@@ -129,6 +133,7 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 	isdOnlyDestRules := make(map[addr.ISD][]*InternalClassRule)
 	sourceAnyDestinationRules := make(map[addr.IA][]*InternalClassRule)
 	destinationAnySourceRules := make(map[addr.IA][]*InternalClassRule)
+	interfaceIncomingRules := make(map[uint64][]*InternalClassRule)
 
 	l4OnlyRules := make([]*InternalClassRule, 0)
 
@@ -172,7 +177,10 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 			} else {
 				l4OnlyRules = append(l4OnlyRules, &crs[k])
 			}
-
+		case INTF:
+			interfaceIncomingRules[cr.SourceAs.intf] = append(
+				interfaceIncomingRules[cr.SourceAs.intf],
+				&crs[k])
 		}
 
 		switch cr.DestinationAs.matchMode {
@@ -215,6 +223,8 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 					&crs[k])
 			}
 			// else case is handled while checking the source match mode
+		case INTF:
+			// This case is not handeled
 		}
 	}
 
@@ -229,6 +239,7 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 		ISDOnlySourceRules:        isdOnlySourceRules,
 		ISDOnlyDestRules:          isdOnlyDestRules,
 		L4OnlyRules:               l4OnlyRules,
+		InterfaceIncomingRules:    interfaceIncomingRules,
 	}
 
 	return &mp
@@ -274,6 +285,16 @@ func getMatchRuleTypeFromRule(
 				matchMode: matchMode(matchModeField)}
 			return m, nil
 		}
+	case INTF:
+		intf, _ := strconv.ParseInt(matchRuleField, 0, 64)
+		m := matchRule{
+			IA:        addr.IA{},
+			intf:      uint64(intf),
+			lowLim:    addr.IA{},
+			upLim:     addr.IA{},
+			matchMode: matchMode(matchModeField)}
+		return m, nil
+
 	}
 
 	return matchRule{}, common.NewBasicError(
@@ -290,11 +311,13 @@ var sourceAnyDestinationMatches []*InternalClassRule
 var destinationAnySourceRules []*InternalClassRule
 var asOnlySourceRules []*InternalClassRule
 var asOnlyDestinationRules []*InternalClassRule
-var isdOnlySourceRules, isdOnlyDestinationRules, matched, l4OnlyRules []*InternalClassRule
-var maskMatched, maskSad, maskDas, maskLf []bool
+var isdOnlySourceRules, isdOnlyDestinationRules, interfaceIncomingRules, interfaceOutgoingRules, matched, l4OnlyRules []*InternalClassRule
+var maskMatched, maskSad, maskDas, maskLf, maskIntf []bool
 var srcAddr, dstAddr addr.IA
 var extensions []common.ExtnType
 var l4t common.L4ProtocolType
+var intf uint64
+var ext common.Extension
 
 var emptyRule = &InternalClassRule{
 	Name:        "default",
@@ -311,6 +334,7 @@ func (*RegularClassRule) GetRuleForPacket(
 
 	srcAddr, _ = rp.SrcIA()
 	dstAddr, _ = rp.DstIA()
+	intf = uint64(rp.Ingress.IfID)
 
 	l4t = rp.L4Type
 	hbhext := rp.HBHExt
@@ -324,7 +348,7 @@ func (*RegularClassRule) GetRuleForPacket(
 		extensions = append(extensions, ext.Type())
 	}
 
-	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, l4type: l4t}
+	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, intf: intf, l4type: l4t}
 
 	returnRule = config.Rules.CrCache.Get(entry)
 
@@ -348,11 +372,15 @@ func (*RegularClassRule) GetRuleForPacket(
 	isdOnlySourceRules = config.Rules.ISDOnlySourceRules[srcAddr.I]
 	isdOnlyDestinationRules = config.Rules.ISDOnlyDestRules[dstAddr.I]
 
+	interfaceIncomingRules = config.Rules.InterfaceIncomingRules[intf]
+
 	l4OnlyRules = config.Rules.L4OnlyRules
 
 	sources[0] = exactAndRangeSourceMatches
 	sources[1] = asOnlySourceRules
 	sources[2] = isdOnlySourceRules
+	// sources[3] = interfaceIncomingRules
+	fmt.Println("Interface Rules", interfaceIncomingRules)
 
 	destinations[0] = exactAndRangeDestinationMatches
 	destinations[1] = asOnlyDestinationRules
@@ -364,16 +392,21 @@ func (*RegularClassRule) GetRuleForPacket(
 	maskSad = make([]bool, len(sourceAnyDestinationMatches))
 	maskDas = make([]bool, len(destinationAnySourceRules))
 	maskLf = make([]bool, len(l4OnlyRules))
+	maskIntf = make([]bool, len(l4OnlyRules))
+
+	fmt.Println("We have matched", matched)
 
 	matchL4Type(maskMatched, &matched, l4t, extensions)
 	matchL4Type(maskSad, &sourceAnyDestinationMatches, l4t, extensions)
 	matchL4Type(maskDas, &destinationAnySourceRules, l4t, extensions)
 	matchL4Type(maskLf, &l4OnlyRules, l4t, extensions)
+	matchL4Type(maskIntf, &interfaceIncomingRules, l4t, extensions)
 
 	max := -1
 	max, returnRule = getRuleWithPrevMax(returnRule, maskMatched, matched, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, maskSad, sourceAnyDestinationMatches, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, maskDas, destinationAnySourceRules, max)
+	max, returnRule = getRuleWithPrevMax(returnRule, maskIntf, interfaceIncomingRules, max)
 	_, returnRule = getRuleWithPrevMax(returnRule, maskLf, l4OnlyRules, max)
 
 	config.Rules.CrCache.Put(entry, returnRule)

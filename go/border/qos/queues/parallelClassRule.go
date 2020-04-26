@@ -31,6 +31,8 @@ func (pcr *ParallelClassRule) GetRuleForPacket(
 	var l4t common.L4ProtocolType
 	var extensions []common.ExtnType
 
+	intf = uint64(rp.Ingress.IfID)
+
 	go func(dun chan bool) {
 		srcAddr, _ = rp.SrcIA()
 		dun <- true
@@ -60,7 +62,7 @@ func (pcr *ParallelClassRule) GetRuleForPacket(
 		<-done
 	}
 
-	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, l4type: l4t}
+	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, intf: intf, l4type: l4t}
 
 	returnRule = config.Rules.CrCache.Get(entry)
 
@@ -149,24 +151,27 @@ func (pcr *ParallelClassRule) GetRuleForPacket(
 	l4OnlyRules = config.Rules.L4OnlyRules
 
 	matched = intersectLongListsRules(pcr.sources, pcr.destinations)
+	interfaceIncomingRules = config.Rules.InterfaceIncomingRules[intf]
 
 	maskMatched = make([]bool, len(matched))
 	maskSad = make([]bool, len(pcr.sources[3]))
 	maskDas = make([]bool, len(pcr.destinations[3]))
 	maskLf = make([]bool, len(l4OnlyRules))
+	maskIntf = make([]bool, len(l4OnlyRules))
 
 	matchL4Type(maskMatched, &matched, l4t, extensions)
 	matchL4Type(maskSad, &pcr.sources[3], l4t, extensions)
 	matchL4Type(maskDas, &pcr.destinations[3], l4t, extensions)
 	matchL4Type(maskLf, &l4OnlyRules, l4t, extensions)
+	maskIntf = make([]bool, len(l4OnlyRules))
 
-	var result [4]*InternalClassRule
+	var result [5]*InternalClassRule
 
 	for i := 0; i < len(result); i++ {
 		result[i] = emptyRule
 	}
 
-	done = make(chan bool, 4)
+	done = make(chan bool, 5)
 
 	go func(dun chan bool) {
 		_, result[0] = getRuleWithPrevMax(returnRule, maskMatched, matched, -1)
@@ -182,6 +187,10 @@ func (pcr *ParallelClassRule) GetRuleForPacket(
 	}(done)
 	go func(dun chan bool) {
 		_, result[3] = getRuleWithPrevMax(returnRule, maskLf, l4OnlyRules, -1)
+		dun <- true
+	}(done)
+	go func(dun chan bool) {
+		_, result[4] = getRuleWithPrevMax(returnRule, maskIntf, interfaceIncomingRules, -1)
 		dun <- true
 	}(done)
 

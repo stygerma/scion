@@ -197,7 +197,7 @@ Rules:
         queueNumber: 6
     -
         name: 'ANY - ANY'
-        priority: 100
+        priority: 102
         sourceAs: '139-ff00:0:989'
         sourceMatchMode: 4
         destinationAs: '2-ff00:0:011'
@@ -205,3 +205,33 @@ Rules:
         L4Type:
             - {Protocol: 1, Extension: -1}
         queueNumber: 7
+    -
+      name: 'INTF - ANY'
+      priority: 0
+      sourceAs: '77'
+      sourceMatchMode: 5
+      destinationAs: '2-ff00:0:011'
+      destinationMatchMode: 4
+      L4Type:
+          - {Protocol: 1, Extension: -1}
+      queueNumber: 7
+    -
+      name: 'ANY - ANY'
+      priority: 100
+      sourceAs: '139-ff00:0:989'
+      sourceMatchMode: 4
+      destinationAs: '223-9f33:783:011'
+      destinationMatchMode: 4
+      L4Type:
+          - {Protocol: 1, Extension: -1}
+      queueNumber: 8
+    -
+      name: 'INTF - Exact 77'
+      priority: 103
+      sourceAs: '77'
+      sourceMatchMode: 5
+      destinationAs: '223-9f33:783:011'
+      destinationMatchMode: 5
+      L4Type:
+          - {Protocol: 1, Extension: -1}
+      queueNumber: 9
