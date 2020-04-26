@@ -412,7 +412,7 @@ func (*RegularClassRule) GetRuleForPacket(
 	max, returnRule = getRuleWithPrevMax(returnRule, maskIntf, interfaceIncomingRules, max)
 	_, returnRule = getRuleWithPrevMax(returnRule, maskLf, l4OnlyRules, max)
 
-	//config.Rules.CrCache.Put(entry, returnRule)
+	config.Rules.CrCache.Put(entry, returnRule)
 
 	return returnRule
 }
