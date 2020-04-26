@@ -27,4 +27,8 @@ cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_112/br1-ff00_0_
 cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_112/br1-ff00_0_112-2/qosConfig.yaml
 cp go/border/qos/testdata/DemoConfig.yaml gen/ISD1/ASff00_0_113/br1-ff00_0_113-1/qosConfig.yaml
 cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_113/br1-ff00_0_113-2/qosConfig.yaml
+<<<<<<< HEAD
 cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_114/br1-ff00_0_114-1/qosConfig.yaml
+=======
+cp go/border/qos/testdata/DemoConfigEmpty.yaml gen/ISD1/ASff00_0_114/br1-ff00_0_114-1/qosConfig.yaml
+>>>>>>> fb245b6bcac29d64084d06edeb84342efc585688

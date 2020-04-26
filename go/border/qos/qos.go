@@ -221,7 +221,6 @@ func (qosConfig *QosConfiguration) SendNotification(qp *queues.QPkt) {
 	select {
 	case qosConfig.notifications <- &np:
 	default:
-		panic("We are overwhelmed")
 	}
 }
 
