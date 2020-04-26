@@ -27,4 +27,5 @@ type MapRules struct {
 	ASOnlyDestRules           map[addr.AS][]*InternalClassRule
 	ISDOnlySourceRules        map[addr.ISD][]*InternalClassRule
 	ISDOnlyDestRules          map[addr.ISD][]*InternalClassRule
+	L4OnlyRules               []*InternalClassRule
 }
