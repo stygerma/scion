@@ -33,7 +33,6 @@ type ProtocolMatchType struct {
 }
 
 type InternalClassRule struct {
-	// This is currently means the ID of the sending border router
 	Name          string
 	Priority      int
 	SourceAs      matchRule
