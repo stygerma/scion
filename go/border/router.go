@@ -78,10 +78,10 @@ func (r *Router) Start() {
 		defer log.HandlePanic()
 		rctrl.Control(r.sRevInfoQ, cfg.General.ReconnectToDispatcher)
 	}()
-	go func() {
-		defer log.HandlePanic()
-		r.bscNotify()
-	}()
+	// go func() {
+	// 	defer log.HandlePanic()
+	// 	r.bscNotify()
+	// }()
 }
 
 // ReloadConfig handles reloading the configuration when SIGHUP is received.
@@ -180,6 +180,8 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		return
 	}
 	r.qosConfig.QueuePacket(rp)
+	// r.forwardPacket(rp)
+
 }
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {
