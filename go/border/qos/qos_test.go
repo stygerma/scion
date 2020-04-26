@@ -16,6 +16,7 @@ package qos
 
 import (
 	"io/ioutil"
+	"net"
 	"testing"
 
 	"github.com/inconshreveable/log15"
@@ -23,9 +24,40 @@ import (
 
 	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/addr"
+	"github.com/scionproto/scion/go/lib/common"
+	"github.com/scionproto/scion/go/lib/l4"
+	"github.com/scionproto/scion/go/lib/spkt"
 )
 
 var blocks chan bool
+
+func genRouterPacket(sourceIA string, destinationIA string, L4Type, intf int) *rpkt.RtrPkt {
+
+	srcIA, _ := addr.IAFromString(sourceIA)
+	dstIA, _ := addr.IAFromString(destinationIA)
+
+	pkt := spkt.ScnPkt{
+
+		SrcIA:   srcIA,
+		DstIA:   dstIA,
+		SrcHost: addr.HostFromIP(net.IP{127, 0, 0, 1}),
+		DstHost: addr.HostFromIP(net.IP{127, 0, 0, 1}),
+		L4: &l4.UDP{
+			SrcPort: 8080,
+			DstPort: 8080,
+		},
+		Pld: common.RawBytes{1, 2, 3, 4},
+	}
+
+	_ = pkt
+
+	rp, _ := rpkt.RtrPktFromScnPkt(&pkt, nil)
+
+	rp.L4Type = common.L4ProtocolType(L4Type)
+	rp.Ingress.IfID = common.IFIDType(intf)
+	return rp
+}
 
 func bBenchmarkQueueSinglePacket(b *testing.B) {
 	root := log15.Root()
@@ -36,7 +68,7 @@ func bBenchmarkQueueSinglePacket(b *testing.B) {
 	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
 	require.NoError(b, err)
 	qosConfig, _ := InitQos(extConfig, forwardPacketByDrop)
-	singlePkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
+	singlePkt := genRouterPacket("1-ff00:0:110", "1-ff00:0:111", 1, 1)
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
@@ -72,12 +104,12 @@ func forwardPacketByDrop(rp *rpkt.RtrPkt) {
 
 func getPackets(numberOfPackets int) []*rpkt.RtrPkt {
 	pkts := []*rpkt.RtrPkt{
-		rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1),
-		rpkt.PrepareRtrPacketWithStrings("2-ff00:0:212", "1-ff00:0:111", 1),
-		rpkt.PrepareRtrPacketWithStrings("3-ff00:0:212", "1-ff00:0:111", 1),
-		rpkt.PrepareRtrPacketWithStrings("4-ff00:0:212", "1-ff00:0:111", 1),
-		rpkt.PrepareRtrPacketWithStrings("5-ff00:0:212", "1-ff00:0:111", 1),
-		rpkt.PrepareRtrPacketWithStrings("6-ff00:0:212", "1-ff00:0:111", 1),
+		genRouterPacket("1-ff00:0:110", "1-ff00:0:111", 1, 1),
+		genRouterPacket("2-ff00:0:212", "1-ff00:0:111", 1, 1),
+		genRouterPacket("3-ff00:0:212", "1-ff00:0:111", 1, 1),
+		genRouterPacket("4-ff00:0:212", "1-ff00:0:111", 1, 1),
+		genRouterPacket("5-ff00:0:212", "1-ff00:0:111", 1, 1),
+		genRouterPacket("6-ff00:0:212", "1-ff00:0:111", 1, 1),
 	}
 	arr := make([]*rpkt.RtrPkt, numberOfPackets*len(pkts))
 	for i := 0; i < numberOfPackets; i++ {

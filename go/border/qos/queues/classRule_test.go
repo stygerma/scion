@@ -17,6 +17,7 @@ package queues_test
 import (
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"path/filepath"
 	"testing"
@@ -26,8 +27,39 @@ import (
 	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/addr"
+	"github.com/scionproto/scion/go/lib/common"
+	"github.com/scionproto/scion/go/lib/l4"
 	"github.com/scionproto/scion/go/lib/log"
+	"github.com/scionproto/scion/go/lib/spkt"
 )
+
+func genRouterPacket(sourceIA string, destinationIA string, L4Type, intf int) *rpkt.RtrPkt {
+
+	srcIA, _ := addr.IAFromString(sourceIA)
+	dstIA, _ := addr.IAFromString(destinationIA)
+
+	pkt := spkt.ScnPkt{
+
+		SrcIA:   srcIA,
+		DstIA:   dstIA,
+		SrcHost: addr.HostFromIP(net.IP{127, 0, 0, 1}),
+		DstHost: addr.HostFromIP(net.IP{127, 0, 0, 1}),
+		L4: &l4.UDP{
+			SrcPort: 8080,
+			DstPort: 8080,
+		},
+		Pld: common.RawBytes{1, 2, 3, 4},
+	}
+
+	_ = pkt
+
+	rp, _ := rpkt.RtrPktFromScnPkt(&pkt, nil)
+
+	rp.L4Type = common.L4ProtocolType(L4Type)
+	rp.Ingress.IfID = common.IFIDType(intf)
+	return rp
+}
 
 func BenchmarkRuleMatchModes(b *testing.B) {
 	extConf, _ := conf.LoadConfig("testdata/matchBenchmark-config.yaml")
@@ -63,7 +95,7 @@ func BenchmarkRuleMatchModes(b *testing.B) {
 	arr := make([]rpkt.RtrPkt, len(tables))
 
 	for k, tab := range tables {
-		arr[k] = *rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1, 1)
+		arr[k] = *genRouterPacket(tab.srcIA, tab.dstIA, 1, 1)
 	}
 
 	b.ResetTimer()
@@ -96,7 +128,7 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 
 	rc := queues.RegularClassRule{}
 
-	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1, 1)
+	pkt := genRouterPacket("11-ff00:0:299", "22-ff00:0:188", 1, 1)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -123,7 +155,7 @@ func BenchmarkSingleMatchSequential(b *testing.B) {
 
 // 	rc := queues.ParallelClassRule{}
 
-// 	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1)
+// 	pkt := genRouterPacket("11-ff00:0:299", "22-ff00:0:188", 1)
 
 // 	b.ResetTimer()
 // 	for i := 0; i < b.N; i++ {
@@ -142,7 +174,7 @@ func BenchmarkCachelessClassRule(b *testing.B) {
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 	classifier := queues.CachelessClassRule{}
 
-	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1, 1)
+	pkt := genRouterPacket("11-ff00:0:299", "22-ff00:0:188", 1, 1)
 
 	b.ResetTimer()
 	var rul *queues.InternalClassRule
@@ -163,7 +195,7 @@ func BenchmarkStandardClassRule(b *testing.B) {
 	qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 	classifier := queues.RegularClassRule{}
 
-	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1, 1)
+	pkt := genRouterPacket("11-ff00:0:299", "22-ff00:0:188", 1, 1)
 
 	b.ResetTimer()
 	var rul *queues.InternalClassRule
@@ -193,7 +225,7 @@ func BenchmarkClassifier(b *testing.B) {
 		{"Parallel Class Rule", &queues.ParallelClassRule{}},
 	}
 
-	pkt := rpkt.PrepareRtrPacketWithStrings("11-ff00:0:299", "22-ff00:0:188", 1, 1)
+	pkt := genRouterPacket("11-ff00:0:299", "22-ff00:0:188", 1, 1)
 	for _, bench := range classifierImplementations {
 
 		b.Run(bench.name, func(b *testing.B) {
@@ -261,7 +293,7 @@ func TestRuleMatchModes(t *testing.T) {
 
 	for _, classifier := range classifiers {
 		for k, tab := range tables {
-			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, tab.l4type, tab.intf)
+			pkt := genRouterPacket(tab.srcIA, tab.dstIA, tab.l4type, tab.intf)
 
 			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 			// queue := queues.GetQueueNumberForPacket(qosConfig.GetConfig(), pkt)
@@ -311,7 +343,7 @@ func TestRuleMatchModesForDemo(t *testing.T) {
 
 	for _, classifier := range classifiers {
 		for k, tab := range tables {
-			pkt := rpkt.PrepareRtrPacketWithStrings(tab.srcIA, tab.dstIA, 1, 1)
+			pkt := genRouterPacket(tab.srcIA, tab.dstIA, 6, 0)
 
 			rul := classifier.GetRuleForPacket(qosConfig.GetConfig(), pkt)
 

@@ -21,8 +21,7 @@ func TestEnAndDequeuePackets(T *testing.T) {
 	pprof.StartCPUProfile(f)
 	defer pprof.StopCPUProfile()
 
-	pkt := rpkt.PrepareRtrPacketWithStrings("1-ff00:0:110", "1-ff00:0:111", 1)
-	qp := queues.QPkt{Rp: pkt, QueueNo: 0}
+	qp := queues.QPkt{Rp: nil, QueueNo: 0}
 
 	queue1 := queues.ChannelPacketQueue{}
 	queue1.InitQueue(
