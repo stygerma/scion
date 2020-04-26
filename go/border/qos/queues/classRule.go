@@ -21,7 +21,6 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
 // ClassRuleInterface allows to get the rule matchting rp from implementing structs
@@ -293,6 +292,9 @@ var asOnlySourceRules []*InternalClassRule
 var asOnlyDestinationRules []*InternalClassRule
 var isdOnlySourceRules, isdOnlyDestinationRules, matched, l4OnlyRules []*InternalClassRule
 var maskMatched, maskSad, maskDas, maskLf []bool
+var srcAddr, dstAddr addr.IA
+var extensions []common.ExtnType
+var l4t common.L4ProtocolType
 
 var emptyRule = &InternalClassRule{
 	Name:        "default",
@@ -307,11 +309,8 @@ func (*RegularClassRule) GetRuleForPacket(
 	var sources [3][]*InternalClassRule
 	var destinations [3][]*InternalClassRule
 
-	srcAddr, _ := rp.SrcIA()
-	dstAddr, _ := rp.DstIA()
-	// l4h, _ := rp.L4Hdr(false)
-	var extensions []common.ExtnType
-	var l4t common.L4ProtocolType
+	srcAddr, _ = rp.SrcIA()
+	dstAddr, _ = rp.DstIA()
 
 	l4t = rp.L4Type
 	hbhext := rp.HBHExt
@@ -325,17 +324,12 @@ func (*RegularClassRule) GetRuleForPacket(
 		extensions = append(extensions, ext.Type())
 	}
 
-	// log.Debug("l4t is", "l4t", l4t)
-	log.Debug("rp.l4 is", "l4t", rp.L4Type)
-	log.Debug("routerPacket", "rp", rp)
-
 	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, l4type: l4t}
 
 	returnRule = config.Rules.CrCache.Get(entry)
 
 	if returnRule != nil {
 		if matchRuleL4Type(returnRule, extensions) {
-			log.Debug("We have a cache match!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 			return returnRule
 		}
 	}
@@ -380,9 +374,7 @@ func (*RegularClassRule) GetRuleForPacket(
 	max, returnRule = getRuleWithPrevMax(returnRule, maskMatched, matched, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, maskSad, sourceAnyDestinationMatches, max)
 	max, returnRule = getRuleWithPrevMax(returnRule, maskDas, destinationAnySourceRules, max)
-	log.Debug("return rule", "rr", returnRule)
 	_, returnRule = getRuleWithPrevMax(returnRule, maskLf, l4OnlyRules, max)
-	log.Debug("return rule", "rr", returnRule)
 
 	config.Rules.CrCache.Put(entry, returnRule)
 
@@ -419,7 +411,6 @@ func matchL4Type(
 		for j := 0; j < len((*list)[i].L4Type); j++ {
 			if (*list)[i].L4Type[j].baseProtocol == l4t {
 				if matchRuleL4Type((*list)[i], extensions) {
-					log.Debug("Matched l4type!!!!")
 					mask[i] = true
 					break
 				}

@@ -169,7 +169,7 @@ Rules:
         queueNumber: 4
     -
         name: 'Exact - ANY'
-        priority: 0
+        priority: 1
         sourceAs: '2-ff00:0:011'
         sourceMatchMode: 0
         destinationAs: '100-ff00:0:989'
@@ -183,7 +183,7 @@ Rules:
         queueNumber: 5
     -
         name: 'ANY - Exact'
-        priority: 0
+        priority: 1
         sourceAs: '139-ff00:0:989'
         sourceMatchMode: 4
         destinationAs: '2-ff00:0:011'
@@ -195,3 +195,13 @@ Rules:
             - {Protocol: 17, Extension: -1}
             - {Protocol: 222, Extension: -1}
         queueNumber: 6
+    -
+        name: 'ANY - ANY'
+        priority: 100
+        sourceAs: '139-ff00:0:989'
+        sourceMatchMode: 4
+        destinationAs: '2-ff00:0:011'
+        destinationMatchMode: 4
+        L4Type:
+            - {Protocol: 1, Extension: -1}
+        queueNumber: 7
