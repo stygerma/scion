@@ -1,12 +1,15 @@
 package queues
 
 import (
+	"fmt"
+
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
+// ParallelClassRule contains helper arrays to store
+// temporary results.
 type ParallelClassRule struct {
 	result []*InternalClassRule
 
@@ -16,6 +19,7 @@ type ParallelClassRule struct {
 
 var _ ClassRuleInterface = (*ParallelClassRule)(nil)
 
+// GetRuleForPacket returns the rule for rp
 func (pcr *ParallelClassRule) GetRuleForPacket(
 	config *InternalRouterConfig,
 	rp *rpkt.RtrPkt) *InternalClassRule {
@@ -27,6 +31,8 @@ func (pcr *ParallelClassRule) GetRuleForPacket(
 	var l4t common.L4ProtocolType
 	var extensions []common.ExtnType
 
+	intf = uint64(rp.Ingress.IfID)
+
 	go func(dun chan bool) {
 		srcAddr, _ = rp.SrcIA()
 		dun <- true
@@ -37,22 +43,16 @@ func (pcr *ParallelClassRule) GetRuleForPacket(
 	}(done)
 	go func(dun chan bool) {
 
-		l4h, _ := rp.L4Hdr(false)
-
-		if l4h == nil {
-			l4t = 0
-		} else {
-			l4t = l4h.L4Type()
-			hbhext := rp.HBHExt
-			e2eext := rp.E2EExt
-			for k := 0; k < len(hbhext); k++ {
-				ext, _ := hbhext[k].GetExtn()
-				extensions = append(extensions, ext.Type())
-			}
-			for k := 0; k < len(e2eext); k++ {
-				ext, _ := e2eext[k].GetExtn()
-				extensions = append(extensions, ext.Type())
-			}
+		l4t = rp.L4Type
+		hbhext := rp.HBHExt
+		e2eext := rp.E2EExt
+		for k := 0; k < len(hbhext); k++ {
+			ext, _ := hbhext[k].GetExtn()
+			extensions = append(extensions, ext.Type())
+		}
+		for k := 0; k < len(e2eext); k++ {
+			ext, _ := e2eext[k].GetExtn()
+			extensions = append(extensions, ext.Type())
 		}
 
 		dun <- true
@@ -62,7 +62,7 @@ func (pcr *ParallelClassRule) GetRuleForPacket(
 		<-done
 	}
 
-	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, l4type: l4t}
+	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, intf: intf, l4type: l4t}
 
 	returnRule = config.Rules.CrCache.Get(entry)
 
@@ -148,33 +148,62 @@ func (pcr *ParallelClassRule) GetRuleForPacket(
 		<-done
 	}
 
-	log.Debug("Matches", "pcr.sources[0]", pcr.sources[0])
-	log.Debug("Matches", "pcr.destinations[0]", pcr.destinations[0])
+	l4OnlyRules = config.Rules.L4OnlyRules
 
 	matched = intersectLongListsRules(pcr.sources, pcr.destinations)
+	interfaceIncomingRules = config.Rules.InterfaceIncomingRules[intf]
 
-	matchL4Type(&matched, l4t, extensions)
+	maskMatched = make([]bool, len(matched))
+	maskSad = make([]bool, len(pcr.sources[3]))
+	maskDas = make([]bool, len(pcr.destinations[3]))
+	maskLf = make([]bool, len(l4OnlyRules))
+	maskIntf = make([]bool, len(l4OnlyRules))
 
-	var result [3]*InternalClassRule
+	matchL4Type(maskMatched, &matched, l4t, extensions)
+	matchL4Type(maskSad, &pcr.sources[3], l4t, extensions)
+	matchL4Type(maskDas, &pcr.destinations[3], l4t, extensions)
+	matchL4Type(maskLf, &l4OnlyRules, l4t, extensions)
+	maskIntf = make([]bool, len(l4OnlyRules))
+
+	var result [5]*InternalClassRule
 
 	for i := 0; i < len(result); i++ {
 		result[i] = emptyRule
 	}
 
-	done = make(chan bool, 3)
+	done = make(chan bool, 5)
 
-	go getRuleWithMaxFrom(result[0], matched, &done)
-	go getRuleWithMaxFrom(result[1], pcr.sources[3], &done)
-	go getRuleWithMaxFrom(result[2], pcr.destinations[3], &done)
+	go func(dun chan bool) {
+		_, result[0] = getRuleWithPrevMax(returnRule, maskMatched, matched, -1)
+		dun <- true
+	}(done)
+	go func(dun chan bool) {
+		_, result[1] = getRuleWithPrevMax(returnRule, maskSad, pcr.sources[3], -1)
+		dun <- true
+	}(done)
+	go func(dun chan bool) {
+		_, result[2] = getRuleWithPrevMax(returnRule, maskDas, pcr.destinations[3], -1)
+		dun <- true
+	}(done)
+	go func(dun chan bool) {
+		_, result[3] = getRuleWithPrevMax(returnRule, maskLf, l4OnlyRules, -1)
+		dun <- true
+	}(done)
+	go func(dun chan bool) {
+		_, result[4] = getRuleWithPrevMax(returnRule, maskIntf, interfaceIncomingRules, -1)
+		dun <- true
+	}(done)
 
 	for i := 0; i < cap(done); i++ {
 		<-done
-		if result[i].Priority > returnRule.Priority {
+	}
+	for i := 0; i < cap(done); i++ {
+		if result[i].Priority >= returnRule.Priority {
 			returnRule = result[i]
 		}
 	}
 
-	// config.Rules.CrCache.Put(entry, returnRule)
+	config.Rules.CrCache.Put(entry, returnRule)
 
 	return returnRule
 }
@@ -249,19 +278,23 @@ func intersectLongListsRules(
 
 func getRuleWithMaxFrom(
 	result *InternalClassRule,
+	mask []bool,
 	list []*InternalClassRule,
 	done *chan bool) {
 
 	prevMax := -1
 	for i := 0; i < len(list); i++ {
-		if list[i] != nil {
+		if mask[i] {
 			if list[i].Priority > prevMax {
-				returnRule = list[i]
+				fmt.Println("list is", list[i])
+				result = list[i]
+				fmt.Println("Will return", result)
 				prevMax = list[i].Priority
 			}
 		} else {
 			break
 		}
 	}
+	fmt.Println("Returning", result)
 	*done <- true
 }

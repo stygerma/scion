@@ -54,7 +54,7 @@ func (sched *RoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
 		}
 
 		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
-			time.Sleep(50 * time.Millisecond)
+			time.Sleep(1 * time.Millisecond)
 		}
 
 		forwarder(qp.Rp)

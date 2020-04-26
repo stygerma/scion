@@ -4,9 +4,10 @@ import (
 	"github.com/scionproto/scion/go/border/rpkt"
 	"github.com/scionproto/scion/go/lib/addr"
 	"github.com/scionproto/scion/go/lib/common"
-	"github.com/scionproto/scion/go/lib/log"
 )
 
+// SemiParallelClassRule contains helper arrays to store
+// temporary results.
 type SemiParallelClassRule struct {
 	result []*InternalClassRule
 
@@ -16,6 +17,7 @@ type SemiParallelClassRule struct {
 
 var _ ClassRuleInterface = (*SemiParallelClassRule)(nil)
 
+// GetRuleForPacket returns the rule for rp
 func (pcr *SemiParallelClassRule) GetRuleForPacket(
 	config *InternalRouterConfig,
 	rp *rpkt.RtrPkt) *InternalClassRule {
@@ -26,6 +28,7 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 	var dstAddr addr.IA
 	var extensions []common.ExtnType
 	var l4t common.L4ProtocolType
+	intf = uint64(rp.Ingress.IfID)
 
 	go func(dun chan bool) {
 		srcAddr, _ = rp.SrcIA()
@@ -37,22 +40,16 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 	}(done)
 	go func(dun chan bool) {
 
-		l4h, _ := rp.L4Hdr(false)
-
-		if l4h == nil {
-			l4t = 0
-		} else {
-			l4t = l4h.L4Type()
-			hbhext := rp.HBHExt
-			e2eext := rp.E2EExt
-			for k := 0; k < len(hbhext); k++ {
-				ext, _ := hbhext[k].GetExtn()
-				extensions = append(extensions, ext.Type())
-			}
-			for k := 0; k < len(e2eext); k++ {
-				ext, _ := e2eext[k].GetExtn()
-				extensions = append(extensions, ext.Type())
-			}
+		l4t = rp.L4Type
+		hbhext := rp.HBHExt
+		e2eext := rp.E2EExt
+		for k := 0; k < len(hbhext); k++ {
+			ext, _ := hbhext[k].GetExtn()
+			extensions = append(extensions, ext.Type())
+		}
+		for k := 0; k < len(e2eext); k++ {
+			ext, _ := e2eext[k].GetExtn()
+			extensions = append(extensions, ext.Type())
 		}
 
 		dun <- true
@@ -62,7 +59,7 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 		<-done
 	}
 
-	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, l4type: l4t}
+	entry := cacheEntry{srcAddress: srcAddr, dstAddress: dstAddr, intf: intf, l4type: l4t}
 
 	returnRule = config.Rules.CrCache.Get(entry)
 
@@ -75,103 +72,121 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 	returnRule = emptyRule
 
 	done = make(chan bool, 8)
-	// exactAndRangeSourceMatches = config.Rules.SourceRules[srcAddr]
-	go pcr.getMatchFromMap(
-		config,
-		&config.Rules.SourceRules,
-		srcAddr,
-		&pcr.sources,
-		0,
-		done)
-	// exactAndRangeDestinationMatches = config.Rules.DestinationRules[dstAddr]
-	go pcr.getMatchFromMap(
-		config,
-		&config.Rules.DestinationRules,
-		dstAddr,
-		&pcr.destinations,
-		0,
-		done)
+	go func(dun chan bool) {
+		pcr.getMatchFromMap(
+			config,
+			&config.Rules.SourceRules,
+			srcAddr,
+			&pcr.sources,
+			0,
+			done)
 
-	// sourceAnyDestinationMatches = config.Rules.SourceAnyDestinationRules[srcAddr]
-	go pcr.getMatchFromMap(
-		config,
-		&config.Rules.SourceAnyDestinationRules,
-		srcAddr,
-		&pcr.sources,
-		3,
-		done)
-	// destinationAnySourceRules = config.Rules.DestinationAnySourceRules[dstAddr]
-	go pcr.getMatchFromMap(
-		config,
-		&config.Rules.DestinationAnySourceRules,
-		dstAddr,
-		&pcr.destinations,
-		3,
-		done)
+		pcr.getMatchFromMap(
+			config,
+			&config.Rules.DestinationRules,
+			dstAddr,
+			&pcr.destinations,
+			0,
+			done)
 
-	// asOnlySourceRules = config.Rules.ASOnlySourceRules[srcAddr.A]
-	go pcr.getMatchASFromMap(
-		config,
-		&config.Rules.ASOnlySourceRules,
-		srcAddr.A,
-		&pcr.sources,
-		1,
-		done)
-	// asOnlyDestinationRules = config.Rules.ASOnlyDestRules[dstAddr.A]
-	go pcr.getMatchASFromMap(
-		config,
-		&config.Rules.ASOnlyDestRules,
-		dstAddr.A,
-		&pcr.destinations,
-		1,
-		done)
+		pcr.getMatchFromMap(
+			config,
+			&config.Rules.SourceAnyDestinationRules,
+			srcAddr,
+			&pcr.sources,
+			3,
+			done)
+		pcr.getMatchFromMap(
+			config,
+			&config.Rules.DestinationAnySourceRules,
+			dstAddr,
+			&pcr.destinations,
+			3,
+			done)
+	}(done)
 
-	// isdOnlySourceRules = config.Rules.ISDOnlySourceRules[srcAddr.I]
-	go pcr.getMatchISDFromMap(
-		config,
-		&config.Rules.ISDOnlySourceRules,
-		srcAddr.I,
-		&pcr.sources,
-		2,
-		done)
-	// isdOnlyDestinationRules = config.Rules.ISDOnlyDestRules[dstAddr.I]
-	go pcr.getMatchISDFromMap(
-		config,
-		&config.Rules.ISDOnlyDestRules,
-		dstAddr.I,
-		&pcr.destinations,
-		2,
-		done)
+	go func(dun chan bool) {
+		pcr.getMatchASFromMap(
+			config,
+			&config.Rules.ASOnlySourceRules,
+			srcAddr.A,
+			&pcr.sources,
+			1,
+			done)
+		pcr.getMatchASFromMap(
+			config,
+			&config.Rules.ASOnlyDestRules,
+			dstAddr.A,
+			&pcr.destinations,
+			1,
+			done)
+		pcr.getMatchISDFromMap(
+			config,
+			&config.Rules.ISDOnlySourceRules,
+			srcAddr.I,
+			&pcr.sources,
+			2,
+			done)
+		pcr.getMatchISDFromMap(
+			config,
+			&config.Rules.ISDOnlyDestRules,
+			dstAddr.I,
+			&pcr.destinations,
+			2,
+			done)
+	}(done)
 
 	for i := 0; i < cap(done); i++ {
 		<-done
 	}
 
-	log.Debug("Matches", "pcr.sources[0]", pcr.sources[0])
-	log.Debug("Matches", "pcr.destinations[0]", pcr.destinations[0])
+	interfaceIncomingRules = config.Rules.InterfaceIncomingRules[intf]
+	l4OnlyRules = config.Rules.L4OnlyRules
 
 	matched = intersectLongListsRules(pcr.sources, pcr.destinations)
 
-	matchL4Type(&matched, l4t, extensions)
+	maskMatched = make([]bool, len(matched))
+	maskSad = make([]bool, len(pcr.sources[3]))
+	maskDas = make([]bool, len(pcr.destinations[3]))
+	maskLf = make([]bool, len(l4OnlyRules))
+	maskIntf = make([]bool, len(l4OnlyRules))
 
-	var result [3]*InternalClassRule
+	matchL4Type(maskMatched, &matched, l4t, extensions)
+	matchL4Type(maskSad, &pcr.sources[3], l4t, extensions)
+	matchL4Type(maskDas, &pcr.destinations[3], l4t, extensions)
+	matchL4Type(maskLf, &l4OnlyRules, l4t, extensions)
+	matchL4Type(maskIntf, &interfaceIncomingRules, l4t, extensions)
+
+	var result [5]*InternalClassRule
 
 	for i := 0; i < len(result); i++ {
 		result[i] = emptyRule
 	}
 
-	done = make(chan bool, 3)
+	done = make(chan bool, 2)
 
-	go getRuleWithMaxFrom(result[0], matched, &done)
-	go getRuleWithMaxFrom(result[1], pcr.sources[3], &done)
-	go getRuleWithMaxFrom(result[2], pcr.destinations[3], &done)
+	go func(dun chan bool) {
+		_, result[0] = getRuleWithPrevMax(returnRule, maskMatched, matched, -1)
+		_, result[1] = getRuleWithPrevMax(returnRule, maskSad, pcr.sources[3], -1)
+		dun <- true
+	}(done)
+	go func(dun chan bool) {
+		_, result[2] = getRuleWithPrevMax(returnRule, maskDas, pcr.destinations[3], -1)
+		_, result[3] = getRuleWithPrevMax(returnRule, maskLf, l4OnlyRules, -1)
+		_, result[4] = getRuleWithPrevMax(returnRule, maskIntf, interfaceIncomingRules, -1)
+		dun <- true
+	}(done)
 
 	for i := 0; i < cap(done); i++ {
 		<-done
+	}
+	for i := 0; i < len(result); i++ {
 		if result[i].Priority > returnRule.Priority {
 			returnRule = result[i]
 		}
 	}
+
+	config.Rules.CrCache.Put(entry, returnRule)
 
 	return returnRule
 }

@@ -25,7 +25,7 @@ import (
 // This is a deficit round robin dequeuer.
 // Queues with higher priority will have more packets dequeued at the same time.
 
-type DeficitRoundRobinScheduler struct {
+type WeightedRoundRobinScheduler struct {
 	quantumSum       int
 	totalLength      int
 	messages         chan bool
@@ -35,9 +35,9 @@ type DeficitRoundRobinScheduler struct {
 	logger           ScheduleLogger
 }
 
-var _ SchedulerInterface = (*DeficitRoundRobinScheduler)(nil)
+var _ SchedulerInterface = (*WeightedRoundRobinScheduler)(nil)
 
-func (sched *DeficitRoundRobinScheduler) Init(routerConfig *queues.InternalRouterConfig) {
+func (sched *WeightedRoundRobinScheduler) Init(routerConfig *queues.InternalRouterConfig) {
 
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
@@ -57,7 +57,7 @@ func getNoPacketsToDequeue(totalLength int, priority int, totalPriority int) int
 	return priority
 }
 
-func (sched *DeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
+func (sched *WeightedRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
 	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
 	nopkts := getNoPacketsToDequeue(sched.totalQueueLength, queue.GetPriority(), sched.quantumSum)
@@ -76,7 +76,7 @@ func (sched *DeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterfa
 		}
 
 		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
-			time.Sleep(50 * time.Millisecond)
+			time.Sleep(1 * time.Millisecond)
 		}
 
 		sched.logger.lastRound[queueNo]++
@@ -85,7 +85,7 @@ func (sched *DeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterfa
 	}
 }
 
-func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig *queues.InternalRouterConfig,
+func (sched *WeightedRoundRobinScheduler) Dequeuer(routerConfig *queues.InternalRouterConfig,
 	forwarder func(rp *rpkt.RtrPkt)) {
 	if sched.totalLength == 0 {
 		panic("There are no queues to dequeue from. Please check that Init is called")
@@ -110,11 +110,11 @@ func (sched *DeficitRoundRobinScheduler) Dequeuer(routerConfig *queues.InternalR
 	}
 }
 
-func (sched *DeficitRoundRobinScheduler) UpdateIncoming(queueNo int) {
+func (sched *WeightedRoundRobinScheduler) UpdateIncoming(queueNo int) {
 	sched.logger.incoming[queueNo]++
 }
 
-func (sched *DeficitRoundRobinScheduler) showLog(routerConfig queues.InternalRouterConfig) {
+func (sched *WeightedRoundRobinScheduler) showLog(routerConfig queues.InternalRouterConfig) {
 
 	sched.logger.iterations++
 	if time.Now().Sub(sched.logger.t0) > time.Duration(5*time.Second) {
@@ -146,6 +146,6 @@ func (sched *DeficitRoundRobinScheduler) showLog(routerConfig queues.InternalRou
 
 }
 
-func (sched *DeficitRoundRobinScheduler) GetMessages() *chan bool {
+func (sched *WeightedRoundRobinScheduler) GetMessages() *chan bool {
 	return &sched.messages
 }
