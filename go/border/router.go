@@ -176,7 +176,15 @@ func (r *Router) processPacket(rp *rpkt.RtrPkt) {
 		return
 	}
 
-	r.qosConfig.QueuePacket(rp)
+	// TODO(joelfischerr): This is for the demo only. Remove this for the final PR.
+	if r.Id == "br1-ff00_0_110-1" {
+		// Enqueue the packet. Packets will be classified, put on different queues,
+		// scheduled and forwarded by forwardPacket
+		r.qosConfig.QueuePacket(rp)
+	} else {
+		// log.Debug("Just forward!")
+		r.forwardPacket(rp)
+	}
 }
 
 func (r *Router) forwardPacket(rp *rpkt.RtrPkt) {

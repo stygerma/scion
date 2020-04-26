@@ -42,7 +42,7 @@ func (sched *WeightedRoundRobinScheduler) Init(routerConfig *queues.InternalRout
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
 
-	sched.messages = make(chan bool, 20)
+	sched.messages = make(chan bool, 100)
 
 	sched.logger = initLogger(sched.totalLength)
 
@@ -117,7 +117,7 @@ func (sched *WeightedRoundRobinScheduler) UpdateIncoming(queueNo int) {
 func (sched *WeightedRoundRobinScheduler) showLog(routerConfig queues.InternalRouterConfig) {
 
 	sched.logger.iterations++
-	if time.Now().Sub(sched.logger.t0) > time.Duration(5*time.Second) {
+	if time.Now().Sub(sched.logger.t0) > time.Duration(1*time.Second) {
 
 		var queLen = make([]int, sched.totalLength)
 		for i := 0; i < sched.totalLength; i++ {
