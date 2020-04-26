@@ -334,6 +334,8 @@ func (*RegularClassRule) GetRuleForPacket(
 	matched = intersectListsRules(sources, destinations)
 
 	matchL4Type(&matched, l4t, extensions)
+	matchL4Type(&sourceAnyDestinationMatches, l4t, extensions)
+	matchL4Type(&destinationAnySourceRules, l4t, extensions)
 
 	max := -1
 	max, returnRule = getRuleWithPrevMax(returnRule, matched, max)
