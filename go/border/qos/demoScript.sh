@@ -7,7 +7,7 @@
 # You may obtain a copy of the License at
 #
 #   http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,7 +58,7 @@ printBlue() {
 
 waitForEnter() {
     if $interactive; then
-        printBlue "Press enter to continue $1" 
+        printBlue "Press enter to continue $1"
         read -p ""
     fi
 }
@@ -74,7 +74,7 @@ transferFileTo() {
     start=$(date +%s)
     SCION_DAEMON_ADDRESS="127.0.0.$1:30255"
     export SCION_DAEMON_ADDRESS
-    ./../scion-apps/netcat/netcat 1-ff00:0:111,[127.0.0.1]:"$2" < ../scion-apps/netcat/data/test100Mb.db
+    ./../scion-apps/netcat/netcat 1-ff00:0:111,[127.0.0.1]:"$2" < ../scion-apps/netcat/data/100MB.bin
     local end=`date +%s`
     local runtime=$((end-start))
     echo $runtime >  ".tempFile$2"
@@ -86,6 +86,13 @@ if [ ! -f ../scion-apps/netcat/netcat ]; then
     echo "Netcat does not exist at the expected path: ../scion-apps/netcat/netcat. Please clone netcat from github.com/joelfischerr/scion-apps/tree/demo"
     exit 1
 fi
+
+if [ ! -f ../scion-apps/netcat/data/100MB.bin ]; then
+    echo "Creating data folder"
+    mkdir ../scion-apps/netcat/data
+    wget -P ../scion-apps/netcat/data/ https://speed.hetzner.de/100MB.bin
+fi
+
 
 # Generate topology and copy configuration files
 
