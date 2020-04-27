@@ -130,8 +130,8 @@ func initScheduler(qConfig *Configuration, forwarder func(rp *rpkt.RtrPkt)) erro
 	qConfig.notifications = make(chan *queues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
 	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
-	qConfig.schedul = &scheduler.WeightedRoundRobinScheduler{}
-	// qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
+	// qConfig.schedul = &scheduler.WeightedRoundRobinScheduler{}
+	qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
 	qConfig.schedul.Init(&qConfig.config)
 	go qConfig.schedul.Dequeuer(&qConfig.config, qConfig.Forwarder)
 
