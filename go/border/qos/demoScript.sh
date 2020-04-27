@@ -82,6 +82,8 @@ transferFileTo() {
 
 printBlue "Starting the demo"
 
+rm logs/*
+
 if [ ! -f ../scion-apps/netcat/netcat ]; then
     echo "Netcat does not exist at the expected path: ../scion-apps/netcat/netcat. Please clone netcat from github.com/joelfischerr/scion-apps/tree/demo"
     exit 1
