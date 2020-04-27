@@ -41,7 +41,7 @@ func (tb *TokenBucket) refill() {
 	now := time.Now()
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
-	if timeSinceLastUpdate > 1 {
+	if timeSinceLastUpdate > 20 {
 
 		newTokens := ((tb.maxBandWidth) * int(timeSinceLastUpdate)) / (1000)
 		fmt.Println("new tokens", newTokens)
