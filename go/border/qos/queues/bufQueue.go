@@ -55,6 +55,12 @@ func (pq *PacketBufQueue) GetFillLevel() int {
 	return pq.GetLength() / pq.pktQue.MaxLength
 }
 
+// GetCapacity returns the capacity i.e. the maximum number of
+// items on this queue
+func (pq *PacketBufQueue) GetCapacity() int {
+	return pq.pktQue.MaxLength
+}
+
 func (pq *PacketBufQueue) GetLength() int {
 	return pq.bufQueue.Readable()
 }

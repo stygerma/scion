@@ -41,8 +41,12 @@ func (sched *WeightedRoundRobinScheduler) Init(routerConfig *queues.InternalRout
 
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
+	var messageLen int
+	for i := 0; i < len(routerConfig.Queues); i++ {
+		messageLen += routerConfig.Queues[i].GetCapacity()
+	}
 
-	sched.messages = make(chan bool, 100)
+	sched.messages = make(chan bool, messageLen)
 
 	sched.logger = initLogger(sched.totalLength)
 

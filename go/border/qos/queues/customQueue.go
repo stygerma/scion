@@ -69,6 +69,12 @@ func (pq *CustomPacketQueue) GetFillLevel() int {
 	return pq.length / pq.pktQue.MaxLength
 }
 
+// GetCapacity returns the capacity i.e. the maximum number of
+// items on this queue
+func (pq *CustomPacketQueue) GetCapacity() int {
+	return pq.pktQue.MaxLength
+}
+
 func (pq *CustomPacketQueue) GetLength() int {
 	return pq.length
 }

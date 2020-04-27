@@ -64,6 +64,12 @@ func (pq *ChannelPacketQueue) GetFillLevel() int {
 	return int(len(pq.queue)) / int(pq.pktQue.MaxLength)
 }
 
+// GetCapacity returns the capacity i.e. the maximum number of
+// items on this queue
+func (pq *ChannelPacketQueue) GetCapacity() int {
+	return pq.pktQue.MaxLength
+}
+
 func (pq *ChannelPacketQueue) GetLength() int {
 
 	return int(len(pq.queue))
