@@ -49,7 +49,10 @@ func (sched *WeightedRoundRobinScheduler) Init(routerConfig *queues.InternalRout
 	for i := 0; i < len(routerConfig.Queues); i++ {
 		sched.quantumSum = sched.quantumSum + routerConfig.Queues[i].GetPriority()
 	}
-	sched.tb.Init(routerConfig.Scheduler.Bandwidth)
+	// sched.tb.Init(routerConfig.Scheduler.Bandwidth)
+	sched.tb.Init(20000000)
+	// sched.tb.Init(2500000)
+	// sched.tb.Init(43176000)
 	sched.sleepDuration = routerConfig.Scheduler.Latency
 }
 
@@ -75,8 +78,13 @@ func (sched *WeightedRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterf
 			break
 		}
 
-		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
-			time.Sleep(1 * time.Millisecond)
+		pktLen = len(qp.Rp.Raw)
+
+		amount0 += pktLen
+		// sched.tb.ForceTake(qp.Rp.Bytes().pktLen())
+
+		for !(sched.tb.Take(pktLen)) {
+			time.Sleep(1 * time.Microsecond)
 		}
 
 		sched.logger.lastRound[queueNo]++
@@ -110,6 +118,8 @@ func (sched *WeightedRoundRobinScheduler) Dequeuer(routerConfig *queues.Internal
 	}
 }
 
+var amount0 int
+
 func (sched *WeightedRoundRobinScheduler) UpdateIncoming(queueNo int) {
 	sched.logger.incoming[queueNo]++
 }
@@ -130,6 +140,9 @@ func (sched *WeightedRoundRobinScheduler) showLog(routerConfig queues.InternalRo
 			sched.logger.lastRound, "deqAttempted",
 			sched.logger.attempted, "deqTotal",
 			sched.logger.total, "currQueueLen", queLen)
+		log.Debug("SPEED", "Mbps", float64(amount0)/1000000.0*8.0, "MBps", float64(amount0)/1000000.0)
+		amount0 = 0
+		log.Debug("Bucket", "tokens Mbps", float64(sched.tb.GetAvailable())/1000000.0*8.0, "MBps", float64(sched.tb.GetAvailable())/1000000.0, "allwed MBps", float64(sched.tb.GetMaxBandwidth())/1000000.0)
 		for i := 0; i < len(sched.logger.lastRound); i++ {
 			sched.logger.lastRound[i] = 0
 		}
