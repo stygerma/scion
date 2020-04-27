@@ -57,13 +57,13 @@ func getNoPacketsToDequeue(totalLength int, priority int, totalPriority int) int
 	return priority
 }
 
-func (sched *WeightedRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
+func (sched *WeightedRoundRobinScheduler) Dequeue(
+	queue queues.PacketQueueInterface,
 	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
-	nopkts := getNoPacketsToDequeue(sched.totalQueueLength, queue.GetPriority(), sched.quantumSum)
-	pktToDequeue := nopkts
-
 	var qp *queues.QPkt
+
+	pktToDequeue := getNoPacketsToDequeue(sched.totalQueueLength, queue.GetPriority(), sched.quantumSum)
 
 	sched.logger.attempted[queueNo] += pktToDequeue
 
@@ -80,7 +80,7 @@ func (sched *WeightedRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterf
 		amount0 += pktLen
 
 		for !(sched.tb.Take(pktLen)) {
-			time.Sleep(1 * time.Millisecond)
+			time.Sleep(30 * time.Millisecond)
 		}
 
 		sched.logger.lastRound[queueNo]++
