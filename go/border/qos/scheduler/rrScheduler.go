@@ -49,10 +49,9 @@ func (sched *RoundRobinScheduler) Init(routerConfig *queues.InternalRouterConfig
 func (sched *RoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
 	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
-	length := queue.GetLength()
 	var qp *queues.QPkt
 
-	for i := 0; i < length; i++ {
+	for i := 0; i < queue.GetLength(); i++ {
 		qp = queue.Pop()
 		if qp == nil {
 			continue

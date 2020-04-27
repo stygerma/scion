@@ -129,8 +129,8 @@ func InitClassification(qConfig *Configuration) error {
 func initScheduler(qConfig *Configuration, forwarder func(rp *rpkt.RtrPkt)) error {
 	qConfig.notifications = make(chan *queues.NPkt, maxNotificationCount)
 	qConfig.Forwarder = forwarder
-	// qConfig.schedul = &scheduler.RoundRobinScheduler{}
-	qConfig.schedul = &scheduler.WeightedRoundRobinScheduler{}
+	qConfig.schedul = &scheduler.RoundRobinScheduler{}
+	// qConfig.schedul = &scheduler.WeightedRoundRobinScheduler{}
 	// qConfig.schedul = &scheduler.RateRoundRobinScheduler{}
 	qConfig.schedul.Init(&qConfig.config)
 	go qConfig.schedul.Dequeuer(&qConfig.config, qConfig.Forwarder)
@@ -202,12 +202,12 @@ func putOnQueue(qosConfig *Configuration, queueNo int, qp *queues.QPkt) {
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	}
 
-	// *qosConfig.schedul.GetMessages() <- true
+	*qosConfig.schedul.GetMessages() <- true
 
-	select {
-	case *qosConfig.schedul.GetMessages() <- true:
-	default:
-	}
+	// select {
+	// case *qosConfig.schedul.GetMessages() <- true:
+	// default:
+	// }
 }
 
 // SendNotification is needed for the part of @stygerma
