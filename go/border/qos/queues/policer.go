@@ -15,6 +15,7 @@
 package queues
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -40,9 +41,10 @@ func (tb *TokenBucket) refill() {
 	now := time.Now()
 	timeSinceLastUpdate := now.Sub(tb.lastRefill).Milliseconds()
 
-	if timeSinceLastUpdate > 20 {
+	if timeSinceLastUpdate > 1 {
 
 		newTokens := ((tb.maxBandWidth) * int(timeSinceLastUpdate)) / (1000)
+		fmt.Println("new tokens", newTokens)
 		tb.lastRefill = now
 
 		if tb.tokens+newTokens > tb.maxBandWidth {
@@ -61,8 +63,11 @@ func (tb *TokenBucket) Available(amount int) bool {
 	return false
 }
 
+func (tb *TokenBucket) GetMaxBandwidth() int {
+	return tb.maxBandWidth
+}
+
 func (tb *TokenBucket) GetAvailable() int {
-	tb.refill()
 	return tb.tokens
 }
 
@@ -73,6 +78,7 @@ func (tb *TokenBucket) GetAll() int {
 }
 
 func (tb *TokenBucket) ForceTake(no int) {
+	tb.refill()
 	tb.tokens -= no
 }
 
@@ -101,5 +107,4 @@ func (tb *TokenBucket) PoliceBucket(qp *QPkt) conf.PoliceAction {
 	}
 
 	return qp.Act.action
-
 }
