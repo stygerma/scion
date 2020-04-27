@@ -84,7 +84,7 @@ func (sched *WeightedRoundRobinScheduler) Dequeue(
 		amount0 += pktLen
 
 		for !(sched.tb.Take(pktLen)) {
-			time.Sleep(30 * time.Millisecond)
+			time.Sleep(5 * time.Millisecond)
 		}
 
 		sched.logger.lastRound[queueNo]++
