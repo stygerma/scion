@@ -49,10 +49,7 @@ func (sched *WeightedRoundRobinScheduler) Init(routerConfig *queues.InternalRout
 	for i := 0; i < len(routerConfig.Queues); i++ {
 		sched.quantumSum = sched.quantumSum + routerConfig.Queues[i].GetPriority()
 	}
-	// sched.tb.Init(routerConfig.Scheduler.Bandwidth)
-	sched.tb.Init(20000000)
-	// sched.tb.Init(2500000)
-	// sched.tb.Init(43176000)
+	sched.tb.Init(routerConfig.Scheduler.Bandwidth)
 	sched.sleepDuration = routerConfig.Scheduler.Latency
 }
 
@@ -81,10 +78,9 @@ func (sched *WeightedRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterf
 		pktLen = len(qp.Rp.Raw)
 
 		amount0 += pktLen
-		// sched.tb.ForceTake(qp.Rp.Bytes().pktLen())
 
 		for !(sched.tb.Take(pktLen)) {
-			time.Sleep(1 * time.Microsecond)
+			time.Sleep(1 * time.Millisecond)
 		}
 
 		sched.logger.lastRound[queueNo]++
