@@ -74,9 +74,9 @@ func (sched *DeficitRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterfa
 			break
 		}
 
-		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
-			time.Sleep(50 * time.Millisecond)
-		}
+		// for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
+		// 	time.Sleep(50 * time.Millisecond)
+		// }
 
 		sched.logger.lastRound[queueNo]++
 		sched.logger.total[queueNo]++
