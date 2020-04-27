@@ -202,6 +202,8 @@ func putOnQueue(qosConfig *Configuration, queueNo int, qp *queues.QPkt) {
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	}
 
+	// *qosConfig.schedul.GetMessages() <- true
+
 	select {
 	case *qosConfig.schedul.GetMessages() <- true:
 	default:
