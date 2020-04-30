@@ -51,18 +51,16 @@ func (sched *RoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
 
 	var qp *queues.QPkt
 
-	for i := 0; i < queue.GetLength(); i++ {
-		qp = queue.Pop()
-		if qp == nil {
-			continue
-		}
-
-		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
-			time.Sleep(1 * time.Millisecond)
-		}
-
-		forwarder(qp.Rp)
+	qp = queue.Pop()
+	if qp == nil {
+		return
 	}
+
+	for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
+		time.Sleep(1 * time.Millisecond)
+	}
+
+	forwarder(qp.Rp)
 }
 
 func (sched *RoundRobinScheduler) Dequeuer(routerConfig *queues.InternalRouterConfig,
