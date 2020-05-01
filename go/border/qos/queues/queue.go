@@ -81,9 +81,9 @@ type PacketQueueInterface interface {
 	GetPacketQueue() PacketQueue
 }
 
-// ReturnAction merges both PoliceAction together and returns the merged result.
-func ReturnAction(pol conf.PoliceAction, prof conf.PoliceAction) conf.PoliceAction {
-	// check if any of pol or prof actions are DROPNOTIFY, DROP, NOTIFY OR PASS, in this order
+// MergeAction merges both PoliceAction together and returns the merged result.
+func MergeAction(pol conf.PoliceAction, prof conf.PoliceAction) conf.PoliceAction {
+	// Check if any of pol or prof actions are DROPNOTIFY, DROP, NOTIFY OR PASS, in this order
 	if pol == conf.DROPNOTIFY || prof == conf.DROPNOTIFY {
 		return conf.DROPNOTIFY
 	} else if pol == conf.DROP || prof == conf.DROP {
