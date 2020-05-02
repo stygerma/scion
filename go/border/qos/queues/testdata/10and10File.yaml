@@ -1,0 +1,485 @@
+Scheduler:
+  Latency: 0
+  Bandwidth: 500Mbps
+Queues:
+- name: Queue No. 0
+  id: 0
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+- name: Queue No. 1
+  id: 1
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+- name: Queue No. 2
+  id: 2
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+- name: Queue No. 3
+  id: 3
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+- name: Queue No. 4
+  id: 4
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+- name: Queue No. 5
+  id: 5
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+- name: Queue No. 6
+  id: 6
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+- name: Queue No. 7
+  id: 7
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+- name: Queue No. 8
+  id: 8
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+- name: Queue No. 9
+  id: 9
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+Rules:
+- name: Rule No. 0
+  priority: 0
+  sourceAs: 274-412:5ff9:bd2a
+  sourceMatchMode: 0
+  destinationAs: 515-b1e0:d40f:ec85
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 1
+  priority: 0
+  sourceAs: 275-413:5ffa:bd2b
+  sourceMatchMode: 0
+  destinationAs: 516-b1e1:d410:ec86
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 1
+- name: Rule No. 2
+  priority: 0
+  sourceAs: 276-414:5ffb:bd2c
+  sourceMatchMode: 0
+  destinationAs: 517-b1e2:d411:ec87
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 2
+- name: Rule No. 3
+  priority: 0
+  sourceAs: 277-415:5ffc:bd2d
+  sourceMatchMode: 0
+  destinationAs: 518-b1e3:d412:ec88
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 3
+- name: Rule No. 4
+  priority: 0
+  sourceAs: 278-416:5ffd:bd2e
+  sourceMatchMode: 0
+  destinationAs: 519-b1e4:d413:ec89
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 4
+- name: Rule No. 5
+  priority: 0
+  sourceAs: 279-417:5ffe:bd2f
+  sourceMatchMode: 0
+  destinationAs: 520-b1e5:d414:ec8a
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 5
+- name: Rule No. 6
+  priority: 0
+  sourceAs: 280-418:5fff:bd30
+  sourceMatchMode: 0
+  destinationAs: 521-b1e6:d415:ec8b
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 6
+- name: Rule No. 7
+  priority: 0
+  sourceAs: 281-419:6000:bd31
+  sourceMatchMode: 0
+  destinationAs: 522-b1e7:d416:ec8c
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 7
+- name: Rule No. 8
+  priority: 0
+  sourceAs: 282-41a:6001:bd32
+  sourceMatchMode: 0
+  destinationAs: 523-b1e8:d417:ec8d
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 8
+- name: Rule No. 9
+  priority: 0
+  sourceAs: 283-41b:6002:bd33
+  sourceMatchMode: 0
+  destinationAs: 524-b1e9:d418:ec8e
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  queueNumber: 9

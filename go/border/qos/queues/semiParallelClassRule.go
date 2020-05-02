@@ -145,11 +145,11 @@ func (pcr *SemiParallelClassRule) GetRuleForPacket(
 
 	matched = intersectLongListsRules(pcr.sources, pcr.destinations)
 
-	maskMatched = make([]bool, len(matched))
-	maskSad = make([]bool, len(pcr.sources[3]))
-	maskDas = make([]bool, len(pcr.destinations[3]))
-	maskLf = make([]bool, len(l4OnlyRules))
-	maskIntf = make([]bool, len(l4OnlyRules))
+	// maskMatched = make([]bool, len(matched))
+	// maskSad = make([]bool, len(pcr.sources[3]))
+	// maskDas = make([]bool, len(pcr.destinations[3]))
+	// maskLf = make([]bool, len(l4OnlyRules))
+	// maskIntf = make([]bool, len(l4OnlyRules))
 
 	matchL4Type(maskMatched, &matched, l4t, extensions)
 	matchL4Type(maskSad, &pcr.sources[3], l4t, extensions)

@@ -17,6 +17,7 @@ package queues_test
 import (
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"os"
 	"path/filepath"
@@ -32,6 +33,7 @@ import (
 	"github.com/scionproto/scion/go/lib/l4"
 	"github.com/scionproto/scion/go/lib/log"
 	"github.com/scionproto/scion/go/lib/spkt"
+	"gopkg.in/yaml.v2"
 )
 
 func genRouterPacket(sourceIA string, destinationIA string, L4Type, intf int) *rpkt.RtrPkt {
@@ -255,7 +257,8 @@ func TestRuleMatchModes(t *testing.T) {
 		&queues.RegularClassRule{},
 		&queues.CachelessClassRule{},
 		&queues.ParallelClassRule{},
-		&queues.SemiParallelClassRule{}}
+		&queues.SemiParallelClassRule{},
+	}
 
 	// classifiers := [1]queues.ClassRuleInterface{
 	// 	&queues.RegularClassRule{}}
@@ -381,4 +384,241 @@ func disableLog(b *testing.B) {
 		b.Fatalf("Unexpected error: %v", err)
 	}
 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
+}
+
+func BenchmarkClassification(b *testing.B) {
+
+	benchTimes := 1
+	noPkts := 1
+
+	rand.Seed(0)
+
+	disableLog(b)
+
+	classifiers := []struct {
+		name string
+		cls  queues.ClassRuleInterface
+	}{
+		{"Regular", &queues.RegularClassRule{}},
+		{"Cacheless", &queues.CachelessClassRule{}},
+		{"Parallel", &queues.ParallelClassRule{}},
+		{"SemiP", &queues.SemiParallelClassRule{}},
+	}
+
+	tables := []struct {
+		srcIA       string
+		dstIA       string
+		l4type      int
+		intf        int
+		ruleName    string
+		queueNumber int
+		shouldMatch bool
+	}{
+		{"11-ff00:0:299", "22-ff00:0:188", 6, 1, "Exact - Exact", 1, true},
+		{"33-ff00:0:277", "44-ff00:0:166", 6, 1, "Exact - ISDONLY", 2, true},
+		{"33-ff00:0:277", "44-ff00:0:165", 6, 1, "Exact - ISDONLY", 2, true},
+		{"33-ff00:0:277", "44-ff00:0:000", 6, 1, "Exact - ISDONLY", 2, true},
+		{"55-ff00:0:055", "66-ff00:0:344", 6, 1, "Exact - ASONLY", 3, true},
+		{"55-ff00:0:055", "12-ff00:0:344", 6, 1, "Exact - ASONLY", 3, true},
+		{"55-ff00:0:055", "13-ff00:0:344", 6, 1, "Exact - ASONLY", 3, true},
+		{"55-ff00:0:055", "14-ff00:0:344", 6, 1, "Exact - ASONLY", 3, true},
+		{"77-ff00:0:233", "85-ff00:0:222", 6, 1, "Exact - RANGE", 4, true},
+		{"77-ff00:0:233", "89-ff00:0:222", 6, 1, "Exact - RANGE", 4, true},
+		{"2-ff00:0:011", "89-ff00:0:222", 6, 1, "Exact - RANGE", 4, false},
+		{"2-ff00:0:011", "89-ff00:0:222", 6, 1, "Exact - ANY", 5, true},
+		{"2-ff00:0:011", "89-ff00:0:344", 6, 1, "Exact - ANY", 5, true},
+		{"2-ff00:0:011", "344-ff00:0:222", 6, 1, "Exact - ANY", 5, true},
+		{"2-ff00:0:011", "22-344:0:222", 6, 1, "Exact - ANY", 5, true},
+		{"2-ff00:0:011", "123-ff00:344:222", 6, 1, "Exact - ANY", 5, true},
+		{"123-ff00:344:222", "2-ff00:0:011", 6, 1, "ANY - Exact", 6, true},
+		{"123-ff00:344:222", "2-ff00:0:011", 1, 1, "ANY - ANY", 7, true},
+		{"123-ff00:344:222", "223-9f33:783:011", 6, 77, "ANY - ANY", 6, false},
+		{"123-ff00:344:222", "223-9f33:783:011", 1, 77, "INTF - Exact 77", 9, true},
+	}
+
+	configFiles := map[string]struct {
+		noQueues  int
+		noRules   int
+		noL4Rules int
+		fileName  string
+	}{
+		"10-10-10":      {10, 10, 10, "testdata/tenEach-config.yaml"},
+		"100-10-10":     {100, 100, 10, "testdata/hundredEach-config.yaml"},
+		"100-1000-10":   {100, 1000, 10, "testdata/hundred-thousand-config.yaml"},
+		"100-10000-10":  {100, 10000, 10, "testdata/hundred-tenThousand-config.yaml"},
+		"100-100000-10": {100, 100000, 10, "testdata/100-100000-10-config.yaml"},
+		"10-100-10":     {10, 1000, 10, "testdata/ten-thousand-config.yaml"},
+		"10-10000-10":   {10, 10000, 10, "testdata/ten-tenThousand-config.yaml"},
+		"10-100000-10":  {10, 100000, 10, "testdata/10-100000-10-config.yaml"},
+	}
+
+	for _, file := range configFiles {
+		generateConfigFile(
+			file.noQueues,
+			file.noRules,
+			file.noL4Rules,
+			file.fileName,
+		)
+	}
+
+	benchmarks := []struct {
+		name           string
+		configLocation string
+	}{
+		{"Standard File", "testdata/DemoConfig.yaml"},
+		{"Standard Benchmark", "testdata/matchBenchmark-config.yaml"},
+		{"Ten Each Benchmark", configFiles["10-10-10"].fileName},
+		{"Hundred Rules Benchmark", configFiles["100-10-10"].fileName},
+		{"Hundred Queues - Thousand Rules Benchmark", configFiles["100-1000-10"].fileName},
+		{"Hundred Queues - Ten Thousand Rules Benchmark", configFiles["100-10000-10"].fileName},
+		{"Hundred Queues - Hundred Thousand Rules Benchmark", configFiles["100-100000-10"].fileName},
+		{"Ten Queues - Thousand Rules Benchmark", configFiles["10-100-10"].fileName},
+		{"Ten Queues - Ten Thousand Rules Benchmark", configFiles["10-10000-10"].fileName},
+		{"Ten Queues - Hundred Thousand Rules Benchmark", configFiles["10-100000-10"].fileName},
+	}
+
+	pkts := make([]*rpkt.RtrPkt, noPkts)
+	tl := len(tables)
+
+	for i := 0; i < len(pkts); i++ {
+		pkts[i] = genRouterPacket(
+			tables[i%tl].srcIA,
+			tables[i%tl].dstIA,
+			tables[i%tl].l4type,
+			tables[i%tl].intf)
+	}
+
+	for _, classifier := range classifiers {
+		for _, bench := range benchmarks {
+			for i := 0; i < benchTimes; i++ {
+
+				extConf, err := conf.LoadConfig(bench.configLocation)
+				if err != nil {
+					log.Debug("Load config file failed", "error", err)
+					log.Debug("The testdata folder from the parent folder should be available for this test but it isn't when running it with bazel. Just run it without Bazel and it will pass.")
+				}
+				qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
+
+				b.Run(
+					classifier.name+"-"+bench.name,
+					func(b *testing.B) {
+						benchClassifier(
+							b,
+							pkts,
+							classifier.cls,
+							qosConfig.GetConfig(),
+						)
+					},
+				)
+			}
+		}
+	}
+	for _, file := range configFiles {
+		err := os.Remove(file.fileName)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func benchClassifier(b *testing.B, pkts []*rpkt.RtrPkt, classifier queues.ClassRuleInterface, config *queues.InternalRouterConfig) {
+	for n := 0; n < b.N; n++ {
+		l := len(pkts)
+		for i := 0; i < l; i++ {
+			classifier.GetRuleForPacket(config, pkts[i])
+		}
+	}
+}
+
+func generateConfigFile(noRules, noQueues, noL4Rules int, name string) {
+
+	upLimt := 65536
+
+	sourceISDStart := rand.Intn(1000)
+	sourceASStart := [3]int{rand.Intn(65536), rand.Intn(65536), rand.Intn(65536)}
+
+	dstISDStart := rand.Intn(1000)
+	dstASStart := [3]int{rand.Intn(65536), rand.Intn(65536), rand.Intn(65536)}
+
+	rules := make([]conf.ExternalClassRule, noRules)
+
+	for i := 0; i < noRules; i++ {
+		sAs := fmt.Sprintf("%d-%x:%x:%x",
+			(sourceISDStart+i)%1000,
+			(sourceASStart[0]+i)%upLimt,
+			(sourceASStart[1]+i)%upLimt,
+			(sourceASStart[2]+i)%upLimt,
+		)
+		dAs := fmt.Sprintf("%d-%x:%x:%x",
+			(dstISDStart+i)%1000,
+			(dstASStart[0]+i)%upLimt,
+			(dstASStart[1]+i)%upLimt,
+			(dstASStart[2]+i)%upLimt,
+		)
+
+		extProt := make([]conf.ExternalProtocolMatchType, noL4Rules)
+		for i := 0; i < len(extProt); i++ {
+			extProt[i] = conf.ExternalProtocolMatchType{
+				BaseProtocol: i,
+				Extension:    -1,
+			}
+		}
+		rules[i] = conf.ExternalClassRule{
+			Name:                 fmt.Sprintf("Rule No. %d", i),
+			Priority:             0,
+			SourceAs:             sAs,
+			SourceMatchMode:      0,
+			DestinationAs:        dAs,
+			DestinationMatchMode: 0,
+			L4Type:               extProt,
+			QueueNumber:          i % noQueues,
+		}
+	}
+
+	queues := make([]conf.ExternalPacketQueue, noQueues)
+
+	for i := 0; i < noQueues; i++ {
+
+		profiles := []conf.ActionProfile{
+			conf.ActionProfile{FillLevel: 50, Prob: 50, Action: conf.NOTIFY},
+			conf.ActionProfile{FillLevel: 70, Prob: 25, Action: conf.DROPNOTIFY},
+			conf.ActionProfile{FillLevel: 80, Prob: 50, Action: conf.DROPNOTIFY},
+			conf.ActionProfile{FillLevel: 90, Prob: 75, Action: conf.DROPNOTIFY},
+		}
+
+		queues[i] = conf.ExternalPacketQueue{
+			Name:         fmt.Sprintf("Queue No. %d", i),
+			ID:           i,
+			MinBandwidth: 0,
+			MaxBandWidth: 100,
+			PoliceRate:   "50Mbps",
+			MaxLength:    1024,
+			Priority:     1,
+			Profile:      profiles,
+		}
+
+	}
+
+	extConf := conf.ExternalConfig{
+		SchedulerConfig: conf.SchedulerConfig{Latency: 0, Bandwidth: "500Mbps"},
+		ExternalQueues:  queues,
+		ExternalRules:   rules,
+	}
+
+	f, err := os.Create(name)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	b, err := yaml.Marshal(extConf)
+	if err != nil {
+		panic(err)
+	}
+
+	bWritten, err := f.Write(b)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("wrote %d bytes\n", bWritten)
 }

@@ -154,9 +154,9 @@ startNetcatListener 36234 3 &
 pid3=$!
 
 # # # Transfer File from AS110 to AS111 to show that 10 Mbit/s can be reached
-SCION_DAEMON_ADDRESS='127.0.0.11:30255'
-export SCION_DAEMON_ADDRESS
-pv ../scion-apps/netcat/data/100MB.bin | ./../scion-apps/netcat/netcat -vv 1-ff00:0:111,[127.0.0.1]:34234
+# SCION_DAEMON_ADDRESS='127.0.0.11:30255'
+# export SCION_DAEMON_ADDRESS
+# pv ../scion-apps/netcat/data/100MB.bin | ./../scion-apps/netcat/netcat -vv 1-ff00:0:111,[127.0.0.1]:34234
 
 waitForEnter
 
@@ -224,6 +224,7 @@ killall netcat
 
 if $optRatio; then
     cd "$currDir"
+    echo "$ratio"
     echo "$ratio" >> ratio.csv
 fi
 
