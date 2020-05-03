@@ -436,45 +436,60 @@ func BenchmarkClassification(b *testing.B) {
 		{"123-ff00:344:222", "223-9f33:783:011", 1, 77, "INTF - Exact 77", 9, true},
 	}
 
-	configFiles := map[string]struct {
+	type param struct {
 		noQueues  int
 		noRules   int
 		noL4Rules int
-		fileName  string
-	}{
-		"10-10-10":      {10, 10, 10, "testdata/tenEach-config.yaml"},
-		"100-10-10":     {100, 100, 10, "testdata/hundredEach-config.yaml"},
-		"100-1000-10":   {100, 1000, 10, "testdata/hundred-thousand-config.yaml"},
-		"100-10000-10":  {100, 10000, 10, "testdata/hundred-tenThousand-config.yaml"},
-		"100-100000-10": {100, 100000, 10, "testdata/100-100000-10-config.yaml"},
-		"10-100-10":     {10, 1000, 10, "testdata/ten-thousand-config.yaml"},
-		"10-10000-10":   {10, 10000, 10, "testdata/ten-tenThousand-config.yaml"},
-		"10-100000-10":  {10, 100000, 10, "testdata/10-100000-10-config.yaml"},
 	}
 
-	for _, file := range configFiles {
+	var params []param
+
+	noQueue := []int{10, 100}
+	noRule := []int{10, 100}
+	noL4Rule := []int{2, 10, 50, 255}
+
+	for i := 0; i < len(noQueue); i++ {
+		for j := 0; j < len(noRule); j++ {
+			for k := 0; k < len(noL4Rule); k++ {
+				params = append(params, param{
+					noQueues:  noQueue[i],
+					noRules:   noRule[j],
+					noL4Rules: noL4Rule[k],
+				})
+			}
+		}
+	}
+
+	// params := []struct {
+	// 	noQueues  int
+	// 	noRules   int
+	// 	noL4Rules int
+	// }{
+	// 	{10, 10, 2},
+	// 	{10, 10, 10},
+	// 	{10, 10, 100},
+	// 	{10, 10, 255},
+	// }
+
+	type benchmark struct {
+		name           string
+		configLocation string
+	}
+
+	var benchmarks []benchmark
+
+	for _, file := range params {
+		name := fmt.Sprintf("%d-%d-%d", file.noQueues, file.noRules, file.noL4Rules)
+		loc := fmt.Sprintf("testdata/%d-%d-%d-config.yaml", file.noQueues, file.noRules, file.noL4Rules)
 		generateConfigFile(
 			file.noQueues,
 			file.noRules,
 			file.noL4Rules,
-			file.fileName,
+			true,
+			loc,
 		)
-	}
+		benchmarks = append(benchmarks, benchmark{name: name, configLocation: loc})
 
-	benchmarks := []struct {
-		name           string
-		configLocation string
-	}{
-		{"Standard File", "testdata/DemoConfig.yaml"},
-		{"Standard Benchmark", "testdata/matchBenchmark-config.yaml"},
-		{"Ten Each Benchmark", configFiles["10-10-10"].fileName},
-		{"Hundred Rules Benchmark", configFiles["100-10-10"].fileName},
-		{"Hundred Queues - Thousand Rules Benchmark", configFiles["100-1000-10"].fileName},
-		{"Hundred Queues - Ten Thousand Rules Benchmark", configFiles["100-10000-10"].fileName},
-		{"Hundred Queues - Hundred Thousand Rules Benchmark", configFiles["100-100000-10"].fileName},
-		{"Ten Queues - Thousand Rules Benchmark", configFiles["10-100-10"].fileName},
-		{"Ten Queues - Ten Thousand Rules Benchmark", configFiles["10-10000-10"].fileName},
-		{"Ten Queues - Hundred Thousand Rules Benchmark", configFiles["10-100000-10"].fileName},
 	}
 
 	pkts := make([]*rpkt.RtrPkt, noPkts)
@@ -513,8 +528,8 @@ func BenchmarkClassification(b *testing.B) {
 			}
 		}
 	}
-	for _, file := range configFiles {
-		err := os.Remove(file.fileName)
+	for _, bench := range benchmarks {
+		err := os.Remove(bench.configLocation)
 		if err != nil {
 			panic(err)
 		}
@@ -530,7 +545,7 @@ func benchClassifier(b *testing.B, pkts []*rpkt.RtrPkt, classifier queues.ClassR
 	}
 }
 
-func generateConfigFile(noRules, noQueues, noL4Rules int, name string) {
+func generateConfigFile(noRules, noQueues, noL4Rules int, exts bool, name string) {
 
 	upLimt := 65536
 
@@ -543,13 +558,13 @@ func generateConfigFile(noRules, noQueues, noL4Rules int, name string) {
 	rules := make([]conf.ExternalClassRule, noRules)
 
 	for i := 0; i < noRules; i++ {
-		sAs := fmt.Sprintf("%d-%x:%x:%x",
+		srcAs := fmt.Sprintf("%d-%x:%x:%x",
 			(sourceISDStart+i)%1000,
 			(sourceASStart[0]+i)%upLimt,
 			(sourceASStart[1]+i)%upLimt,
 			(sourceASStart[2]+i)%upLimt,
 		)
-		dAs := fmt.Sprintf("%d-%x:%x:%x",
+		dstAs := fmt.Sprintf("%d-%x:%x:%x",
 			(dstISDStart+i)%1000,
 			(dstASStart[0]+i)%upLimt,
 			(dstASStart[1]+i)%upLimt,
@@ -558,17 +573,24 @@ func generateConfigFile(noRules, noQueues, noL4Rules int, name string) {
 
 		extProt := make([]conf.ExternalProtocolMatchType, noL4Rules)
 		for i := 0; i < len(extProt); i++ {
-			extProt[i] = conf.ExternalProtocolMatchType{
-				BaseProtocol: i,
-				Extension:    -1,
+			if exts {
+				extProt[i] = conf.ExternalProtocolMatchType{
+					BaseProtocol: i % 255,
+					Extension:    -1,
+				}
+			} else {
+				extProt[i] = conf.ExternalProtocolMatchType{
+					BaseProtocol: i % 255,
+					Extension:    i % upLimt,
+				}
 			}
 		}
 		rules[i] = conf.ExternalClassRule{
 			Name:                 fmt.Sprintf("Rule No. %d", i),
 			Priority:             0,
-			SourceAs:             sAs,
+			SourceAs:             srcAs,
 			SourceMatchMode:      0,
-			DestinationAs:        dAs,
+			DestinationAs:        dstAs,
 			DestinationMatchMode: 0,
 			L4Type:               extProt,
 			QueueNumber:          i % noQueues,
@@ -616,9 +638,8 @@ func generateConfigFile(noRules, noQueues, noL4Rules int, name string) {
 		panic(err)
 	}
 
-	bWritten, err := f.Write(b)
+	_, err = f.Write(b)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("wrote %d bytes\n", bWritten)
 }
