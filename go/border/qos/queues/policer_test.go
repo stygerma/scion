@@ -61,3 +61,57 @@ func TestBasic(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkRefill(b *testing.B) {
+
+	initialVal := 100000000000
+
+	tb := TokenBucket{}
+	tb.Init(initialVal)
+	tb.ForceTake(initialVal)
+
+	for n := 0; n < b.N; n++ {
+		tb.refill()
+		tb.ForceTake(10000)
+	}
+}
+
+func BenchmarkAvailable(b *testing.B) {
+
+	tb := TokenBucket{}
+	tb.Init(10000)
+
+	for n := 0; n < b.N; n++ {
+		tb.Available(100)
+	}
+}
+
+func BenchmarkTake(b *testing.B) {
+
+	tb := TokenBucket{}
+	tb.Init(10000)
+
+	benches := []struct {
+		name    string
+		takeVal int
+	}{
+		{"1", 1},
+		{"10", 10},
+		{"100", 100},
+		{"100", 1000},
+		{"10000", 10000},
+	}
+
+	for _, bench := range benches {
+		b.Run(
+			bench.name,
+			func(b *testing.B) {
+				for n := 0; n < b.N; n++ {
+					tb.Take(bench.takeVal)
+				}
+			},
+		)
+
+	}
+
+}

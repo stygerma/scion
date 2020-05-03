@@ -17,7 +17,6 @@ package queues_test
 import (
 	"fmt"
 	"io/ioutil"
-	"math"
 	"math/rand"
 	"net"
 	"os"
@@ -387,32 +386,109 @@ func disableLog(b *testing.B) {
 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 }
 
-func BenchmarkClassification(b *testing.B) {
+type classifier struct {
+	name string
+	cls  queues.ClassRuleInterface
+}
 
-	benchTimes := 1
+func BenchmarkClassification1(b *testing.B) {
+	classifiers := []classifier{
+		{"Regular", &queues.RegularClassRule{}},
+		{"Cacheless", &queues.CachelessClassRule{}},
+		// {"Parallel", &queues.ParallelClassRule{}},
+		// {"SemiP", &queues.SemiParallelClassRule{}},
+	}
 
 	noPktss := []int{1, 10, 100, 1000}
 
-	noQueue := [6]int{10, 100}
-	noRule := [6]int{10, 100}
-	noL4Rule := []int{2, 10, 50, 255}
+	noQueue := []int{1, 10, 100, 1000}
+	noRule := []int{1}
+	noL4Rule := []int{2, 10, 100, 255, 400}
+	bmClassification(b, noPktss, noQueue, noRule, noL4Rule, classifiers)
+}
 
-	for i := 0; i < len(noQueue); i++ {
-		noQueue[i] = int(math.Pow10(i))
-	}
-	for i := 0; i < len(noRule); i++ {
-		noRule[i] = int(math.Pow10(i))
+func BenchmarkClassification2(b *testing.B) {
+	classifiers := []classifier{
+		{"Regular", &queues.RegularClassRule{}},
+		{"Cacheless", &queues.CachelessClassRule{}},
+		// {"Parallel", &queues.ParallelClassRule{}},
+		// {"SemiP", &queues.SemiParallelClassRule{}},
 	}
 
-	classifiers := []struct {
-		name string
-		cls  queues.ClassRuleInterface
-	}{
+	noPktss := []int{1, 10, 100, 1000}
+
+	noQueue := []int{1, 10, 100, 1000}
+	noRule := []int{10}
+	noL4Rule := []int{2, 10, 100, 255, 400}
+	bmClassification(b, noPktss, noQueue, noRule, noL4Rule, classifiers)
+}
+
+func BenchmarkClassification3(b *testing.B) {
+	classifiers := []classifier{
+		{"Regular", &queues.RegularClassRule{}},
+		{"Cacheless", &queues.CachelessClassRule{}},
+		// {"Parallel", &queues.ParallelClassRule{}},
+		// {"SemiP", &queues.SemiParallelClassRule{}},
+	}
+
+	noPktss := []int{1, 10, 100, 1000}
+
+	noQueue := []int{1, 10, 100, 1000}
+	noRule := []int{100}
+	noL4Rule := []int{2, 10, 100, 255, 400}
+	bmClassification(b, noPktss, noQueue, noRule, noL4Rule, classifiers)
+}
+
+func BenchmarkClassification4(b *testing.B) {
+	classifiers := []classifier{
+		{"Regular", &queues.RegularClassRule{}},
+		{"Cacheless", &queues.CachelessClassRule{}},
+		// {"Parallel", &queues.ParallelClassRule{}},
+		// {"SemiP", &queues.SemiParallelClassRule{}},
+	}
+
+	noPktss := []int{1, 10, 100, 1000}
+
+	noQueue := []int{1, 10, 100, 1000}
+	noRule := []int{1000}
+	noL4Rule := []int{2, 10, 100, 255, 400}
+	bmClassification(b, noPktss, noQueue, noRule, noL4Rule, classifiers)
+}
+
+func BenchmarkClassification5(b *testing.B) {
+	classifiers := []classifier{
 		{"Regular", &queues.RegularClassRule{}},
 		// {"Cacheless", &queues.CachelessClassRule{}},
 		// {"Parallel", &queues.ParallelClassRule{}},
 		// {"SemiP", &queues.SemiParallelClassRule{}},
 	}
+
+	noPktss := []int{1, 10, 100, 1000}
+
+	noQueue := []int{1, 10}
+	noRule := []int{10000}
+	noL4Rule := []int{2, 10, 100, 255, 400}
+	bmClassification(b, noPktss, noQueue, noRule, noL4Rule, classifiers)
+}
+func BenchmarkClassification6(b *testing.B) {
+	classifiers := []classifier{
+		// {"Regular", &queues.RegularClassRule{}},
+		{"Cacheless", &queues.CachelessClassRule{}},
+		// {"Parallel", &queues.ParallelClassRule{}},
+		// {"SemiP", &queues.SemiParallelClassRule{}},
+	}
+
+	noPktss := []int{1, 10, 100, 1000}
+
+	noQueue := []int{1, 10}
+	noRule := []int{10000}
+	noL4Rule := []int{2, 10, 100, 255, 400}
+	bmClassification(b, noPktss, noQueue, noRule, noL4Rule, classifiers)
+}
+
+func bmClassification(b *testing.B, noPktss, noQueue, noRule, noL4Rule []int, classifiers []classifier) {
+
+	benchTimes := 1
 
 	tables := []struct {
 		srcIA       string

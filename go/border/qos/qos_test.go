@@ -79,6 +79,7 @@ func bBenchmarkQueueSinglePacket(b *testing.B) {
 // BenchmarkQueueSinglePacket measures the performance of the queue. Run with
 // go test -v -run=^$ -bench=BenchmarkQueueSinglePacket ./go/border/qos/ \
 //    -benchtime=20s -cpuprofile=newprofile.pprof
+// for a CPU profile
 func BenchmarkQueueSinglePacket(t *testing.B) {
 	root := log15.Root()
 	file, err := ioutil.TempFile("", "benchmark-log")
@@ -92,9 +93,7 @@ func BenchmarkQueueSinglePacket(t *testing.B) {
 
 	t.ResetTimer()
 	for n := 0; n < t.N; n++ {
-		for _, pkt := range arr {
-			qosConfig.QueuePacket(pkt)
-		}
+		qosConfig.QueuePacket(arr[0])
 	}
 }
 
@@ -116,4 +115,36 @@ func getPackets(numberOfPackets int) []*rpkt.RtrPkt {
 		copy(arr[i*len(pkts):], pkts)
 	}
 	return arr
+}
+
+var blocker = make(chan bool, 1024)
+
+func BenchmarkQueueSinglePacketBlocking(t *testing.B) {
+	root := log15.Root()
+	file, err := ioutil.TempFile("", "benchmark-log")
+	require.NoError(t, err)
+	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
+
+	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
+	require.NoError(t, err)
+	qosConfig, _ := InitQos(extConfig, forwardPacketByDropAndUnblock)
+	arr := getPackets(1)
+
+	t.ResetTimer()
+	var i int
+	const l = 20
+	for n := 0; n < t.N; n++ {
+		for i = 0; i < l; i++ {
+			qosConfig.QueuePacket(arr[0])
+		}
+
+		for i = 0; i < l; i++ {
+			<-blocker
+		}
+	}
+}
+
+func forwardPacketByDropAndUnblock(rp *rpkt.RtrPkt) {
+	blocker <- true
+	rp.Release()
 }
