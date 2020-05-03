@@ -17,6 +17,7 @@ package queues_test
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"math/rand"
 	"net"
 	"os"
@@ -389,20 +390,26 @@ func disableLog(b *testing.B) {
 func BenchmarkClassification(b *testing.B) {
 
 	benchTimes := 1
-	noPkts := 1
 
-	rand.Seed(0)
+	noPktss := []int{1, 10, 100, 1000}
 
-	disableLog(b)
+	noQueue := [6]int{10, 100}
+	noRule := [6]int{10, 100}
+	noL4Rule := []int{2, 10, 50, 255}
+
+	for i := 0; i < 6; i++ {
+		noQueue[i] = int(math.Pow10(i))
+		noRule[i] = int(math.Pow10(i))
+	}
 
 	classifiers := []struct {
 		name string
 		cls  queues.ClassRuleInterface
 	}{
 		{"Regular", &queues.RegularClassRule{}},
-		{"Cacheless", &queues.CachelessClassRule{}},
-		{"Parallel", &queues.ParallelClassRule{}},
-		{"SemiP", &queues.SemiParallelClassRule{}},
+		// {"Cacheless", &queues.CachelessClassRule{}},
+		// {"Parallel", &queues.ParallelClassRule{}},
+		// {"SemiP", &queues.SemiParallelClassRule{}},
 	}
 
 	tables := []struct {
@@ -436,6 +443,9 @@ func BenchmarkClassification(b *testing.B) {
 		{"123-ff00:344:222", "223-9f33:783:011", 1, 77, "INTF - Exact 77", 9, true},
 	}
 
+	rand.Seed(0)
+	disableLog(b)
+
 	type param struct {
 		noQueues  int
 		noRules   int
@@ -443,10 +453,6 @@ func BenchmarkClassification(b *testing.B) {
 	}
 
 	var params []param
-
-	noQueue := []int{10, 100}
-	noRule := []int{10, 100}
-	noL4Rule := []int{2, 10, 50, 255}
 
 	for i := 0; i < len(noQueue); i++ {
 		for j := 0; j < len(noRule); j++ {
@@ -459,17 +465,6 @@ func BenchmarkClassification(b *testing.B) {
 			}
 		}
 	}
-
-	// params := []struct {
-	// 	noQueues  int
-	// 	noRules   int
-	// 	noL4Rules int
-	// }{
-	// 	{10, 10, 2},
-	// 	{10, 10, 10},
-	// 	{10, 10, 100},
-	// 	{10, 10, 255},
-	// }
 
 	type benchmark struct {
 		name           string
@@ -489,42 +484,45 @@ func BenchmarkClassification(b *testing.B) {
 			loc,
 		)
 		benchmarks = append(benchmarks, benchmark{name: name, configLocation: loc})
-
-	}
-
-	pkts := make([]*rpkt.RtrPkt, noPkts)
-	tl := len(tables)
-
-	for i := 0; i < len(pkts); i++ {
-		pkts[i] = genRouterPacket(
-			tables[i%tl].srcIA,
-			tables[i%tl].dstIA,
-			tables[i%tl].l4type,
-			tables[i%tl].intf)
 	}
 
 	for _, classifier := range classifiers {
 		for _, bench := range benchmarks {
-			for i := 0; i < benchTimes; i++ {
+			for _, noPkts := range noPktss {
+				for i := 0; i < benchTimes; i++ {
 
-				extConf, err := conf.LoadConfig(bench.configLocation)
-				if err != nil {
-					log.Debug("Load config file failed", "error", err)
-					log.Debug("The testdata folder from the parent folder should be available for this test but it isn't when running it with bazel. Just run it without Bazel and it will pass.")
+					extConf, err := conf.LoadConfig(bench.configLocation)
+					if err != nil {
+						log.Debug("Load config file failed", "error", err)
+						log.Debug("The testdata folder from the parent folder should be available for this test but it isn't when running it with bazel. Just run it without Bazel and it will pass.")
+					}
+					qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
+
+					pkts := make([]*rpkt.RtrPkt, noPkts)
+					tl := len(tables)
+
+					for i := 0; i < len(pkts); i++ {
+						pkts[i] = genRouterPacket(
+							tables[i%tl].srcIA,
+							tables[i%tl].dstIA,
+							tables[i%tl].l4type,
+							tables[i%tl].intf)
+					}
+
+					benchName := fmt.Sprintf("%v-%v-%d", classifier.name, bench.name, noPkts)
+
+					b.Run(
+						benchName,
+						func(b *testing.B) {
+							benchClassifier(
+								b,
+								pkts,
+								classifier.cls,
+								qosConfig.GetConfig(),
+							)
+						},
+					)
 				}
-				qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
-
-				b.Run(
-					classifier.name+"-"+bench.name,
-					func(b *testing.B) {
-						benchClassifier(
-							b,
-							pkts,
-							classifier.cls,
-							qosConfig.GetConfig(),
-						)
-					},
-				)
 			}
 		}
 	}
