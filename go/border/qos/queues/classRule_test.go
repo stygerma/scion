@@ -397,8 +397,10 @@ func BenchmarkClassification(b *testing.B) {
 	noRule := [6]int{10, 100}
 	noL4Rule := []int{2, 10, 50, 255}
 
-	for i := 0; i < 6; i++ {
+	for i := 0; i < len(noQueue); i++ {
 		noQueue[i] = int(math.Pow10(i))
+	}
+	for i := 0; i < len(noRule); i++ {
 		noRule[i] = int(math.Pow10(i))
 	}
 
@@ -471,23 +473,20 @@ func BenchmarkClassification(b *testing.B) {
 		configLocation string
 	}
 
-	var benchmarks []benchmark
-
-	for _, file := range params {
-		name := fmt.Sprintf("%d-%d-%d", file.noQueues, file.noRules, file.noL4Rules)
-		loc := fmt.Sprintf("testdata/%d-%d-%d-config.yaml", file.noQueues, file.noRules, file.noL4Rules)
-		generateConfigFile(
-			file.noQueues,
-			file.noRules,
-			file.noL4Rules,
-			true,
-			loc,
-		)
-		benchmarks = append(benchmarks, benchmark{name: name, configLocation: loc})
-	}
-
 	for _, classifier := range classifiers {
-		for _, bench := range benchmarks {
+		for _, param := range params {
+
+			name := fmt.Sprintf("%d-%d-%d", param.noQueues, param.noRules, param.noL4Rules)
+			loc := fmt.Sprintf("testdata/%d-%d-%d-config.yaml", param.noQueues, param.noRules, param.noL4Rules)
+			generateConfigFile(
+				param.noQueues,
+				param.noRules,
+				param.noL4Rules,
+				true,
+				loc,
+			)
+			bench := benchmark{name: name, configLocation: loc}
+
 			for _, noPkts := range noPktss {
 				for i := 0; i < benchTimes; i++ {
 
@@ -524,14 +523,19 @@ func BenchmarkClassification(b *testing.B) {
 					)
 				}
 			}
+
+			err := os.Remove(bench.configLocation)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
-	for _, bench := range benchmarks {
-		err := os.Remove(bench.configLocation)
-		if err != nil {
-			panic(err)
-		}
-	}
+	// for _, bench := range benchmarks {
+	// 	err := os.Remove(bench.configLocation)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// }
 }
 
 func benchClassifier(b *testing.B, pkts []*rpkt.RtrPkt, classifier queues.ClassRuleInterface, config *queues.InternalRouterConfig) {

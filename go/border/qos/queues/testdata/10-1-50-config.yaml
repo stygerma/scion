@@ -1,0 +1,1105 @@
+Scheduler:
+  Latency: 0
+  Bandwidth: 500Mbps
+Queues:
+- name: Queue No. 0
+  id: 0
+  CIR: 0
+  PIR: 100
+  policeRate: 50Mbps
+  maxLength: 1024
+  priority: 1
+  profile:
+  - fill-level: 50
+    prob: 50
+    action: 1
+  - fill-level: 70
+    prob: 25
+    action: 3
+  - fill-level: 80
+    prob: 50
+    action: 3
+  - fill-level: 90
+    prob: 75
+    action: 3
+Rules:
+- name: Rule No. 0
+  priority: 0
+  sourceAs: 985-b77a:7774:b689
+  sourceMatchMode: 0
+  destinationAs: 918-26d1:5a05:963e
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 1
+  priority: 0
+  sourceAs: 986-b77b:7775:b68a
+  sourceMatchMode: 0
+  destinationAs: 919-26d2:5a06:963f
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 2
+  priority: 0
+  sourceAs: 987-b77c:7776:b68b
+  sourceMatchMode: 0
+  destinationAs: 920-26d3:5a07:9640
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 3
+  priority: 0
+  sourceAs: 988-b77d:7777:b68c
+  sourceMatchMode: 0
+  destinationAs: 921-26d4:5a08:9641
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 4
+  priority: 0
+  sourceAs: 989-b77e:7778:b68d
+  sourceMatchMode: 0
+  destinationAs: 922-26d5:5a09:9642
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 5
+  priority: 0
+  sourceAs: 990-b77f:7779:b68e
+  sourceMatchMode: 0
+  destinationAs: 923-26d6:5a0a:9643
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 6
+  priority: 0
+  sourceAs: 991-b780:777a:b68f
+  sourceMatchMode: 0
+  destinationAs: 924-26d7:5a0b:9644
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 7
+  priority: 0
+  sourceAs: 992-b781:777b:b690
+  sourceMatchMode: 0
+  destinationAs: 925-26d8:5a0c:9645
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 8
+  priority: 0
+  sourceAs: 993-b782:777c:b691
+  sourceMatchMode: 0
+  destinationAs: 926-26d9:5a0d:9646
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
+- name: Rule No. 9
+  priority: 0
+  sourceAs: 994-b783:777d:b692
+  sourceMatchMode: 0
+  destinationAs: 927-26da:5a0e:9647
+  destinationMatchMode: 0
+  L4Type:
+  - Protocol: 0
+    Extension: -1
+  - Protocol: 1
+    Extension: -1
+  - Protocol: 2
+    Extension: -1
+  - Protocol: 3
+    Extension: -1
+  - Protocol: 4
+    Extension: -1
+  - Protocol: 5
+    Extension: -1
+  - Protocol: 6
+    Extension: -1
+  - Protocol: 7
+    Extension: -1
+  - Protocol: 8
+    Extension: -1
+  - Protocol: 9
+    Extension: -1
+  - Protocol: 10
+    Extension: -1
+  - Protocol: 11
+    Extension: -1
+  - Protocol: 12
+    Extension: -1
+  - Protocol: 13
+    Extension: -1
+  - Protocol: 14
+    Extension: -1
+  - Protocol: 15
+    Extension: -1
+  - Protocol: 16
+    Extension: -1
+  - Protocol: 17
+    Extension: -1
+  - Protocol: 18
+    Extension: -1
+  - Protocol: 19
+    Extension: -1
+  - Protocol: 20
+    Extension: -1
+  - Protocol: 21
+    Extension: -1
+  - Protocol: 22
+    Extension: -1
+  - Protocol: 23
+    Extension: -1
+  - Protocol: 24
+    Extension: -1
+  - Protocol: 25
+    Extension: -1
+  - Protocol: 26
+    Extension: -1
+  - Protocol: 27
+    Extension: -1
+  - Protocol: 28
+    Extension: -1
+  - Protocol: 29
+    Extension: -1
+  - Protocol: 30
+    Extension: -1
+  - Protocol: 31
+    Extension: -1
+  - Protocol: 32
+    Extension: -1
+  - Protocol: 33
+    Extension: -1
+  - Protocol: 34
+    Extension: -1
+  - Protocol: 35
+    Extension: -1
+  - Protocol: 36
+    Extension: -1
+  - Protocol: 37
+    Extension: -1
+  - Protocol: 38
+    Extension: -1
+  - Protocol: 39
+    Extension: -1
+  - Protocol: 40
+    Extension: -1
+  - Protocol: 41
+    Extension: -1
+  - Protocol: 42
+    Extension: -1
+  - Protocol: 43
+    Extension: -1
+  - Protocol: 44
+    Extension: -1
+  - Protocol: 45
+    Extension: -1
+  - Protocol: 46
+    Extension: -1
+  - Protocol: 47
+    Extension: -1
+  - Protocol: 48
+    Extension: -1
+  - Protocol: 49
+    Extension: -1
+  queueNumber: 0
