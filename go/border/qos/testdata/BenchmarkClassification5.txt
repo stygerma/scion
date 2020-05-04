@@ -1,0 +1,450 @@
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2632022	       459 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  251210	      4823 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   24895	     48426 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2504	    479267 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2610228	       459 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  248674	      4836 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   24566	     48756 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2402	    490681 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2589032	       462 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  245146	      4776 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   24688	     48823 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2396	    492107 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2600310	       466 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  226434	      4796 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   24672	     49014 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    2424	    484087 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2610483	       459 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  250009	      4812 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   25088	     48368 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2499	    477308 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2438196	       495 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  226867	      5241 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   23368	     51650 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    2228	    514855 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2390713	       486 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  236082	      5089 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   23342	     51347 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2214	    526650 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2414881	       491 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  235312	      5113 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   23287	     52468 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2170	    529690 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2424572	       490 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  226275	      5261 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   23162	     51885 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2305	    512055 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2446482	       484 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  229282	      5346 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   23176	     51252 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2275	    521487 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	124.863s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2600986	       464 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  252358	      4852 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   24585	     48929 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2412	    491308 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2652054	       460 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  249331	      4811 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   24490	     49209 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2409	    490455 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2603553	       463 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  248936	      4835 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   24651	     48365 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2461	    479731 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2624948	       461 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  244578	      4948 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   24355	     49455 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    2448	    483429 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2600697	       457 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  242619	      4846 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   25198	     47472 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2479	    485622 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2460106	       486 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  226174	      5192 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   23067	     51970 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    1988	    526241 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2430879	       483 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  235647	      5090 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   23074	     51639 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2278	    521120 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2428513	       502 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  223730	      5347 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   22434	     52967 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2191	    535109 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2420805	       501 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  228950	      5095 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   23378	     51305 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2308	    519424 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2330727	       479 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  233977	      5159 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   22878	     52296 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2137	    528496 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	124.257s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2573384	       465 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  251154	      4831 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   25236	     48040 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2407	    494026 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2621065	       458 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  244857	      4778 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   25132	     47813 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2360	    492480 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2639354	       455 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  250876	      4808 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   24608	     48861 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2348	    480274 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2585857	       465 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  250590	      4786 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   25142	     47931 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    2328	    491602 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2609632	       455 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  250038	      4779 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   25027	     47907 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2414	    484886 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2445391	       496 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  234722	      5136 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   23226	     51536 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    2258	    518733 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2479513	       492 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  228700	      5179 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   23378	     51872 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2215	    521628 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2491755	       481 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  233308	      5137 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   23028	     52390 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2205	    525766 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2364288	       489 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  236763	      5094 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   23332	     51395 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2196	    519697 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2436094	       493 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  232514	      5174 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   23238	     51759 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2270	    519068 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	123.968s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2561109	       464 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  249822	      4879 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   24469	     48740 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2409	    485865 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2627384	       458 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  250069	      4792 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   25029	     48036 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2380	    487607 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2605977	       460 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  250797	      4782 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   25158	     47619 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2364	    482051 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2587527	       463 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  246446	      4818 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   24944	     48532 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    2408	    485940 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2629986	       454 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  244758	      4869 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   24612	     48751 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2438	    485433 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2425713	       492 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  234858	      5076 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   23257	     51435 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    2299	    521000 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2448272	       485 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  233304	      5139 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   23144	     51414 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2205	    515208 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2430463	       495 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  234138	      5141 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   23518	     51513 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2251	    523248 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2424890	       490 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  232045	      5220 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   22819	     51588 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2268	    513869 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2451789	       488 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  232615	      5148 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   23083	     52452 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2253	    522136 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	124.020s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2595591	       471 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  250485	      4826 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   24741	     49672 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2401	    493284 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2630060	       457 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  253458	      4720 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   24692	     48474 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2428	    487222 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2622247	       456 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  244014	      4811 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   24391	     48914 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2365	    486801 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2590008	       467 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  249451	      4733 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   25016	     47832 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    2346	    483427 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2605392	       461 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  244689	      4805 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   25182	     47816 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2416	    483503 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2444468	       487 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  231739	      5133 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   22869	     51861 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    2286	    519260 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2466016	       491 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  235340	      5071 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   23570	     50808 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2268	    517116 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2421607	       485 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  231171	      5125 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   22850	     52464 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2263	    512615 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2467102	       494 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  226982	      5178 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   23240	     52090 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2306	    517158 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2462888	       521 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  226143	      5251 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   23517	     51160 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2265	    524570 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	124.138s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2661388	       455 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  250641	      4804 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   24488	     48714 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2323	    488251 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2617500	       508 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  250419	      4790 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   24523	     49067 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2410	    487067 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2532355	       469 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  251714	      4767 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   24922	     47736 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2434	    489172 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2513392	       470 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  246468	      4799 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   25134	     48099 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    2467	    478471 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2548056	       469 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  245457	      4821 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   22540	     49401 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2329	    500746 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2452910	       485 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  231961	      5144 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   23004	     52192 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    2241	    527466 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2453114	       498 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  228511	      5197 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   20402	     51646 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2294	    520580 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2404641	       555 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  236664	      5079 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   23037	     51223 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2268	    518374 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2459074	       487 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  224487	      5284 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   23380	     52017 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2269	    625203 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2410714	       495 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  230072	      5174 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   22302	     52970 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2263	    515652 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	125.681s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2624086	       463 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  251968	      4858 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   24758	     48484 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2311	    490385 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2564788	       461 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  251560	      4795 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   25048	     48395 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2404	    489197 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2601463	       463 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  247869	      4741 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   25310	     47315 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2457	    483343 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2592208	       472 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  248560	      4800 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   24684	     48523 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    1922	    564677 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2615650	       464 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  251332	      4891 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   25072	     47999 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2496	    481593 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2351550	       503 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  227535	      5166 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   23617	     50727 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    2235	    540514 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2476134	       486 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  235898	      5091 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   23082	     52346 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2353	    508339 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2439085	       492 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  233506	      5144 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   23206	     51559 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2084	    523388 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2463081	       483 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  228996	      5193 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   23047	     52153 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2012	    532261 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2448458	       486 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  233769	      5125 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   22594	     52309 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2275	    517123 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	124.802s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2616390	       462 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  252253	      4837 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   25065	     48480 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2431	    485227 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2655716	       466 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  244620	      4808 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   24924	     48606 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2439	    485994 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2230146	       483 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  245950	      4780 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   24730	     47614 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2378	    492308 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2592643	       465 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  239762	      4892 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   25006	     47869 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    2474	    489304 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2621370	       457 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  222361	      4978 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   24709	     48367 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2474	    485951 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2477112	       485 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  233022	      5105 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   22999	     52524 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    2311	    518887 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2424859	       491 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  213602	      5158 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   23306	     51038 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2253	    541168 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2494944	       485 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  233760	      5141 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   22596	     51116 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2338	    512015 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2350762	       487 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  230786	      5200 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   22675	     51844 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2242	    514941 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2405689	       488 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  216554	      5189 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   23160	     58670 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2271	    514345 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	125.857s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2632435	       462 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  250542	      4822 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   24746	     48844 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2388	    480410 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2646055	       460 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  247719	      4825 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   24798	     48417 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2415	    487068 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2550426	       472 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  241453	      5054 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   24648	     48932 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2365	    539167 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2556741	       469 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  246055	      4872 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   24705	     48574 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    2414	    492974 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2571255	       467 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  242586	      4864 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   24870	     48261 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2365	    492793 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2442056	       491 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  225349	      5324 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   23353	     51682 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    2161	    526847 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2399325	       493 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  202892	      5178 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   22941	     52244 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2278	    524197 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2417480	       491 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  235336	      5139 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   22881	     51613 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2250	    513264 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2468791	       487 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  233564	      5099 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   23058	     51369 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2199	    519871 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2450164	       486 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  233215	      5142 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   23264	     51865 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2204	    526241 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	125.664s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification5/Regular-1-10000-2-1-8         	 2608171	       462 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-10-8        	  249897	      4834 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-100-8       	   25269	     48278 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-2-1000-8      	    2472	    484633 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1-8        	 2634578	       463 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-10-8       	  245139	      4808 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-100-8      	   24454	     49372 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-10-1000-8     	    2343	    498209 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1-8       	 2623675	       456 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-10-8      	  243512	      4842 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-100-8     	   23906	     50247 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-100-1000-8    	    2358	    488648 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1-8       	 2537475	       462 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-10-8      	  244839	      4847 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-100-8     	   25063	     48506 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-255-1000-8    	    2437	    562939 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1-8       	 2629476	       458 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-10-8      	  245334	      4945 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-100-8     	   24680	     48627 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-1-10000-400-1000-8    	    2361	    485602 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1-8        	 2460068	       486 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-10-8       	  225608	      5228 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-100-8      	   22820	     52242 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-2-1000-8     	    2233	    506382 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1-8       	 2214774	       502 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-10-8      	  222979	      5346 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-100-8     	   23208	     51672 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-10-1000-8    	    2176	    533771 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1-8      	 2469091	       485 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-10-8     	  216510	      5190 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-100-8    	   22671	     52977 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-100-1000-8   	    2228	    542126 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1-8      	 2502320	       476 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-10-8     	  232831	      5182 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-100-8    	   23299	     51443 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-255-1000-8   	    2264	    522520 ns/op	   64000 B/op	    2000 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1-8      	 2441352	       483 ns/op	      64 B/op	       2 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-10-8     	  232467	      5200 ns/op	     640 B/op	      20 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-100-8    	   23150	     51961 ns/op	    6400 B/op	     200 allocs/op
+BenchmarkClassification5/Regular-10-10000-400-1000-8   	    2253	    518799 ns/op	   64000 B/op	    2000 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	124.487s

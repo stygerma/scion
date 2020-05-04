@@ -1,0 +1,60 @@
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	13130115	        94.5 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.345s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	12188067	        93.0 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.245s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	12635685	        92.0 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.272s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	13118425	        92.5 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.319s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	12946012	        91.7 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.294s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	12998084	        90.2 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.278s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	12884031	        91.7 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.288s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	13093585	        93.6 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.330s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	12967629	        94.6 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.333s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkRefill-8   	13181788	        90.3 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	1.295s
