@@ -1,0 +1,20 @@
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	0.008s

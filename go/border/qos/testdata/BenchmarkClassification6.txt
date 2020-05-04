@@ -1,0 +1,450 @@
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 8534824	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  831264	      1445 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   79238	     15022 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    8071	    147835 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8350675	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  827436	      1452 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   82929	     14899 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    7746	    151359 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8374189	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  824701	      1446 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   82363	     14317 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    8079	    143715 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8288618	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  818348	      1428 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   83749	     14492 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    8043	    143584 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 8338222	       144 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  837675	      1450 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   77628	     16933 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    7962	    147261 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 6897391	       175 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  691063	      1740 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   64371	     18824 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    5574	    192016 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 7130916	       174 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  639529	      1874 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   66484	     18154 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6741	    173472 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 6905980	       172 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  687122	      1757 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   65439	     18490 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6559	    181259 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 6812095	       173 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  647748	      1859 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   66819	     17857 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    6466	    177215 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 7147198	       167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  644191	      1821 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   68599	     19030 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6535	    181717 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	119.320s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 7871158	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  830654	      1437 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   81552	     14715 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    8161	    146141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8190217	       147 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  836379	      1432 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   80194	     15010 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    8144	    147756 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8413539	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  832419	      1703 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   83184	     14435 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    8132	    144730 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8286106	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  839419	      1426 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   83642	     14379 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    7933	    146596 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 8413875	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  825483	      1443 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   81872	     14456 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    7874	    150547 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 7185474	       166 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  655144	      1770 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   65362	     18435 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    6230	    201331 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 7129185	       170 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  662845	      1763 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   63840	     18300 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6286	    186088 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 7026208	       170 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  554721	      1832 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   66076	     18189 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6229	    189944 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 6872498	       174 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  645218	      1830 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   63360	     19014 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    6525	    183282 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 7139374	       191 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  657952	      1821 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   63553	     18663 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6223	    188677 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	115.996s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 8473377	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  846446	      1429 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   83034	     14401 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    7855	    144815 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8108505	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  822892	      1447 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   82825	     14427 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    7514	    152599 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8421854	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  830210	      1429 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   83673	     14325 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    7359	    158501 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8257322	       140 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  838266	      1446 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   83551	     14351 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    7947	    148631 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 8481824	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  830622	      1451 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   83131	     14317 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    7950	    145377 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 7196708	       167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  628171	      1862 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   63573	     18704 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    5696	    188386 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 7090978	       177 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  687516	      1710 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   67720	     17615 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6358	    184171 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 7101320	       168 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  660200	      1802 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   64263	     18169 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6322	    180166 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 7164975	       169 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  664450	      1746 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   65478	     18174 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    6252	    182328 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 6859588	       171 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  644467	      1853 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   64388	     18833 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6674	    177123 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	115.104s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 8291288	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  783081	      1540 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   83618	     14370 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    7804	    146578 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8373144	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  833647	      1446 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   81607	     14475 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    7916	    148262 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8397946	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  812754	      1440 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   81894	     15166 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    8205	    146957 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8204752	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  831078	      1451 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   83572	     14485 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    7942	    165899 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 8407354	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  814716	      1435 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   83373	     14469 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    8234	    144017 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 7174267	       166 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  684226	      1754 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   63720	     18858 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    6421	    186200 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 7189562	       167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  699721	      1777 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   54532	     19648 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6471	    183927 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 7065646	       171 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  658670	      1760 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   61970	     18000 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6464	    184438 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 7040460	       171 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  654084	      1931 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   64400	     18540 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    6505	    183506 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 7082529	       170 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  656082	      1787 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   69294	     17162 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6302	    185120 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	117.608s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 8431658	       148 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  835861	      1445 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   83330	     14332 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    8128	    145144 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8505498	       158 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  836834	      1440 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   82768	     14448 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    7930	    147453 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8505140	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  818961	      1441 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   83749	     14434 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    7873	    146585 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8402163	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  837895	      1442 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   82443	     14451 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    7911	    145566 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 8431750	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  785810	      1485 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   80097	     14383 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    7845	    147729 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 7206414	       164 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  643933	      1857 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   68870	     17482 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    6279	    173826 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 7105464	       167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  671952	      1735 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   69283	     17787 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6330	    183354 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 7119734	       166 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  647268	      1870 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   55856	     18146 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6276	    188351 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 7162165	       167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  633121	      1858 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   67370	     17368 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    5924	    194693 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 6895581	       174 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  692530	      1949 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   62509	     19102 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6081	    189121 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	115.887s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 8462772	       168 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  833074	      1447 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   83202	     14564 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    7983	    147192 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8528852	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  831103	      1433 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   83326	     14402 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    8037	    145083 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8434341	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  837712	      1450 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   82442	     14447 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    8211	    145063 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8268568	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  838021	      1421 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   81345	     14391 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    7844	    144611 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 8487112	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  826508	      1434 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   83397	     14419 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    7722	    145011 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 6957280	       173 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  660796	      1812 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   68446	     17490 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    6202	    187931 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 7160466	       166 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  674241	      1769 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   64683	     18609 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6152	    207018 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 7062372	       168 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  666802	      1810 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   61425	     19282 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6248	    190128 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 7184386	       167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  647402	      1824 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   68185	     17177 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    6396	    185868 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 7218348	       206 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  682545	      1759 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   62202	     19062 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6522	    209491 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	117.824s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 8522727	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  833444	      1466 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   83412	     14378 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    7701	    153351 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8192577	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  826578	      1471 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   79366	     15086 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    8119	    147157 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8301786	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  818349	      1591 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   82810	     14514 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    8181	    145040 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8391022	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  814365	      1439 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   81158	     14472 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    7566	    150167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 8450541	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  777686	      1549 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   82725	     14296 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    7810	    149542 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 6775254	       176 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  641083	      1888 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   68134	     17553 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    6460	    184675 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 7114725	       168 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  682942	      1743 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   68374	     17686 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6590	    182293 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 7296000	       165 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  675739	      1743 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   66333	     18062 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6636	    180802 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 6912682	       168 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  690708	      1751 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   65745	     18211 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    6200	    189485 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 7208706	       167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  638002	      1848 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   63637	     18826 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6272	    191015 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	115.579s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 8387902	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  826324	      1451 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   82692	     14401 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    8060	    146940 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8279383	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  812805	      1437 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   83050	     14422 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    8090	    146479 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8384516	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  824426	      1446 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   83355	     14401 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    7868	    145206 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8232435	       146 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  829941	      1434 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   83725	     14519 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    8028	    145198 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 7794610	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  816661	      1431 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   83710	     14339 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    8132	    169631 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 7070088	       169 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  643923	      1864 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   67162	     17964 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    6577	    181665 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 7060477	       169 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  659520	      1834 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   66134	     17902 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6490	    178629 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 6840794	       173 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  675355	      1731 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   63950	     19085 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6794	    171727 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 7138005	       167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  687664	      1756 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   66675	     18062 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    6376	    188730 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 6885164	       169 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  676087	      1779 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   67381	     17612 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6073	    185567 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	116.891s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 8306156	       145 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  841622	      1430 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   81034	     14391 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    8078	    144699 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8472788	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  828933	      1443 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   83611	     14313 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    8235	    144780 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8468052	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  754520	      1555 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   83766	     14528 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    8217	    147025 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8296420	       143 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  814192	      1433 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   83912	     14447 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    8090	    145085 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 8440963	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  823036	      1449 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   80904	     14871 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    8196	    145058 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 6896882	       167 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  656055	      1793 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   66997	     17691 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    6553	    177227 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 6978813	       173 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  695752	      1682 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   64819	     18581 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6181	    189673 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 6925621	       175 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  651871	      1812 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   65154	     18420 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6734	    177026 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 6947862	       171 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  672992	      1778 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   63859	     18650 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    6373	    182910 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 7064362	       171 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  697257	      1711 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   66363	     18069 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6453	    182516 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	115.785s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos/queues
+BenchmarkClassification6/Cacheless-1-10000-2-1-8         	 8494956	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-10-8        	  834195	      1423 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-100-8       	   82976	     14367 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-2-1000-8      	    8144	    145742 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1-8        	 8465929	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-10-8       	  811311	      1448 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-100-8      	   76318	     16498 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-10-1000-8     	    7960	    145961 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1-8       	 8461196	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-10-8      	  826081	      1442 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-100-8     	   83278	     14498 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-100-1000-8    	    7862	    144759 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1-8       	 8418037	       141 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-10-8      	  838526	      1433 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-100-8     	   82546	     14551 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-255-1000-8    	    7705	    144436 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1-8       	 8365188	       142 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-10-8      	  812914	      1426 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-100-8     	   83833	     14433 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-1-10000-400-1000-8    	    7695	    144776 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1-8        	 7043677	       171 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-10-8       	  625731	      1851 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-100-8      	   67516	     17851 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-2-1000-8     	    6087	    189088 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1-8       	 7048725	       170 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-10-8      	  659013	      1820 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-100-8     	   66447	     18097 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-10-1000-8    	    6442	    185550 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1-8      	 7002313	       172 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-10-8     	  632211	      1805 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-100-8    	   64303	     18416 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-100-1000-8   	    6138	    194229 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1-8      	 7132053	       168 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-10-8     	  628390	      1912 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-100-8    	   65809	     18338 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-255-1000-8   	    6369	    183925 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1-8      	 7186848	       168 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-10-8     	  653530	      1854 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-100-8    	   69759	     17052 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClassification6/Cacheless-10-10000-400-1000-8   	    6741	    177797 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos/queues	115.335s
