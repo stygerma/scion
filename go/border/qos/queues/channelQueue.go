@@ -61,7 +61,7 @@ func (pq *ChannelPacketQueue) canDequeue() bool {
 
 func (pq *ChannelPacketQueue) GetFillLevel() int {
 
-	return int(len(pq.queue)) / int(pq.pktQue.MaxLength)
+	return int(float64(len(pq.queue)) / float64(pq.pktQue.MaxLength) * 100)
 }
 
 // GetCapacity returns the capacity i.e. the maximum number of
