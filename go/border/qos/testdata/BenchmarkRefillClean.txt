@@ -1,0 +1,10 @@
+BenchmarkRefill-8   	13130115	        94.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRefill-8   	12188067	        93.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRefill-8   	12635685	        92.0 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRefill-8   	13118425	        92.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRefill-8   	12946012	        91.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRefill-8   	12998084	        90.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRefill-8   	12884031	        91.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRefill-8   	13093585	        93.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRefill-8   	12967629	        94.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkRefill-8   	13181788	        90.3 ns/op	       0 B/op	       0 allocs/op
