@@ -1,0 +1,10 @@
+BenchmarkAvailable-8   	1000000000	         0.379 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAvailable-8   	1000000000	         0.383 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAvailable-8   	1000000000	         0.372 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAvailable-8   	1000000000	         0.399 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAvailable-8   	1000000000	         0.363 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAvailable-8   	1000000000	         0.366 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAvailable-8   	1000000000	         0.366 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAvailable-8   	1000000000	         0.379 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAvailable-8   	1000000000	         0.415 ns/op	       0 B/op	       0 allocs/op
+BenchmarkAvailable-8   	1000000000	         0.371 ns/op	       0 B/op	       0 allocs/op
