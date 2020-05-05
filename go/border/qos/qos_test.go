@@ -15,7 +15,6 @@
 package qos
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net"
 	"testing"
@@ -94,8 +93,12 @@ func BenchmarkQueueSinglePacket(t *testing.B) {
 	arr := getPackets(1)
 
 	t.ResetTimer()
+	var i int
+	const l = 20
 	for n := 0; n < t.N; n++ {
-		qosConfig.QueuePacket(arr[0])
+		for i = 0; i < l; i++ {
+			qosConfig.QueuePacket(arr[0])
+		}
 	}
 }
 
@@ -134,7 +137,7 @@ func BenchmarkQueueSinglePacketBlocking(t *testing.B) {
 
 	t.ResetTimer()
 	var i int
-	const l = 1020
+	const l = 20
 	for n := 0; n < t.N; n++ {
 		for i = 0; i < l; i++ {
 			qosConfig.QueuePacket(arr[0])
@@ -146,33 +149,33 @@ func BenchmarkQueueSinglePacketBlocking(t *testing.B) {
 	}
 }
 
-func BenchmarkQueueSinglePacketBlockingDiffNo(b *testing.B) {
-	root := log15.Root()
-	file, err := ioutil.TempFile("", "benchmark-log")
-	require.NoError(b, err)
-	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
+// func BenchmarkQueueSinglePacketBlockingDiffNo(b *testing.B) {
+// 	root := log15.Root()
+// 	file, err := ioutil.TempFile("", "benchmark-log")
+// 	require.NoError(b, err)
+// 	root.SetHandler(log15.Must.FileHandler(file.Name(), log15.LogfmtFormat()))
 
-	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
-	require.NoError(b, err)
-	qosConfig, _ := InitQos(extConfig, forwardPacketByDropAndUnblock)
-	arr := getPackets(1)
+// 	extConfig, err := conf.LoadConfig("testdata/sample-config.yaml")
+// 	require.NoError(b, err)
+// 	qosConfig, _ := InitQos(extConfig, forwardPacketByDropAndUnblock)
+// 	arr := getPackets(1)
 
-	b.ResetTimer()
-	var i int
-	for l := 0; l < 1024; l++ {
-		b.Run(fmt.Sprintf("Len%d", l), func(b *testing.B) {
-			for n := 0; n < b.N; n++ {
-				for i = 0; i < l; i++ {
-					qosConfig.QueuePacket(arr[0])
-				}
+// 	b.ResetTimer()
+// 	var i int
+// 	for l := 0; l < 1024; l++ {
+// 		b.Run(fmt.Sprintf("Len%d", l), func(b *testing.B) {
+// 			for n := 0; n < b.N; n++ {
+// 				for i = 0; i < l; i++ {
+// 					qosConfig.QueuePacket(arr[0])
+// 				}
 
-				for i = 0; i < l; i++ {
-					<-blocker
-				}
-			}
-		})
-	}
-}
+// 				for i = 0; i < l; i++ {
+// 					<-blocker
+// 				}
+// 			}
+// 		})
+// 	}
+// }
 
 func BenchmarkPoliceQueue(t *testing.B) {
 	root := log15.Root()
