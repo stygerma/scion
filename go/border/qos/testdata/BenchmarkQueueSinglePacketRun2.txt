@@ -1,0 +1,70 @@
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    235623 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257931 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.960s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    233980 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    258539 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.954s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    237648 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257728 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.976s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    236144 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257508 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.963s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    235306 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257008 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.945s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    234376 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    256745 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.939s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    235244 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    256994 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.949s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    237179 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257194 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.966s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    235818 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257724 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.963s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacket-8           	   10000	    235312 ns/op
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    259407 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	4.970s
