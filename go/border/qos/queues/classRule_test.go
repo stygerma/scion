@@ -481,8 +481,24 @@ func BenchmarkClassification6(b *testing.B) {
 	noPktss := []int{1, 10, 100, 1000}
 
 	noQueue := []int{1, 10}
-	noRule := []int{10000}
+	noRule := []int{1000}
 	noL4Rule := []int{2, 10, 100, 255, 400}
+	bmClassification(b, noPktss, noQueue, noRule, noL4Rule, classifiers)
+}
+
+func BenchmarkClassification7(b *testing.B) {
+	classifiers := []classifier{
+		{"Regular", &queues.RegularClassRule{}},
+		// {"Caeless", &queues.CachelessClassRule{}},
+		// {"Parallel", &queues.ParallelClassRule{}},
+		// {"SemiP", &queues.SemiParallelClassRule{}},
+	}
+
+	noPktss := []int{10}
+
+	noQueue := []int{100}
+	noRule := []int{1, 10, 100, 1000, 10000}
+	noL4Rule := []int{10}
 	bmClassification(b, noPktss, noQueue, noRule, noL4Rule, classifiers)
 }
 
@@ -574,14 +590,18 @@ func bmClassification(b *testing.B, noPktss, noQueue, noRule, noL4Rule []int, cl
 					qosConfig, _ := qos.InitQos(extConf, forwardPacketByDrop)
 
 					pkts := make([]*rpkt.RtrPkt, noPkts)
-					tl := len(tables)
+					// tl := len(tables)
 
 					for i := 0; i < len(pkts); i++ {
 						pkts[i] = genRouterPacket(
-							tables[i%tl].srcIA,
-							tables[i%tl].dstIA,
-							tables[i%tl].l4type,
-							tables[i%tl].intf)
+							// tables[i%tl].srcIA,
+							// tables[i%tl].dstIA,
+							// tables[i%tl].l4type,
+							// tables[i%tl].intf)
+							tables[0].srcIA,
+							tables[0].dstIA,
+							tables[0].l4type,
+							tables[0].intf)
 					}
 
 					benchName := fmt.Sprintf("%v-%v-%d", classifier.name, bench.name, noPkts)
