@@ -18,27 +18,27 @@ tput setaf 2; echo "Starting benchmarks"; tput sgr0
 # echo "Run $i/10"
 # done
 
-tput setaf 2; echo "Benchmarking qos PoliceQueue"; tput sgr0
-for i in {1..10}; do
-go test -run=xxx github.com/scionproto/scion/go/border/qos -bench=BenchmarkPoliceQueue >> testdata/BenchmarkPoliceQueue.txt
-echo "Run $i/10"
-done
+# tput setaf 2; echo "Benchmarking qos PoliceQueue"; tput sgr0
+# for i in {1..10}; do
+# go test -run=xxx github.com/scionproto/scion/go/border/qos -bench=BenchmarkPoliceQueue >> testdata/BenchmarkPoliceQueue.txt
+# echo "Run $i/10"
+# done
 
-tput setaf 2; echo "Benchmarking qos CheckAction"; tput sgr0
-for i in {1..10}; do
-go test -run=xxx github.com/scionproto/scion/go/border/qos -bench=BenchmarkCheckAction >> testdata/BenchmarkCheckAction.txt
-echo "Run $i/10"
-done
+# tput setaf 2; echo "Benchmarking qos CheckAction"; tput sgr0
+# for i in {1..10}; do
+# go test -run=xxx github.com/scionproto/scion/go/border/qos -bench=BenchmarkCheckAction >> testdata/BenchmarkCheckAction.txt
+# echo "Run $i/10"
+# done
 
-tput setaf 2; echo "Benchmarking qos Queue Single Packet Blocking"; tput sgr0
-for i in {1..10}; do
-go test -run=xxx github.com/scionproto/scion/go/border/qos -bench=BenchmarkQueueSinglePacketBlocking >> testdata/BenchmarkQueueSinglePacketBlocking.txt
-echo "Run $i/10"
-done
+# tput setaf 2; echo "Benchmarking qos Queue Single Packet Blocking"; tput sgr0
+# for i in {1..10}; do
+# go test -run=xxx github.com/scionproto/scion/go/border/qos -bench=BenchmarkQueueSinglePacketBlocking >> testdata/BenchmarkQueueSinglePacketBlockingRun2.txt
+# echo "Run $i/10"
+# done
 
 tput setaf 2; echo "Benchmarking qos Queue Single Packet Non-Blocking"; tput sgr0
 for i in {1..10}; do
-go test -run=xxx github.com/scionproto/scion/go/border/qos -bench=BenchmarkQueueSinglePacket >> testdata/BenchmarkQueueSinglePacket.txt
+go test -run=xxx github.com/scionproto/scion/go/border/qos -bench=BenchmarkQueueSinglePacket >> testdata/BenchmarkQueueSinglePacketRun2.txt
 echo "Run $i/10"
 done
 
