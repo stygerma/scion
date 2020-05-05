@@ -155,7 +155,8 @@ func initWorkers(qConfig *Configuration) error {
 // QueuePacket is called from router.go and is the first step in the qos subsystem
 // it is thread safe (necessary bc. of multiple sockets in the border router).
 func (qosConfig *Configuration) QueuePacket(rp *rpkt.RtrPkt) {
-	rc := queues.RegularClassRule{}
+	// rc := queues.RegularClassRule{}
+	rc := queues.CachelessClassRule{}
 	config := qosConfig.GetConfig()
 
 	rule := rc.GetRuleForPacket(config, rp)
