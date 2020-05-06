@@ -66,7 +66,9 @@ func (pq *CustomPacketQueue) canDequeue() bool {
 }
 
 func (pq *CustomPacketQueue) GetFillLevel() int {
-	return pq.length / pq.pktQue.MaxLength
+	pq.mutex.Lock()
+	defer pq.mutex.Unlock()
+	return int(float64(pq.length) / float64(pq.pktQue.MaxLength) * 100)
 }
 
 func (pq *CustomPacketQueue) GetLength() int {

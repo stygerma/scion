@@ -54,7 +54,7 @@ func (pq *PacketSliceQueue) canDequeue() bool {
 func (pq *PacketSliceQueue) GetFillLevel() int {
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()
-	return len(pq.queue) / pq.pktQue.MaxLength
+	return int(float64(len(pq.queue)) / float64(pq.pktQue.MaxLength) * 100)
 }
 
 func (pq *PacketSliceQueue) GetLength() int {
