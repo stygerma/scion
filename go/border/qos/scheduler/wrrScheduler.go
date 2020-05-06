@@ -41,8 +41,12 @@ func (sched *WeightedRoundRobinScheduler) Init(routerConfig *queues.InternalRout
 
 	sched.quantumSum = 0
 	sched.totalLength = len(routerConfig.Queues)
+	var messageLen int
+	for i := 0; i < len(routerConfig.Queues); i++ {
+		messageLen += routerConfig.Queues[i].GetCapacity()
+	}
 
-	sched.messages = make(chan bool, 100)
+	sched.messages = make(chan bool, messageLen)
 
 	sched.logger = initLogger(sched.totalLength)
 
@@ -57,13 +61,13 @@ func getNoPacketsToDequeue(totalLength int, priority int, totalPriority int) int
 	return priority
 }
 
-func (sched *WeightedRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
+func (sched *WeightedRoundRobinScheduler) Dequeue(
+	queue queues.PacketQueueInterface,
 	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
-	nopkts := getNoPacketsToDequeue(sched.totalQueueLength, queue.GetPriority(), sched.quantumSum)
-	pktToDequeue := nopkts
-
 	var qp *queues.QPkt
+
+	pktToDequeue := getNoPacketsToDequeue(sched.totalQueueLength, queue.GetPriority(), sched.quantumSum)
 
 	sched.logger.attempted[queueNo] += pktToDequeue
 
@@ -80,7 +84,7 @@ func (sched *WeightedRoundRobinScheduler) Dequeue(queue queues.PacketQueueInterf
 		amount0 += pktLen
 
 		for !(sched.tb.Take(pktLen)) {
-			time.Sleep(1 * time.Millisecond)
+			time.Sleep(30 * time.Millisecond)
 		}
 
 		sched.logger.lastRound[queueNo]++

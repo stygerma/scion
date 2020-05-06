@@ -35,7 +35,12 @@ var _ SchedulerInterface = (*RoundRobinScheduler)(nil)
 func (sched *RoundRobinScheduler) Init(routerConfig *queues.InternalRouterConfig) {
 	sched.totalLength = len(routerConfig.Queues)
 
-	sched.messages = make(chan bool, 20)
+	var messageLen int
+	for i := 0; i < len(routerConfig.Queues); i++ {
+		messageLen += routerConfig.Queues[i].GetCapacity()
+	}
+
+	sched.messages = make(chan bool, messageLen)
 
 	sched.tb.Init(routerConfig.Scheduler.Bandwidth)
 	sched.sleepDuration = routerConfig.Scheduler.Latency
@@ -44,21 +49,18 @@ func (sched *RoundRobinScheduler) Init(routerConfig *queues.InternalRouterConfig
 func (sched *RoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
 	forwarder func(rp *rpkt.RtrPkt), queueNo int) {
 
-	length := queue.GetLength()
 	var qp *queues.QPkt
 
-	for i := 0; i < length; i++ {
-		qp = queue.Pop()
-		if qp == nil {
-			continue
-		}
-
-		for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
-			time.Sleep(1 * time.Millisecond)
-		}
-
-		forwarder(qp.Rp)
+	qp = queue.Pop()
+	if qp == nil {
+		return
 	}
+
+	for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
+		time.Sleep(1 * time.Millisecond)
+	}
+
+	forwarder(qp.Rp)
 }
 
 func (sched *RoundRobinScheduler) Dequeuer(routerConfig *queues.InternalRouterConfig,

@@ -57,6 +57,12 @@ func (pq *PacketSliceQueue) GetFillLevel() int {
 	return int(float64(len(pq.queue)) / float64(pq.pktQue.MaxLength) * 100)
 }
 
+// GetCapacity returns the capacity i.e. the maximum number of
+// items on this queue
+func (pq *PacketSliceQueue) GetCapacity() int {
+	return pq.pktQue.MaxLength
+}
+
 func (pq *PacketSliceQueue) GetLength() int {
 	pq.mutex.Lock()
 	defer pq.mutex.Unlock()

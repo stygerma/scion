@@ -1,0 +1,120 @@
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    258117 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.603s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    258360 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.607s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    258291 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.621s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    258067 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.624s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    258991 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.619s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    258175 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.614s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    257586 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.604s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    257902 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.633s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    258197 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.604s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-4   	   10000	    259535 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.668s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257700 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.595s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    258222 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.597s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    258859 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.604s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    259394 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.611s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257987 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.596s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    256704 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.582s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257486 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.591s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    258663 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.602s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    258869 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.605s
+goos: linux
+goarch: amd64
+pkg: github.com/scionproto/scion/go/border/qos
+BenchmarkQueueSinglePacketBlocking-8   	   10000	    257881 ns/op
+PASS
+ok  	github.com/scionproto/scion/go/border/qos	2.595s

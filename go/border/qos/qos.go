@@ -155,7 +155,8 @@ func initWorkers(qConfig *Configuration) error {
 // QueuePacket is called from router.go and is the first step in the qos subsystem
 // it is thread safe (necessary bc. of multiple sockets in the border router).
 func (qosConfig *Configuration) QueuePacket(rp *rpkt.RtrPkt) {
-	rc := queues.RegularClassRule{}
+	// rc := queues.RegularClassRule{}
+	rc := queues.CachelessClassRule{}
 	config := qosConfig.GetConfig()
 
 	rule := rc.GetRuleForPacket(config, rp)
@@ -185,7 +186,7 @@ func putOnQueue(qosConfig *Configuration, queueNo int, qp *queues.QPkt) {
 	polAct := qosConfig.config.Queues[queueNo].Police(qp)
 	profAct := qosConfig.config.Queues[queueNo].CheckAction()
 
-	act := queues.ReturnAction(polAct, profAct)
+	act := queues.MergeAction(polAct, profAct)
 
 	switch act {
 	case conf.PASS:
@@ -202,12 +203,7 @@ func putOnQueue(qosConfig *Configuration, queueNo int, qp *queues.QPkt) {
 		qosConfig.config.Queues[queueNo].Enqueue(qp)
 	}
 
-	// *qosConfig.schedul.GetMessages() <- true
-
-	select {
-	case *qosConfig.schedul.GetMessages() <- true:
-	default:
-	}
+	*qosConfig.schedul.GetMessages() <- true
 }
 
 // SendNotification is needed for the part of @stygerma

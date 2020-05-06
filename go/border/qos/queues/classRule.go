@@ -241,6 +241,14 @@ func RulesToMap(crs []InternalClassRule) *MapRules {
 		InterfaceIncomingRules:    interfaceIncomingRules,
 	}
 
+	extensions = make([]common.ExtnType, 255)
+
+	maskMatched = make([]bool, len(crs))
+	maskSad = make([]bool, len(crs))
+	maskDas = make([]bool, len(crs))
+	maskLf = make([]bool, len(crs))
+	maskIntf = make([]bool, len(crs))
+
 	return &mp
 
 }
@@ -385,11 +393,11 @@ func (*RegularClassRule) GetRuleForPacket(
 
 	matched = intersectListsRules(sources, destinations)
 
-	maskMatched = make([]bool, len(matched))
-	maskSad = make([]bool, len(sourceAnyDestinationMatches))
-	maskDas = make([]bool, len(destinationAnySourceRules))
-	maskLf = make([]bool, len(l4OnlyRules))
-	maskIntf = make([]bool, len(l4OnlyRules))
+	// maskMatched = make([]bool, len(matched))
+	// maskSad = make([]bool, len(sourceAnyDestinationMatches))
+	// maskDas = make([]bool, len(destinationAnySourceRules))
+	// maskLf = make([]bool, len(l4OnlyRules))
+	// maskIntf = make([]bool, len(l4OnlyRules))
 
 	matchL4Type(maskMatched, &matched, l4t, extensions)
 	matchL4Type(maskSad, &sourceAnyDestinationMatches, l4t, extensions)
@@ -430,6 +438,11 @@ func matchL4Type(
 	list *[]*InternalClassRule,
 	l4t common.L4ProtocolType,
 	extensions []common.ExtnType) {
+
+	for i := 0; i < len(mask); i++ {
+		mask[i] = false
+
+	}
 
 	for i := 0; i < len(*list); i++ {
 		if (*list)[i] == nil {
