@@ -26,6 +26,7 @@ type QPkt struct {
 	QueueNo int
 	Act     Action
 	Rp      *rpkt.RtrPkt
+	Forward bool
 }
 
 type NPkt struct {
