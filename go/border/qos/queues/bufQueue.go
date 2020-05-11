@@ -17,9 +17,11 @@ package queues
 import (
 	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/lib/ringbuf"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type PacketBufQueue struct {
@@ -28,6 +30,7 @@ type PacketBufQueue struct {
 	bufQueue *ringbuf.Ring
 	length   int
 	tb       TokenBucket
+	pid      scmp.PID
 }
 
 var _ PacketQueueInterface = (*PacketBufQueue)(nil)
@@ -41,6 +44,11 @@ func (pq *PacketBufQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutTb *
 	pq.bufQueue = ringbuf.New(pq.pktQue.MaxLength, func() interface{} {
 		return &QPkt{}
 	}, pq.pktQue.Name)
+	if pq.pktQue.CongestionWarning.Approach == 2 {
+		pq.pid = scmp.PID{FactorProportional: .1, FactorIntegral: .5,
+			FactorDerivative: .1, LastUpdate: time.Now(), SetPoint: 70,
+			Min: 60, Max: 90}
+	}
 }
 
 func (pq *PacketBufQueue) Enqueue(rp *QPkt) {
@@ -127,4 +135,8 @@ func (pq *PacketBufQueue) GetCongestionWarning() *CongestionWarning {
 
 func (pq *PacketBufQueue) GetTokenBucket() *TokenBucket {
 	return &pq.tb
+}
+
+func (pq *PacketBufQueue) GetPID() *scmp.PID {
+	return &pq.pid
 }

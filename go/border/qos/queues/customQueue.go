@@ -17,8 +17,10 @@ package queues
 import (
 	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/scionproto/scion/go/border/qos/conf"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type CustomPacketQueue struct {
@@ -30,6 +32,7 @@ type CustomPacketQueue struct {
 	head   int
 	tail   int
 	mask   int
+	pid    scmp.PID
 }
 
 var _ PacketQueueInterface = (*CustomPacketQueue)(nil)
@@ -44,6 +47,11 @@ func (pq *CustomPacketQueue) InitQueue(que PacketQueue, mutQue *sync.Mutex, mutT
 	pq.head = 0
 	pq.tail = 0
 	pq.mask = pq.pktQue.MaxLength - 1
+	if pq.pktQue.CongestionWarning.Approach == 2 { //TODO: uncomment when congestionWarning is correctly assigned in pktQue
+		pq.pid = scmp.PID{FactorProportional: .1, FactorIntegral: .3,
+			FactorDerivative: .3, LastUpdate: time.Now(), SetPoint: 70,
+			Min: 60, Max: 90}
+	}
 }
 
 func (pq *CustomPacketQueue) Enqueue(rp *QPkt) {
@@ -160,4 +168,8 @@ func (pq *CustomPacketQueue) GetCongestionWarning() *CongestionWarning {
 
 func (pq *CustomPacketQueue) GetTokenBucket() *TokenBucket {
 	return &pq.tb
+}
+
+func (pq *CustomPacketQueue) GetPID() *scmp.PID {
+	return &pq.pid
 }

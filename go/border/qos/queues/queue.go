@@ -20,6 +20,7 @@ import (
 
 	"github.com/scionproto/scion/go/border/qos/conf"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/scmp"
 )
 
 type QPkt struct {
@@ -101,6 +102,7 @@ type PacketQueueInterface interface {
 	GetPacketQueue() PacketQueue
 	GetCongestionWarning() *CongestionWarning
 	GetTokenBucket() *TokenBucket
+	GetPID() *scmp.PID
 }
 
 // MergeAction merges both PoliceAction together and returns the merged result.
