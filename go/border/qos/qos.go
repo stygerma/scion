@@ -244,7 +244,7 @@ func (qosConfig *Configuration) SendNotification(qp *queues.QPkt) { //COMP:
 			return
 		}
 	}
-	log.Debug("Send notification method in router", "packet id", np.Qpkt.Rp.Id)
+	log.Debug("Send notification method in router", "packet id", np.Qpkt.Rp.Id, "queue fullness", qosConfig.config.Queues[np.Qpkt.QueueNo].GetFillLevel())
 
 	qosConfig.notifications <- &np
 }
