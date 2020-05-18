@@ -19,6 +19,7 @@ import (
 
 	"github.com/scionproto/scion/go/border/qos/queues"
 	"github.com/scionproto/scion/go/border/rpkt"
+	"github.com/scionproto/scion/go/lib/log"
 )
 
 type RoundRobinScheduler struct {
@@ -59,12 +60,20 @@ func (sched *RoundRobinScheduler) Dequeue(queue queues.PacketQueueInterface,
 	for !(sched.tb.Take(qp.Rp.Bytes().Len())) {
 		time.Sleep(1 * time.Millisecond)
 	}
-	if uint8(qp.Act.GetAction()) == 1 { //TODO: find smarter way
+	qp.Mtx.Lock()
+	if (uint8(qp.Act.GetAction()) == 1) && !qp.Forward { //TODO: find smarter way uint8(qp.Act.GetAction()) == 0 ||
+		// if !qp.Forward {
 		qp.Forward = true
+		qp.Mtx.Unlock()
+		log.Debug("Packet in RoundRobinScheduler forwarding enabled", "id", qp.Rp.Id)
+
 		return
 	}
+	qp.Mtx.Unlock()
 
 	forwarder(qp.Rp)
+	log.Debug("Packet in RoundRobinScheduler forwarded", "id", qp.Rp.Id)
+
 }
 
 func (sched *RoundRobinScheduler) Dequeuer(routerConfig *queues.InternalRouterConfig,

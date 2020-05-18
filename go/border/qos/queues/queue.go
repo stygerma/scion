@@ -28,6 +28,7 @@ type QPkt struct {
 	Act     Action
 	Rp      *rpkt.RtrPkt
 	Forward bool
+	Mtx     sync.Mutex
 }
 
 type NPkt struct {
